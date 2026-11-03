@@ -17,6 +17,7 @@ Estimates are for one book with standard delivery. Regions are mainland Portugal
 The manual comparison defaults to delivered totals, with an item-price sorting option. On-page comparisons use totals when both relevant rules are known; an item-only fallback is explicitly labelled when shipping is unknown. Marketplace shipping, import charges, heavy parcels and paid extras are not inferred.
 
 Initial published rules, verified 2026-11-03 and expiring after 30 days:
+
 - Wook: standard delivery for mainland orders of at least EUR 16 is free; the fee below the threshold is unknown. Loyalty reimbursement is not deducted. Standard shipping to Madeira/Azores is free under the stated conditions. Maximum 10 kg, excluding marketplace items. [Source](https://www.wook.pt/Mensagem/index/?key=portes-gratis)
 - Presença: mainland standard shipping EUR 3 below EUR 20, free above EUR 20. Exactly EUR 20 is left unknown because the published wording is ambiguous. Madeira/Azores EUR 4. [Source](https://www.presenca.pt/policies/shipping-policy)
 

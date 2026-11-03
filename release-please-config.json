@@ -1,27 +1,53 @@
 {
   "packages": {
     ".": {
-      "release-type": "simple",
+      "release-type": "node",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,
       "changelog-path": "CHANGELOG.md",
       "include-component-in-tag": false,
       "include-v-in-tag": true,
       "extra-files": [
-        { "type": "json", "path": "package.json", "jsonpath": "$.version" },
-        { "type": "json", "path": "package-lock.json", "jsonpath": "$.version" },
-        { "type": "json", "path": "package-lock.json", "jsonpath": "$.packages[''].version" },
-        { "type": "json", "path": "extension/manifest.json", "jsonpath": "$.version" }
+        {
+          "type": "json",
+          "path": "manifest.json",
+          "jsonpath": "$.version"
+        },
+        "version.txt"
       ],
       "changelog-sections": [
-        { "type": "feat", "section": "Features" },
-        { "type": "fix", "section": "Bug Fixes" },
-        { "type": "perf", "section": "Performance" },
-        { "type": "deps", "section": "Dependencies" },
-        { "type": "chore", "hidden": true },
-        { "type": "ci", "hidden": true },
-        { "type": "test", "hidden": true },
-        { "type": "refactor", "hidden": true }
+        {
+          "type": "feat",
+          "section": "Features"
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes"
+        },
+        {
+          "type": "perf",
+          "section": "Performance"
+        },
+        {
+          "type": "deps",
+          "section": "Dependencies"
+        },
+        {
+          "type": "chore",
+          "hidden": true
+        },
+        {
+          "type": "ci",
+          "hidden": true
+        },
+        {
+          "type": "test",
+          "hidden": true
+        },
+        {
+          "type": "refactor",
+          "hidden": true
+        }
       ]
     }
   }

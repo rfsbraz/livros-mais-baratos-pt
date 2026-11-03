@@ -6,7 +6,7 @@ Extensão Chrome para comparar preços de livros em livrarias portuguesas, pela 
 
 1. Descarrega e extrai o ZIP da extensão, ou clona este repositório.
 2. Abre `chrome://extensions` e ativa o **Modo de programador**.
-3. Clica em **Carregar expandida** e escolhe a pasta com `manifest.json` (a pasta `extension/` no repositório).
+3. Clica em **Carregar expandida** e escolhe a pasta com `manifest.json` (a pasta `dist/chrome/` no repositório).
 4. Aceita as permissões de acesso às lojas que o Chrome apresentar e visita uma página de livro suportada. As comparações começam automaticamente.
 5. Para comparar manualmente ou ajustar preferências, abre o ícone da extensão. Confirma o ISBN, escolhe as lojas e clica em **Comparar**. O título é opcional.
 
@@ -70,6 +70,10 @@ Em Entrega e portes, escolhe o destino e configura custos, mínimos para portes 
 As 26 lojas automáticas estão distribuídas por 24 horários diários: uma ou duas lojas por hora, com atrasos aleatórios entre pedidos. Os limites HTTP 429 são distinguidos dos bloqueios 403. Falhas atualizam uma issue sem apagar resultados de lojas ainda não verificadas; os avisos fecham após recuperação. Consulta [a documentação](docs/store-monitoring.md).
 
 Confirmed background, scheduled and manual results are cached locally for up to 50 ISBNs. Opening the menu on a detected book restores selected-store prices immediately, with the check time. Results older than ten minutes are marked potentially outdated; results older than 24 hours are hidden and pruned on the next write. Comparar explicitly refreshes prices. Cached displays do not create history observations. Clear data deletes this cache and invalidates pending background writes. Shipping totals are recomputed using current rules.
+
+## Desenvolvimento e outros navegadores
+
+`npm run build:all` cria pacotes Chrome, Firefox e Edge em `dist/`. Os ficheiros da extensão estão na raiz do repositório; testes em `tests/unit` e `tests/e2e`, materiais das lojas em `store-listing`. Consulta [arquitetura e publicação](docs/reference-alignment.md). Firefox requer assinatura AMO para instalação permanente.
 
 ## ☕ Support
 

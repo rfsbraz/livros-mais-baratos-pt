@@ -2,40 +2,132 @@ name: Release
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag (v0.1.5)
+        required: true
+        type: string
+      stores:
+        description: Stores to publish
+        type: choice
+        options: [none, all, chrome, firefox, edge]
+        default: none
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 concurrency:
-  group: release-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  release:
+  release-please:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      RELEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - name: Explain missing release configuration
-        if: env.RELEASE_TOKEN == ''
-        run: echo 'Configure RELEASE_PLEASE_TOKEN to enable releases.' >> "$GITHUB_STEP_SUMMARY"
       - uses: googleapis/release-please-action@v4
-        if: env.RELEASE_TOKEN != ''
         id: release
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+  target:
+    needs: release-please
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.release-please.outputs.release_created == 'true') }}
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      stores: ${{ steps.tag.outputs.stores }}
+    steps:
+      - id: tag
+        env:
+          TAG: ${{ inputs.tag || needs.release-please.outputs.tag_name }}
+          STORES: ${{ inputs.stores || 'all' }}
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "stores=$STORES" >> "$GITHUB_OUTPUT"
+  build-release:
+    needs: target
+    if: ${{ !cancelled() && needs.target.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
       - uses: actions/checkout@v4
-        if: steps.release.outputs.release_created
         with:
-          ref: ${{ steps.release.outputs.tag_name }}
+          ref: refs/tags/${{ needs.target.outputs.tag }}
+          persist-credentials: false
       - uses: actions/setup-node@v4
-        if: steps.release.outputs.release_created
         with:
           node-version: 22
           cache: npm
-      - if: steps.release.outputs.release_created
-        run: npm ci && npm run check && npm test && npm run build
-      - if: steps.release.outputs.release_created
-        run: gh release upload "$TAG" dist/*.zip
+      - name: Verify release version
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-          TAG: ${{ steps.release.outputs.tag_name }}
+          TAG: ${{ needs.target.outputs.tag }}
+        run: node --input-type=module -e "import fs from 'node:fs'; if ('v'+JSON.parse(fs.readFileSync('package.json')).version !== process.env.TAG) process.exit(1)"
+      - run: npm ci
+      - run: npm run check && npm test && npm run build:all
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.target.outputs.tag }}
+          files: dist/*-*.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: browser-extensions
+          path: dist/*-*.zip
+          retention-days: 7
+  publish-to-chrome:
+    needs: [target, build-release]
+    if: ${{ !cancelled() && needs.build-release.result == 'success' && vars.CHROME_PUBLISH_ENABLED == 'true' && (needs.target.outputs.stores == 'all' || needs.target.outputs.stores == 'chrome') }}
+    runs-on: ubuntu-latest
+    environment: chrome-store
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-extensions
+          path: dist
+      - uses: mnao305/chrome-extension-upload@v7.0.0
+        with:
+          file-path: dist/*-chrome.zip
+          extension-id: ${{ vars.CHROME_EXTENSION_ID }}
+          publisher-id: ${{ vars.CHROME_PUBLISHER_ID }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: true
+          glob: true
+  publish-to-firefox:
+    needs: [target, build-release]
+    if: ${{ !cancelled() && needs.build-release.result == 'success' && vars.FIREFOX_PUBLISH_ENABLED == 'true' && (needs.target.outputs.stores == 'all' || needs.target.outputs.stores == 'firefox') }}
+    runs-on: ubuntu-latest
+    environment: firefox-store
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-extensions
+          path: dist
+      - run: mv dist/*-firefox.zip dist/firefox.zip
+      - uses: wdzeng/firefox-addon@v1
+        with:
+          addon-guid: livros-mais-baratos-pt@rfsbraz.github.io
+          xpi-path: dist/firefox.zip
+          jwt-issuer: ${{ secrets.AMO_JWT_ISSUER }}
+          jwt-secret: ${{ secrets.AMO_JWT_SECRET }}
+  publish-to-edge:
+    needs: [target, build-release]
+    if: ${{ !cancelled() && needs.build-release.result == 'success' && vars.EDGE_PUBLISH_ENABLED == 'true' && (needs.target.outputs.stores == 'all' || needs.target.outputs.stores == 'edge') }}
+    runs-on: ubuntu-latest
+    environment: edge-store
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-extensions
+          path: dist
+      - run: mv dist/*-edge.zip dist/edge.zip
+      - uses: wdzeng/edge-addon@v2
+        with:
+          product-id: ${{ secrets.EDGE_PRODUCT_ID }}
+          client-id: ${{ secrets.EDGE_CLIENT_ID }}
+          api-key: ${{ secrets.EDGE_API_KEY }}
+          zip-path: dist/edge.zip
+          notes-for-certification: Compare the same ISBN on the six default shops. Open Definições for shipping and alerts. No account required. All test data is excluded from the package.

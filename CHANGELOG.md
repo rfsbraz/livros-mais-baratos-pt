@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Align root layout, linting, formatting, CI/release jobs and store maintenance with the Geocaching extension. Add Firefox and Edge builds with shared runtime code.
+
 - Read fallback ISBN text without cloning retailer SVGs or other elements with inline event handlers.
 
 - Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
@@ -23,6 +25,8 @@
 - Disclose commissions in the interface and store listing; preserve opt-outs and existing attribution.
 
 ## Unreleased
+
+- Align root layout, linting, formatting, CI/release jobs and store maintenance with the Geocaching extension. Add Firefox and Edge builds with shared runtime code.
 
 - Read fallback ISBN text without cloning retailer SVGs or other elements with inline event handlers.
 

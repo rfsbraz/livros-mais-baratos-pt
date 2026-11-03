@@ -1,0 +1,32 @@
+name: Firefox listing
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Apply the reviewed listing text to AMO
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: firefox-listing
+  cancel-in-progress: false
+jobs:
+  listing:
+    runs-on: ubuntu-latest
+    environment: firefox-store
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Preview listing
+        run: node scripts/amo-listing.mjs
+      - name: Apply listing
+        if: ${{ inputs.apply && vars.FIREFOX_PUBLISH_ENABLED == 'true' }}
+        run: node scripts/amo-listing.mjs --apply
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}

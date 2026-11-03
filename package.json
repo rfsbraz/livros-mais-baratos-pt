@@ -5,17 +5,45 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage tests/*.test.js",
-    "test:integration": "node tests/browser.mjs && node tests/extension-smoke.mjs && node tests/automatic.mjs && node tests/watch-browser.mjs",
+    "test": "node --test tests/unit/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/unit/*.test.js",
+    "test:integration": "node tests/e2e/browser.mjs && node tests/e2e/extension-smoke.mjs && node tests/e2e/automatic.mjs && node tests/e2e/watch-browser.mjs",
     "check": "node scripts/check.mjs",
-    "build": "node scripts/build.mjs",
-    "test:live": "node scripts/live-monitor.mjs"
+    "build": "npm run sync-version && node scripts/build-multi.mjs --browser chrome",
+    "test:live": "node scripts/live-monitor.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "sync-version": "node scripts/sync-version.mjs",
+    "build:zip": "npm run build",
+    "build:chrome": "npm run build",
+    "build:firefox": "npm run sync-version && node scripts/build-multi.mjs --browser firefox",
+    "build:edge": "npm run sync-version && node scripts/build-multi.mjs --browser edge",
+    "build:all": "npm run sync-version && node scripts/build-multi.mjs --browser all",
+    "test:e2e": "playwright test",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:firefox": "playwright test --project=firefox",
+    "test:e2e:edge": "playwright test --project=edge",
+    "test:e2e:screenshots": "node scripts/store-assets.mjs",
+    "store-listing:build": "node scripts/store-metadata.mjs",
+    "store-listing:check": "node scripts/check-listing.mjs",
+    "store-listing:amo": "node scripts/amo-listing.mjs",
+    "store-listing:drift": "node scripts/store-maintenance.mjs drift",
+    "store-credentials:check": "node scripts/store-maintenance.mjs credentials"
   },
   "devDependencies": {
-    "playwright": "1.56.1"
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.56.1",
+    "esbuild": "^0.25.12",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "playwright": "1.56.1",
+    "playwright-webextext": "^0.0.5",
+    "prettier": "^3.9.10",
+    "tslib": "^2.9.1"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   }
 }
