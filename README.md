@@ -67,6 +67,8 @@ Em Entrega e portes, escolhe o destino e configura custos, mínimos para portes 
 
 As 26 lojas automáticas estão distribuídas por 24 horários diários: uma ou duas lojas por hora, com atrasos aleatórios entre pedidos. Os limites HTTP 429 são distinguidos dos bloqueios 403. Falhas atualizam uma issue sem apagar resultados de lojas ainda não verificadas; os avisos fecham após recuperação. Consulta [a documentação](docs/store-monitoring.md).
 
+Confirmed background, scheduled and manual results are cached locally for up to 50 ISBNs. Opening the menu on a detected book restores selected-store prices immediately, with the check time. Results older than ten minutes are marked potentially outdated; results older than 24 hours are hidden and pruned on the next write. Comparar explicitly refreshes prices. Cached displays do not create history observations. Clear data deletes this cache and invalidates pending background writes. Shipping totals are recomputed using current rules.
+
 ## ☕ Support
 
 If you find this useful and want to support development, you can [buy me a coffee](https://buymeacoffee.com/rfsbraz) - no pressure at all, just a nice way to say thanks.

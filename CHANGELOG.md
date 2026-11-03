@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Show locally cached background, scheduled and manual prices immediately in the menu, with freshness labels and explicit refresh.
+
 ## 0.1.5
 
 - Add saved-book price targets, staggered scheduled checks and deduplicated notifications.

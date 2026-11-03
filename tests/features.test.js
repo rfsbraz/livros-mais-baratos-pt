@@ -87,3 +87,19 @@ test('concurrent manual and scheduled observations merge without losing shelf pr
   assert.equal(stored.affiliateEnabled, false);
   delete globalThis.chrome;
 });
+
+
+test('price cache expires, filters stores, bounds storage and clears with user data', async () => {
+  const { cachePrices, cachedPrices, CACHE_MAX_MS, CACHE_FRESH_MS } = await import('../extension/price-cache.js');
+  const cache = cachePrices({}, isbn, [offer, { ...offer, id: 'bertrand', url: 'https://evil.test/' }], now, now);
+  assert.equal(cachedPrices(cache, isbn, ['wook'], now).offers.length, 1);
+  assert.equal(cachedPrices(cache, isbn, ['bertrand'], now), null);
+  assert.equal(cachedPrices(cache, isbn, ['wook'], now + CACHE_FRESH_MS).stale, true);
+  assert.equal(cachedPrices(cache, isbn, ['wook'], now + CACHE_MAX_MS), null);
+  assert.equal(cachedPrices(cache, isbn, ['wook'], now - 1), null);
+  assert.deepEqual(cachePrices(cache, isbn, [], now - 1, now), cache);
+  let many = {};
+  for (let i = 0; i < 60; i++) many = cachePrices(many, String(i), [offer], now + i, now + i);
+  assert.equal(Object.keys(many).length, 50);
+  assert.deepEqual(reduceData({priceCache: cache}, {type:'clear'}, now).priceCache, {});
+});

@@ -1,3 +1,4 @@
+import { cachePrices } from './price-cache.js';
 import { isbn13, remember } from './core.js';
 import { STORES } from './stores.js';
 import { REGIONS } from './shipping.js';
@@ -20,12 +21,14 @@ export function reduceData(data, action, now = Date.now()) {
       revision: (next.saved[isbn].watch?.revision || 0) + 1, nextCheckAt: now + 60000 + Math.floor(Math.random() * 240000) };
   } else if (action.type === 'observe' && isbn) {
     next.history = remember(next.history, isbn, action.offers, now, action.source || 'manual');
+    next.priceCache = cachePrices(next.priceCache, isbn, action.offers, now, now);
   } else if (action.type === 'selection') {
     next.selectedStores = action.ids.filter(id => STORES.some(s => s.id === id));
   } else if (action.type === 'shipping') {
     if (!REGIONS[action.value?.region]) throw new Error('Destino inválido.');
     next.shipping = action.value;
   } else if (action.type === 'clear') {
+    next.priceCache = {}; next.cacheEpoch = (next.cacheEpoch || 0) + 1;
     next.saved = {}; next.history = {}; next.watchNotices = []; next.watchJob = null;
     next.selectedStores = STORES.map(s => s.id); next.autoEnabled = false; next.watchEnabled = false;
   }

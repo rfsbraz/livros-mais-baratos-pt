@@ -46,8 +46,10 @@ async function compare(message) {
   } else {
     best = cheaperOffer(book, entry.offers, sourceId); total = best?.price; saving = book.price - total;
   }
-  return best ? { isbn: book.isbn, name: best.name, url: best.url, price: total, itemPrice: best.price, currentPrice: basis === 'delivered' ? currentDelivery.total : book.price,
+  const alert = best ? { isbn: book.isbn, name: best.name, url: best.url, price: total, itemPrice: best.price, currentPrice: basis === 'delivered' ? currentDelivery.total : book.price,
     currency: best.currency, saving, basis, checkedAt: entry.at } : null;
+  const offers = entry.offers.map(o => Object.fromEntries(['id', 'status', 'price', 'currency', 'condition', 'availability', 'marketplace', 'seller', 'url', 'title'].filter(k => o[k] !== undefined).map(k => [k, o[k]])));
+  return { alert, prices: { at: entry.at, offers } };
 }
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (message?.target !== 'offscreen' || message.type !== 'compare' || sender.id !== chrome.runtime.id || sender.tab) return;

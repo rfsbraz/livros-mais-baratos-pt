@@ -1,3 +1,4 @@
+import { cachePrices } from './price-cache.js';
 import { STORES } from './stores.js';
 import { remember, safeUrl } from './core.js';
 import { targetOffer } from './shipping.js';
@@ -22,6 +23,7 @@ export function completeWatch(data, message, now = Date.now()) {
   watch.nextCheckAt = now + 86400000 + Math.floor(Math.random() * 900000);
   watch.lastCheckedAt = now;
   watch.lastStatus = offers.some(o => o.status === 'ok') ? 'ok' : 'unavailable';
+  next.priceCache = cachePrices(next.priceCache, book.isbn, offers, now, now);
   next.history = remember(next.history || {}, book.isbn, offers, now, 'scheduled');
   const best = targetOffer(offers, watch, data.shipping || {}, now);
   if (best && (!Number.isFinite(watch.lastNotifiedPrice) || best.targetPrice < watch.lastNotifiedPrice)) {

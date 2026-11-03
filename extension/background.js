@@ -1,3 +1,4 @@
+import { cachePrices } from './price-cache.js';
 import { writeData } from './data.js';
 import { installWatch } from './watch.js';
 import { STORES, storeForUrl } from './stores.js';
@@ -9,10 +10,10 @@ async function offscreen() {
   await creating;
 }
 async function settings() {
-  const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores', 'shipping']);
+  const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores', 'shipping', 'cacheEpoch']);
   const grants = await chrome.permissions.getAll();
   const stores = STORES.filter(s => (!Array.isArray(data.selectedStores) || data.selectedStores.includes(s.id)) && grants.origins?.includes(`${s.origin}/*`));
-  return { enabled: data.autoEnabled !== false, stores, shipping: data.shipping || {} };
+  return { cacheEpoch: data.cacheEpoch || 0, enabled: data.autoEnabled !== false, stores, shipping: data.shipping || {} };
 }
 async function sync() {
   const { enabled, stores } = await settings();
@@ -45,13 +46,19 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (message?.target !== 'background' || message.type !== 'compare-page') return;
   (async () => {
     if (sender.id !== chrome.runtime.id || !sender.tab || sender.frameId !== 0 || sender.url !== message.url || !validCurrent(message.book, sender.url)) return null;
-    const { enabled, stores, shipping } = await settings();
+    const { enabled, stores, shipping, cacheEpoch } = await settings();
     const source = storeForUrl(sender.url);
     if (!enabled || !stores.some(s => s.id === source.id)) return null;
     await offscreen();
     const result = await chrome.runtime.sendMessage({ target: 'offscreen', type: 'compare', book: message.book, sourceId: source.id, storeIds: stores.map(s => s.id), shipping });
     const latest = await settings();
-    return latest.enabled && latest.stores.map(s => s.id).join() === stores.map(s => s.id).join() ? result : null;
+    if (!latest.enabled || latest.cacheEpoch !== cacheEpoch || latest.stores.map(s => s.id).join() !== stores.map(s => s.id).join()) return null;
+    if (result?.prices) await writeData(data => {
+      if ((data.cacheEpoch || 0) !== cacheEpoch || data.autoEnabled === false) return null;
+      data.priceCache = cachePrices(data.priceCache, message.book.isbn, result.prices.offers, result.prices.at);
+      return data;
+    });
+    return result?.alert || null;
   })().then(reply).catch(() => reply(null));
   return true;
 });

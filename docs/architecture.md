@@ -37,3 +37,5 @@ Validate adapters against live pages and store terms before broad release. Add r
 ## Design
 
 Ink `#172e59`, blue `#2458bb`, white `#ffffff`, mist `#eef3fc`, grey `#536278`, green `#16624a`. A small book-spine monogram anchors the header. Segoe UI carries controls and prices; Georgia gives book titles a literary feel. Prices align right, store names left, with one list rather than a grid of cards. Keyboard focus is visible; all dynamic merchant text is escaped through text nodes.
+
+Confirmed background, scheduled and manual results are cached locally for up to 50 ISBNs. Opening the menu on a detected book restores selected-store prices immediately, with the check time. Results older than ten minutes are marked potentially outdated; results older than 24 hours are hidden and pruned on the next write. Comparar explicitly refreshes prices. Cached displays do not create history observations. Clear data deletes this cache and invalidates pending background writes. Shipping totals are recomputed using current rules.

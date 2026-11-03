@@ -50,6 +50,7 @@ try {
   await shop.reload();
   await shop.getByText('Poupa 2,00').waitFor();
   assert.equal(await popup.evaluate(() => window.autoRequests), afterFirst, 'Repeated edition uses cached comparisons');
+  assert.equal(await popup.evaluate(async isbn => (await chrome.storage.local.get('priceCache')).priceCache[isbn].offers.length, isbn), 2, 'automatic results persist for the menu');
   await shop.evaluate(() => {
     const script = document.querySelector('script[type="application/ld+json"]');
     const data = JSON.parse(script.textContent); data.offers.price = '17.00'; script.textContent = JSON.stringify(data);

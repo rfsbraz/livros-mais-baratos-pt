@@ -1,3 +1,4 @@
+import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
 import { quoteDelivery, shippingRule, REGIONS } from './shipping.js';
 import { renderHistoryChart } from './history-view.js';
@@ -9,6 +10,7 @@ import { compareStore, pooled } from './compare.js';
 
 const $ = id => document.getElementById(id);
 const money = (cents, currency = 'EUR') => new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
+let priceCache = {}, comparing = false;
 let current = null, saved = {}, history = {}, controller = null, run = 0, activeOffers = [];
 let selected = new Set(STORES.map(s => s.id));
 let autoEnabled = true, affiliateEnabled = false, shipping = { region: 'mainland' }, priceOrder = 'delivered';
@@ -22,6 +24,14 @@ function showBook(book) {
   $('title').textContent = book.title || 'O teu livro';
   $('edition').textContent = `ISBN ${book.isbn}`;
   saveLabel(); renderHistory(); renderManual();
+}
+function showCached() {
+  if (!current || comparing) return false;
+  const entry = cachedPrices(priceCache, current.isbn, [...selected]);
+  if (!entry) return false;
+  activeOffers = entry.offers; renderOffers(activeOffers);
+  status('Preços guardados: ' + new Date(entry.at).toLocaleString('pt-PT') + (entry.stale ? ' · Podem estar desatualizados.' : '') + ' · ' + entry.offers.length + ' lojas. Clica em Comparar para atualizar.');
+  return true;
 }
 function link(text, url, eligible = false) {
   const a = document.createElement('a'); a.textContent = text; a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; bindAffiliateLink(a, () => affiliateEnabled, eligible); return a;
@@ -98,6 +108,7 @@ async function start(book) {
   if (!isbn) { status('Introduz um ISBN-10 ou ISBN-13 válido. Encontras o número junto ao código de barras.'); $('isbn').focus(); return; }
   const stores = STORES.filter(s => selected.has(s.id));
   if (!stores.length) { status('Seleciona pelo menos uma loja para comparar.'); $('shops').open = true; return; }
+  comparing = true;
   const permission = chrome.permissions.contains({ origins: stores.map(s => `${s.origin}/*`) });
   controller?.abort(); controller = new AbortController(); const signal = controller.signal; const token = ++run;
   let knownTitle = book.title || saved[isbn]?.title || '';
@@ -132,11 +143,11 @@ async function start(book) {
     renderSaved(); renderHistory();
     status(found.length ? `${found.length} de ${stores.length} preços confirmados para esta edição. Confirma os portes e condições na loja.` : 'Não foi possível confirmar preços. Experimenta indicar também o título, ou abre as lojas para consultar.');
   } catch { if (token === run) status('Não foi possível concluir a consulta ou guardar os dados. Tenta novamente.'); }
-  finally { if (token === run) $('cancel').hidden = true; }
+  finally { if (token === run) { comparing = false; $('cancel').hidden = true; } }
 }
 $('search').onsubmit = event => { event.preventDefault(); start({ isbn: $('isbn').value, title: $('title-query').value.trim() }); };
 $('cancel').onclick = () => {
-  ++run; controller?.abort(); $('cancel').hidden = true;
+  ++run; comparing = false; controller?.abort(); $('cancel').hidden = true;
   renderOffers(activeOffers.map(o => ['queued', 'loading'].includes(o.status) ? { ...o, status: 'cancelled' } : o));
   status('Consulta interrompida. Os resultados parciais não foram guardados no histórico.');
 };
@@ -174,27 +185,27 @@ $('save').onclick = async () => {
 };
 $('clear').onclick = async () => {
   if (!confirm('Apagar a estante, o histórico e a seleção de lojas, e desativar todos os avisos e verificações agendadas?')) return;
-  ++run; controller?.abort(); $('cancel').hidden = true; saved = {}; history = {}; selected = new Set(STORES.map(s => s.id));
-  try { applyData(await changeData({ type: 'clear' })); autoEnabled = false; $('watch-toggle').checked = false; autoLabel(); renderSaved(); renderHistory(); renderShops(); renderNotices([]); saveLabel(); status('Estante e histórico apagados.'); } catch { status('Não foi possível apagar os dados. Tenta novamente.'); }
+  ++run; comparing = false; controller?.abort(); $('cancel').hidden = true; saved = {}; history = {}; selected = new Set(STORES.map(s => s.id));
+  try { applyData(await changeData({ type: 'clear' })); priceCache = {}; activeOffers = []; renderOffers([]); autoEnabled = false; $('watch-toggle').checked = false; autoLabel(); renderSaved(); renderHistory(); renderShops(); renderNotices([]); saveLabel(); status('Estante e histórico apagados.'); } catch { status('Não foi possível apagar os dados. Tenta novamente.'); }
 };
 async function init() {
   try {
-    const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores', 'autoEnabled', 'affiliateEnabled', 'shipping', 'watchEnabled', 'watchNotices', 'priceOrder']);
+    const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores', 'autoEnabled', 'affiliateEnabled', 'shipping', 'watchEnabled', 'watchNotices', 'priceOrder', 'priceCache']);
     autoEnabled = data.autoEnabled !== false; autoLabel();
     affiliateEnabled = data.affiliateEnabled !== false; $('affiliate-toggle').checked = affiliateEnabled;
-    saved = data.saved || {}; history = data.history || {};
+    saved = data.saved || {}; history = data.history || {}; priceCache = data.priceCache || {};
     if (Array.isArray(data.selectedStores)) selected = new Set(data.selectedStores.filter(id => STORES.some(s => s.id === id)));
     shipping = data.shipping || { region: 'mainland' }; priceOrder = data.priceOrder || 'delivered';
     initShipping(); $('watch-toggle').checked = data.watchEnabled !== false; renderNotices(data.watchNotices || []);
     renderSaved(); renderShops();
     const requested = isbn13(new URLSearchParams(location.search).get('isbn'));
-    if (requested && saved[requested]) { $('isbn').value = requested; showBook(saved[requested]); status('Preço-alvo atingido. Compara novamente para confirmar a oferta.'); return; }
+    if (requested && saved[requested]) { $('isbn').value = requested; showBook(saved[requested]); if (!showCached()) status('Preço-alvo atingido. Compara novamente para confirmar a oferta.'); return; }
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id || !/^https?:/.test(tab.url || '')) { status('Introduz um ISBN ou abre uma página de livro para começar.'); return; }
     const [result] = await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: () => ({ html: document.documentElement.outerHTML.slice(0, 4_000_000) }) });
     const book = detectBook(new DOMParser().parseFromString(result.result.html, 'text/html'), tab.url);
     if (run) return;
-    if (book.isbn) { $('isbn').value = book.isbn; $('title-query').value = book.title; showBook(book); status('Livro detetado. Clica em Comparar para consultar as livrarias.'); }
+    if (book.isbn) { $('isbn').value = book.isbn; $('title-query').value = book.title; showBook(book); if (!showCached()) status('Livro detetado. Clica em Comparar para consultar as livrarias.'); }
     else status('Não encontrei um ISBN único nesta página. Introduz o ISBN da edição que procuras.');
   } catch { renderShops(); status('Esta página não permite a leitura do livro. Podes introduzir o ISBN manualmente.'); }
 }
@@ -290,6 +301,7 @@ $('shipping-reset').onclick = async () => {
 $('watch-toggle').onchange = async () => { await chrome.storage.local.set({ watchEnabled: $('watch-toggle').checked }); };
 chrome.storage.onChanged?.addListener((changes, area) => {
   if (area !== 'local') return;
+  if (changes.priceCache) { priceCache = changes.priceCache.newValue || {}; if (!showCached() && !comparing) { activeOffers = []; renderOffers([]); } }
   if (changes.history) { history = changes.history.newValue || {}; renderHistory(); }
   if (changes.saved) { saved = changes.saved.newValue || {}; if (!document.activeElement?.closest('.watch-form')) renderSaved(); }
   if (changes.watchNotices) renderNotices(changes.watchNotices.newValue || []);

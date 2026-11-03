@@ -82,7 +82,7 @@ A opção Apoiar através de ligações de afiliado está ativa por predefiniç�
 
 A estante suporta até 100 livros. O histórico suporta até 200 edições e 360 observações por edição. Quando voltas a comparar uma edição, as suas observações com mais de 90 dias são removidas. Históricos de livros que não voltas a consultar podem permanecer até serem substituídos pelo limite de 200 edições ou apagados por ti.
 
-As consultas automáticas usam uma cache em memória com até 50 combinações de edição e lojas. Os resultados podem ser reutilizados durante dez minutos. Não são gravados no histórico. Desativar os avisos ou alterar as lojas autorizadas fecha o documento que processa as consultas, cancela os seus pedidos e limpa a cache. Fechar um aviso suprime-o para esse ISBN no documento atual da página.
+As consultas automáticas usam uma cache em memória com até 50 combinações de edição e lojas. Os resultados podem ser reutilizados durante dez minutos. Não são gravados no histórico. Desativar os avisos ou alterar as lojas autorizadas fecha o documento que processa as consultas, cancela os seus pedidos e limpa a cache em memória. Os preços confirmados também ficam guardados localmente para o menu, até 50 ISBNs. O menu exclui resultados com mais de 24 horas e assinala preços com mais de dez minutos como potencialmente desatualizados. As entradas expiradas são removidas na próxima gravação; Apagar dados elimina toda a cache. Fechar um aviso suprime-o para esse ISBN no documento atual da página.
 
 ## Controlo e eliminação
 

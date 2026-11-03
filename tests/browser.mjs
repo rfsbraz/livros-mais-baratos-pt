@@ -63,6 +63,8 @@ try {
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
   assert.equal(await page.locator('#affiliate-toggle').isChecked(), false);
+  await page.getByRole('status').filter({ hasText: 'Preços guardados:' }).waitFor();
+  assert.equal(await page.locator('#results .offer').count(), 3, 'reopening restores prices without comparing');
   await page.route('https://www.wook.pt/**', route => route.fulfill({ contentType: 'text/html', body: product('18.00') }));
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();

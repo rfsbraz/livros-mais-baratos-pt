@@ -61,6 +61,8 @@ try {
   // Notification destination opens the observed book without fabricating older history.
   await page.goto('chrome-extension://' + id + '/popup.html?isbn=' + isbn);
   await page.locator('#book').waitFor();
+  await page.getByRole('status').filter({ hasText: 'Preços guardados:' }).waitFor();
+  assert.equal(await page.locator('#results .offer').count(), 2);
   await page.locator('#history-section').evaluate(el => { el.open = true; });
   await page.locator('#history svg').waitFor();
   assert.equal(await page.locator('#history circle').count(), 2);
@@ -71,7 +73,7 @@ try {
   await page.getByRole('button', { name: 'Apagar dados' }).click();
   await poll(async () => Object.keys((await chrome.storage.local.get('saved')).saved || {}).length === 0);
   state = await page.evaluate(() => chrome.storage.local.get(null));
-  assert.deepEqual(state.history, {}); assert.deepEqual(state.watchNotices, []); assert.equal(state.watchJob, null);
+  assert.deepEqual(state.priceCache, {}); assert.deepEqual(state.history, {}); assert.deepEqual(state.watchNotices, []); assert.equal(state.watchJob, null);
   assert.deepEqual(errors, []);
   console.log('Scheduled browser checks passed: target UI, native alarm, offscreen results, local history, deduplication, chart, pause and clear.');
 } finally { await context.close(); }
