@@ -1,10 +1,10 @@
 # Architecture
 
-Manifest V3, plain ES modules, no runtime dependencies and no backend. The popup owns manual comparisons. Optional automatic alerts use a service worker, dynamically registered content scripts and a hidden offscreen document for DOM parsing. No periodic scraping or scheduled monitoring is installed.
+Manifest V3, plain ES modules, no runtime dependencies and no backend. The popup owns manual comparisons. Automatic-by-default alerts use a service worker, dynamically registered content scripts and a hidden offscreen document for DOM parsing. No periodic scraping or scheduled monitoring is installed.
 
 ## Automatic page alerts
 
-The popup requests selected host permissions in a user gesture before saving `autoEnabled`. The service worker registers `content.js` only on selected, granted hosts, including currently open tabs. Install/startup, permission changes and preference changes reconcile registration. Disabling or changing configuration closes the offscreen document to cancel requests and discard cache, and tells existing page scripts to remove stale notices.
+The manifest declares exactly the 26 configured shop origins in `host_permissions`. Fresh installs use `autoEnabled !== false` with all shops selected, without writing preferences or opening the toolbar. Explicitly saved false values remain disabled across updates and restarts. The popup checks existing grants rather than requesting site access at runtime. The service worker registers `content.js` only on selected, granted hosts, including currently open tabs. Install/startup, permission changes and preference changes reconcile registration. Disabling or changing configuration closes the offscreen document to cancel requests and discard cache, and tells existing page scripts to remove stale notices.
 
 The content script parses the current product DOM using the existing ISBN and price adapters. It rejects search pages, marketplace sources, identified digital formats and unverifiable current prices. It observes delayed page content and URL changes, invalidates stale asynchronous results and supports back/forward cache restoration. The worker validates the sender's extension ID, top-level frame, source URL, selected/granted source and current-offer fields before forwarding only book metadata. Full page HTML is not sent outside the tab.
 
@@ -25,6 +25,10 @@ Wook uses `/pesquisa?keyword={isbn}`, Bertrand uses `/pesquisa/{isbn}`, and both
 The expanded catalogue and observed extraction rules are documented in [store coverage](store-coverage.md). Mundo Fantasma uses the public Svelte search data response only to find product SKUs; a bounded index reader creates product links, then independently verifies ISBN and price in product JSON-LD. Saída de Emergência uses its displayed sale price instead of stale structured pricing. Other publisher adapters associate a labelled ISBN with a single Product. Cart/wishlist action links are rejected before fetching. HTML/JSON bodies are limited to 4 MB; no downloaded scripts execute.
 
 Routes and schemas may change. Blocks, unsupported schemas and invalid responses produce an unavailable/unverified row with a manual shop link. Browser tests use reconstructed fixtures from observed public fields, plus adversarial and UI scenarios. A real Manifest V3 smoke test checks native loading and storage. Live tests are separate from CI: 18 of 26 adapters returned verified sample offers on 2026-11-03. Run `node scripts/live-smoke.mjs` for all stores or append store IDs for a subset; it pre-grants only the configured hosts in a temporary test copy. No private source is sent to an external browser service.
+
+## Store publication assets
+
+Run `npm run build`, `node scripts/store-assets.mjs` and `node scripts/store-metadata.mjs` from the repository root. Versioned output is written under the sibling `outputs/` directory. Captures use the real UI with labelled demonstration data. The upload ZIP is copied from the tested build, and public privacy/support URLs remain pending hosting.
 
 ## Future work
 

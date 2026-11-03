@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Add opt-in automatic book-page detection and dismissible cheaper-offer notices, with exact-edition, stock, condition and currency checks.
+- Enable automatic comparisons on fresh installation with required access to the 26 configured shops, without opening the popup or an activation step.
+- Preserve a saved disabled preference and refresh store screenshots, listing copy, privacy disclosures and install instructions.
+
+- Add automatic book-page detection and dismissible cheaper-offer notices, with exact-edition, stock, condition and currency checks.
 - Run automatic comparisons independently of the popup, with bounded concurrency, short-lived caching and permission-aware registration.
 
 - Expand the researched catalogue to 26 automatic adapters, 17 manual sources and 17 reference entries covering all stores and aliases in the source inventory.

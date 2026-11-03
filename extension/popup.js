@@ -7,7 +7,7 @@ const $ = id => document.getElementById(id);
 const money = (cents, currency = 'EUR') => new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
 let current = null, saved = {}, history = {}, controller = null, run = 0, activeOffers = [];
 let selected = new Set(STORES.map(s => s.id));
-let autoEnabled = false;
+let autoEnabled = true;
 function autoLabel() { $('auto-toggle').textContent = autoEnabled ? 'Desativar avisos automáticos' : 'Ativar avisos automáticos'; $('auto-toggle').setAttribute('aria-pressed', String(autoEnabled)); }
 let writes = Promise.resolve();
 const status = text => { $('status').textContent = text; };
@@ -103,7 +103,7 @@ async function start(book) {
   if (!isbn) { status('Introduz um ISBN-10 ou ISBN-13 válido. Encontras o número junto ao código de barras.'); $('isbn').focus(); return; }
   const stores = STORES.filter(s => selected.has(s.id));
   if (!stores.length) { status('Seleciona pelo menos uma loja para comparar.'); $('shops').open = true; return; }
-  const permission = chrome.permissions.request({ origins: stores.map(s => `${s.origin}/*`) });
+  const permission = chrome.permissions.contains({ origins: stores.map(s => `${s.origin}/*`) });
   controller?.abort(); controller = new AbortController(); const signal = controller.signal; const token = ++run;
   let knownTitle = book.title || saved[isbn]?.title || '';
   showBook({ isbn, title: knownTitle });
@@ -147,7 +147,7 @@ $('auto-toggle').onclick = async () => {
     if (!autoEnabled) {
       const stores = STORES.filter(s => selected.has(s.id));
       if (!stores.length) { status('Seleciona pelo menos uma loja para ativar os avisos.'); return; }
-      if (!await chrome.permissions.request({ origins: stores.map(s => `${s.origin}/*`) })) { status('Acesso não autorizado. Os avisos continuam desativados.'); return; }
+      if (!await chrome.permissions.contains({ origins: stores.map(s => `${s.origin}/*`) })) { status('Acesso não autorizado. Os avisos continuam desativados.'); return; }
     }
     autoEnabled = !autoEnabled;
     await chrome.storage.local.set({ autoEnabled }); autoLabel();
@@ -168,7 +168,7 @@ $('clear').onclick = async () => {
 async function init() {
   try {
     const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores', 'autoEnabled']);
-    autoEnabled = data.autoEnabled === true; autoLabel();
+    autoEnabled = data.autoEnabled !== false; autoLabel();
     saved = data.saved || {}; history = data.history || {};
     if (Array.isArray(data.selectedStores)) selected = new Set(data.selectedStores.filter(id => STORES.some(s => s.id === id)));
     renderSaved(); renderShops();

@@ -108,7 +108,7 @@ KuantoKusta, Keepa, CamelCamelCamel, Cuantolibro, Livroo, Bibliotequita e BuscaL
 ## Como reproduzir e interpretar
 
 1. Instala a extensão, indica ISBN e, se necessário, o título.
-2. Seleciona as lojas e autoriza os respetivos domínios.
+2. O acesso às lojas é solicitado na instalação. Ajusta a seleção na extensão se quiseres.
 3. Compara a oferta apresentada com a mesma edição na loja. Confirma stock, vendedor, formato, portes e moeda.
 4. Se não houver preço confirmado, usa a ligação da loja; a extensão não substitui uma falha por um preço presumido.
 

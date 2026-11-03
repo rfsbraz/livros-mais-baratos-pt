@@ -29,7 +29,7 @@ export function start() {
     const url = location.href, store = storeForUrl(url);
     const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores']);
     if (stopped || location.href !== url) return;
-    if (!data.autoEnabled || (Array.isArray(data.selectedStores) && !data.selectedStores.includes(store?.id))) { remove(); key = ''; generation++; return; }
+    if (data.autoEnabled === false || (Array.isArray(data.selectedStores) && !data.selectedStores.includes(store?.id))) { remove(); key = ''; generation++; return; }
     let book = null;
     if (store && !store.marketplace && store.product.test(location.pathname) && !/ebook|e-book|audiobook|audiolivro/i.test(location.pathname)) {
       const detected = detectBook(document, url);
