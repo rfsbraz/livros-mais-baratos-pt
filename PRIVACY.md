@@ -4,6 +4,12 @@ Automatic alerts are enabled by default after installation. The extension detect
 
 Saved titles, ISBNs and observed prices remain in `chrome.storage.local`, not Chrome sync. At most 100 saved books, 200 ISBN histories and 360 observations per ISBN are retained. On updating a book's history, observations older than 90 days for that book are removed. Old histories for unqueried books can remain until replaced by the 200-book bound or deleted.
 
-Automatic results are cached only in the hidden extension document's memory, with at most 50 ISBN/store-selection entries and a ten-minute reuse window. They are not written to price history. Disabling alerts or changing authorized shops closes that document, cancels its requests and clears its cache. Dismissals last for the current page document. There is no scheduled monitoring of saved books, browsing-history collection, analytics, advertising, affiliate tracking, remote code or account system.
+Automatic results are cached only in the hidden extension document's memory, with at most 50 ISBN/store-selection entries and a ten-minute reuse window. They are not written to price history. Disabling alerts or changing authorized shops closes that document, cancels its requests and clears its cache. Dismissals last for the current page document. There is no scheduled monitoring of saved books, browsing-history collection, analytics, remote code or account system.
 
 Selected store IDs and the automatic-alert preference are saved locally. **Desativar avisos automáticos** stops automatic checks and removes notices from open pages. Use **Apagar dados** to delete the shelf and history, reset store selection and disable automatic alerts. Uninstalling removes extension storage. Site access can be restricted in Chrome's extension settings. Updates that add site permissions may require Chrome approval.
+
+## Optional affiliate links
+
+Affiliate support is enabled by default and saved locally as `affiliateEnabled`. Turn off **Apoiar através de ligações de afiliado** to disable it. The preference is preserved across updates and clearing the shelf/history. Only deliberate clicks on a verified cheaper Wook offer may add `a_aid=5d3ee4327c2fd` to its destination. Existing attribution is preserved. Comparison requests, page URLs, copied links and stored results are not rewritten. Other stores have no affiliate partner configured. Rankings do not depend on commissions.
+
+After an affiliate click, Wook receives the affiliate identifier and normal browser navigation data and may use cookies under its own privacy policy. This can earn the developer a commission. Disabling this setting stops future affiliate additions; it does not remove cookies already set by Wook.

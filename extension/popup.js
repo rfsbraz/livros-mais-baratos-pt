@@ -1,3 +1,4 @@
+import { bindAffiliateLink } from './affiliate.js';
 import { isbn13, remember } from './core.js';
 import { STORES, CATALOGUE, searchUrl } from './stores.js';
 import { detectBook } from './parser.js';
@@ -7,7 +8,7 @@ const $ = id => document.getElementById(id);
 const money = (cents, currency = 'EUR') => new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
 let current = null, saved = {}, history = {}, controller = null, run = 0, activeOffers = [];
 let selected = new Set(STORES.map(s => s.id));
-let autoEnabled = true;
+let autoEnabled = true, affiliateEnabled = false;
 function autoLabel() { $('auto-toggle').textContent = autoEnabled ? 'Desativar avisos automáticos' : 'Ativar avisos automáticos'; $('auto-toggle').setAttribute('aria-pressed', String(autoEnabled)); }
 let writes = Promise.resolve();
 const status = text => { $('status').textContent = text; };
@@ -23,8 +24,8 @@ function showBook(book) {
   $('edition').textContent = `ISBN ${book.isbn}`;
   saveLabel(); renderHistory(); renderManual();
 }
-function link(text, url) {
-  const a = document.createElement('a'); a.textContent = text; a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a;
+function link(text, url, eligible = false) {
+  const a = document.createElement('a'); a.textContent = text; a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; bindAffiliateLink(a, () => affiliateEnabled, eligible); return a;
 }
 function renderManual() {
   $('manual-results').replaceChildren();
@@ -93,7 +94,8 @@ function renderOffers(offers) {
       const condition = offer.condition === 'UsedCondition' ? 'Usado' : offer.condition === 'NewCondition' ? 'Novo' : 'Estado por confirmar';
       detail.textContent = `${condition} · ${availability[offer.availability] || 'Disponibilidade por confirmar'}${offer.marketplace ? ` · vendedor: ${offer.seller || 'confirmar na loja'}` : ''}${offer.currency !== 'EUR' ? ' · sem conversão de moeda' : ''}`;
     } else detail.textContent = ({ loading: 'A consultar…', queued: 'A aguardar…', cancelled: 'Consulta interrompida.', denied: 'Acesso não autorizado. Abre a loja para consultar.' })[offer.status] || 'Preço não confirmado. Abre a loja para consultar.';
-    row.append(link(offer.name, offer.url), price, detail);
+    const cheaper = available.includes(offer) && available.some(other => other.price > offer.price);
+    row.append(link(offer.name, offer.url, cheaper), price, detail);
     if (offer.price === best && available.includes(offer)) { row.classList.add('best'); const badge = document.createElement('span'); badge.className = 'badge'; badge.textContent = 'Menor preço novo em EUR, com stock confirmado'; row.append(badge); }
     $(offer.status === 'ok' ? 'results' : 'unconfirmed-results').append(row);
   }
@@ -154,6 +156,19 @@ $('auto-toggle').onclick = async () => {
     status(autoEnabled ? 'Avisos ativos nas lojas autorizadas e selecionadas. Abre um livro para procurar preços mais baixos.' : 'Avisos automáticos desativados.');
   } catch { status('Não foi possível alterar os avisos automáticos.'); }
 };
+$('affiliate-toggle').onchange = async () => {
+  const next = $('affiliate-toggle').checked;
+  try {
+    await chrome.storage.local.set({ affiliateEnabled: next });
+    affiliateEnabled = next;
+  } catch { $('affiliate-toggle').checked = affiliateEnabled; status('Não foi possível guardar a preferência de afiliados.'); }
+};
+chrome.storage.onChanged?.addListener((changes, area) => {
+  if (area === 'local' && changes.affiliateEnabled) {
+    affiliateEnabled = changes.affiliateEnabled.newValue !== false;
+    $('affiliate-toggle').checked = affiliateEnabled;
+  }
+});
 $('save').onclick = async () => {
   if (!current) return;
   if (!saved[current.isbn] && Object.keys(saved).length >= 100) { status('A estante tem 100 livros. Remove um para guardar outro.'); return; }
@@ -167,8 +182,9 @@ $('clear').onclick = async () => {
 };
 async function init() {
   try {
-    const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores', 'autoEnabled']);
+    const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores', 'autoEnabled', 'affiliateEnabled']);
     autoEnabled = data.autoEnabled !== false; autoLabel();
+    affiliateEnabled = data.affiliateEnabled !== false; $('affiliate-toggle').checked = affiliateEnabled;
     saved = data.saved || {}; history = data.history || {};
     if (Array.isArray(data.selectedStores)) selected = new Set(data.selectedStores.filter(id => STORES.some(s => s.id === id)));
     renderSaved(); renderShops();

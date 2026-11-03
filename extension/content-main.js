@@ -1,9 +1,11 @@
+import { bindAffiliateLink } from './affiliate.js';
 import { detectBook, parseOffer, structured } from './parser.js';
 import { storeForUrl } from './stores.js';
 import { validCurrent } from './auto-rules.js';
 
 export function start() {
   let stopped = false, timer, key = '', generation = 0, host, lastUrl = location.href;
+  let affiliateEnabled = false;
   const dismissed = new Set();
   const money = n => new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(n / 100);
   function remove() { host?.remove(); host = null; }
@@ -21,14 +23,18 @@ export function start() {
     const detail = document.createElement('p'); detail.textContent = `${result.name}: ${money(result.price)} · Nesta loja: ${money(book.price)}`;
     const edition = document.createElement('small'); edition.textContent = `Mesma edição · ISBN ${book.isbn} · Novo, em stock`;
     const link = document.createElement('a'); link.textContent = `Ver oferta na ${result.name}`; link.href = result.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+    bindAffiliateLink(link, () => affiliateEnabled, true);
     const note = document.createElement('small'); note.textContent = `Preços sem portes. Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
-    panel.append(close, brand, title, detail, edition, link, note); shadow.append(style, panel); document.documentElement.append(host);
+    const disclosure = document.createElement('small');
+    disclosure.textContent = new URL(result.url).hostname === 'www.wook.pt' && affiliateEnabled ? 'Ligação de afiliado: podemos receber uma comissão ao clicares. Podes desativar na extensão.' : '';
+    panel.append(close, brand, title, detail, edition, link, disclosure, note); shadow.append(style, panel); document.documentElement.append(host);
   }
   async function scan() {
     if (stopped) return;
     const url = location.href, store = storeForUrl(url);
-    const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores']);
+    const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores', 'affiliateEnabled']);
     if (stopped || location.href !== url) return;
+    affiliateEnabled = data.affiliateEnabled !== false;
     if (data.autoEnabled === false || (Array.isArray(data.selectedStores) && !data.selectedStores.includes(store?.id))) { remove(); key = ''; generation++; return; }
     let book = null;
     if (store && !store.marketplace && store.product.test(location.pathname) && !/ebook|e-book|audiobook|audiolivro/i.test(location.pathname)) {
@@ -52,7 +58,8 @@ export function start() {
   observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['content'] });
   const interval = setInterval(() => { if (location.href !== lastUrl) { lastUrl = location.href; key = ''; generation++; remove(); schedule(); } }, 1000);
   function changed(changes, area) {
-    if (area !== 'local' || (!changes.autoEnabled && !changes.selectedStores)) return;
+    if (area !== 'local' || (!changes.autoEnabled && !changes.selectedStores && !changes.affiliateEnabled)) return;
+    if (changes.affiliateEnabled) affiliateEnabled = changes.affiliateEnabled.newValue !== false;
     generation++; key = ''; remove(); schedule();
   }
   chrome.storage.onChanged.addListener(changed);

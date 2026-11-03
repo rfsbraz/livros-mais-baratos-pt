@@ -43,12 +43,35 @@ try {
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
   assert.equal(await page.locator('.offer').count(), 4);
+  assert.equal(await page.locator('#affiliate-toggle').isChecked(), true);
+  await page.route('https://www.wook.pt/**', route => route.fulfill({ contentType: 'text/html', body: product('16.00') }));
+  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
+  async function captureWookClick() {
+    await page.locator('#results a').filter({ hasText: 'Wook' }).evaluate(a => {
+      a.addEventListener('click', e => { e.preventDefault(); window.__clicked = a.href; }, { once: true });
+    });
+    await page.locator('#results a').filter({ hasText: 'Wook' }).click();
+    return page.evaluate(() => window.__clicked);
+  }
+  assert(!(await page.locator('#results a').filter({ hasText: 'Wook' }).getAttribute('href')).includes('a_aid'));
+  assert((await captureWookClick()).includes('a_aid=5d3ee4327c2fd'));
+  await page.locator('#affiliate-toggle').uncheck();
+  await page.waitForFunction(() => window.__data.affiliateEnabled === false);
+  assert(!(await captureWookClick()).includes('a_aid'));
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
+  assert.equal(await page.locator('#affiliate-toggle').isChecked(), false);
+  await page.route('https://www.wook.pt/**', route => route.fulfill({ contentType: 'text/html', body: product('18.00') }));
+  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
+
   assert.match(await page.locator('#results').textContent(), /Sem stock/);
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'Livro guardado' }).waitFor();
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#count').textContent === '1');
-  assert.equal(await page.evaluate(() => window.__data.history['9780306406157'].length), 3);
+  assert.equal(await page.evaluate(() => window.__data.history['9780306406157'].length), 9);
   // Parser regressions: wrong edition, script injection, currency and search/product separation.
   const parsed = await page.evaluate(async ({ good, wrong }) => {
     const { parseOffer, detectBook, productLinks } = await import('./parser.js');
