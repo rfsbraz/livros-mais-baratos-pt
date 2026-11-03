@@ -24,4 +24,4 @@ Commit messages use a single scoped conventional title, for example `fix(parser)
 
 The owner must configure `RELEASE_PLEASE_TOKEN` with repository permissions. Release Please uses simple versioning with conservative pre-1.0 bumps. Release automation synchronizes the manifest and package versions, builds the ZIP and attaches it to the release. No automatic Chrome Web Store publication occurs.
 
-Main should require the `unit` and `browser` checks and enforce protection for administrators. Private-repository branch protection availability depends on the account plan. Patch dependency updates may auto-merge after required checks; minor/major updates need review.
+Main should require the `unit` and `browser` checks and enforce protection for administrators. GitHub rejected this configuration on 2026-11-03 because the current account needs Pro for private-repository protection. Visibility remains private. The patch auto-merge workflow skips merging unless it can verify both required checks in branch protection; minor/major updates always need review. Release automation remains idle until `RELEASE_PLEASE_TOKEN` is configured.

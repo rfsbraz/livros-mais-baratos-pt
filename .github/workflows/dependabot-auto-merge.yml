@@ -8,9 +8,22 @@ jobs:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
+      - name: Require enforced checks before enabling auto-merge
+        id: protection
+        run: |
+          if gh api "repos/$REPO/branches/$BASE/protection" --jq '.required_status_checks.contexts | (index("unit") != null and index("browser") != null)' 2>/dev/null | grep -qx true; then
+            echo 'enabled=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'Auto-merge skipped: required branch checks are unavailable or cannot be verified.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: dependabot/fetch-metadata@v2
+        if: steps.protection.outputs.enabled == 'true'
         id: meta
-      - if: steps.meta.outputs.update-type == 'version-update:semver-patch'
+      - if: steps.protection.outputs.enabled == 'true' && steps.meta.outputs.update-type == 'version-update:semver-patch'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
