@@ -23,15 +23,16 @@ function product(price, currency = 'EUR', stock = 'InStock', id = isbn) {
 }
 try {
   await page.addInitScript(({ html }) => {
-    window.__data = JSON.parse(localStorage.getItem('testData') || '{}');
+    window.__data = JSON.parse(localStorage.getItem('testData') || '{"selectedStores":["wook","bertrand","almedina","bookcover"]}');
     window.__permission = true;
     window.chrome = {
       storage: { local: { get: async () => window.__data, set: async data => { window.__data = data; localStorage.setItem('testData', JSON.stringify(data)); } } },
-      permissions: { request: async () => window.__permission },
+      permissions: { request: async request => { window.__requested = request; return window.__permission; } },
       tabs: { query: async () => [{ id: 1, url: 'https://www.wook.pt/livro/example' }] },
       scripting: { executeScript: async () => [{ result: { html } }] }
     };
   }, { html: product('20.00') });
+  await page.route('https://**/*', route => route.fulfill({ status: 403, body: 'Unconfigured test store' }));
   await page.route('https://www.wook.pt/**', route => route.fulfill({ contentType: 'text/html', body: product('18.00') }));
   await page.route('https://www.bertrand.pt/**', route => route.fulfill({ contentType: 'text/html', body: product('17.00') }));
   await page.route('https://www.almedina.net/**', route => route.fulfill({ status: 403, body: 'Blocked' }));
@@ -62,6 +63,40 @@ try {
     };
   }, { good: product('18.00'), wrong: product('1.00', 'EUR', 'InStock', '9780804429573') });
   assert.equal(parsed.good, 1800); assert.equal(parsed.wook, 1946); assert.equal(parsed.wrong, null); assert.equal(parsed.malformed, null); assert.deepEqual(parsed.links, ['https://www.wook.pt/livro/good']);
+  const fixtures = JSON.parse(await readFile('tests/fixtures/store-shapes.json', 'utf8')).cases;
+  const fixtureResults = await page.evaluate(async cases => {
+    const { parseOffer, detectBook } = await import('./parser.js');
+    return cases.map(c => {
+      const doc = new DOMParser().parseFromString(c.html, 'text/html');
+      return { store: c.store, offer: parseOffer(doc, c.isbn, c.url), detected: detectBook(doc, c.url).isbn, wrong: parseOffer(doc, '9780306406157', c.url) };
+    });
+  }, fixtures);
+  for (let i = 0; i < fixtures.length; i++) {
+    const expected = fixtures[i], actual = fixtureResults[i];
+    assert.equal(actual.offer?.price, expected.price, `${expected.store}: observed price shape`);
+    assert.equal(actual.offer?.currency, expected.currency, `${expected.store}: currency`);
+    assert.equal(actual.detected, expected.isbn, `${expected.store}: detected ISBN`);
+    assert.equal(actual.wrong, null, `${expected.store}: wrong edition must be rejected`);
+  }
+  assert.equal(await page.locator('.shop-option').count(), 26);
+  assert.equal(await page.locator('#manual-results .manual-row').count(), 17);
+  const fallback = await page.evaluate(async ({ good, wrong }) => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const store = STORES.find(s => s.id === 'gradiva'), fetched = [];
+    const result = await compareStore(store, '9780306406157', new AbortController().signal, async url => {
+      fetched.push(url);
+      let html = '';
+      if (url.includes('s=978')) html = '<a href="/produto/wrong/">Other edition</a><a href="/produto/cart/?add-to-cart=1">Add</a>';
+      else if (url.includes('s=')) html = '<a href="/produto/right/">Exact edition</a>';
+      else html = url.includes('/right/') ? good : wrong;
+      return new DOMParser().parseFromString(html, 'text/html');
+    }, 'The title');
+    return { status: result.status, price: result.price, fetched };
+  }, { good: product('18.00'), wrong: product('1.00', 'EUR', 'InStock', '9780804429573') });
+  assert.equal(fallback.status, 'ok'); assert.equal(fallback.price, 1800);
+  assert.equal(fallback.fetched.length, 4);
+  assert(!fallback.fetched.some(url => url.includes('add-to-cart')));
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'válido' }).waitFor();
@@ -74,6 +109,26 @@ try {
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   await mkdir('work', { recursive: true });
   await page.screenshot({ path: 'work/extension-preview.png', fullPage: true });
+  // Selection survives reload, requests only selected origins, and cancellation does not save partial history.
+  await page.locator('#shops > summary').click();
+  await page.locator('#select-none').click();
+  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  await page.getByRole('status').filter({ hasText: 'pelo menos uma loja' }).waitFor();
+  await page.locator('input[value="wook"]').check();
+  await page.waitForFunction(() => window.__data.selectedStores.join() === 'wook');
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector('#coverage').textContent === 'Lojas: 1 de 26 selecionadas');
+  const beforeCancel = await page.evaluate(() => JSON.stringify(window.__data.history));
+  let releaseRequest;
+  const requestStarted = new Promise(resolve => { releaseRequest = resolve; });
+  await page.route('https://www.wook.pt/**', route => { releaseRequest(route); });
+  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  const pending = await requestStarted;
+  await page.getByRole('button', { name: 'Parar consulta', exact: true }).click();
+  await pending.fulfill({ contentType: 'text/html', body: product('18.00') }).catch(() => {});
+  await page.getByRole('status').filter({ hasText: 'Consulta interrompida' }).waitFor();
+  assert.equal(await page.evaluate(() => JSON.stringify(window.__data.history)), beforeCancel);
+  assert.deepEqual(await page.evaluate(() => window.__requested.origins), ['https://www.wook.pt/*']);
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Apagar dados' }).click();
   await page.getByRole('status').filter({ hasText: 'apagados' }).waitFor();

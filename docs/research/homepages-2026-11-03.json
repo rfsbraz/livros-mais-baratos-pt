@@ -1,0 +1,844 @@
+[
+  {
+    "id": "penguin",
+    "status": 200,
+    "url": "https://penguinlivros.pt/",
+    "title": "Penguin Livros - Novidades, promoções e muito mais",
+    "forms": [
+      {
+        "action": "https://penguinlivros.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.4"
+  },
+  {
+    "id": "presenca",
+    "status": 200,
+    "url": "https://www.presenca.pt/",
+    "title": "Grupo Editorial Presença",
+    "forms": [
+      {
+        "action": "https://www.presenca.pt/localization",
+        "method": "post",
+        "inputs": [
+          {
+            "name": "form_type",
+            "type": "hidden",
+            "value": "localization"
+          },
+          {
+            "name": "utf8",
+            "type": "hidden",
+            "value": "✓"
+          },
+          {
+            "name": "_method",
+            "type": "hidden",
+            "value": "put"
+          },
+          {
+            "name": "return_to",
+            "type": "hidden",
+            "value": "/"
+          },
+          {
+            "name": "country_filter",
+            "type": "search"
+          }
+        ]
+      },
+      {
+        "action": "https://www.presenca.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "search"
+          },
+          {
+            "name": "options[prefix]",
+            "type": "hidden",
+            "value": "last"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "planeta",
+    "status": 200,
+    "url": "https://www.planetadelivros.pt/",
+    "title": "PlanetadeLivros | Romances, e-books e audiolivros",
+    "forms": []
+  },
+  {
+    "id": "guerraepaz",
+    "status": 200,
+    "url": "https://www.guerraepaz.pt/",
+    "title": "Guerra e Paz - Editora generalista",
+    "forms": [
+      {
+        "action": "https://www.guerraepaz.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "text"
+          },
+          {
+            "name": "post_type",
+            "type": "hidden",
+            "value": "product"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.3"
+  },
+  {
+    "id": "gradiva",
+    "status": 200,
+    "url": "https://www.gradiva.pt/",
+    "title": "Gradiva - Livraria online",
+    "forms": [
+      {
+        "action": "https://www.gradiva.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.3"
+  },
+  {
+    "id": "relogiodagua",
+    "status": 200,
+    "url": "https://www.relogiodagua.pt/",
+    "title": "Relógio D'Água - Editores",
+    "forms": [
+      {
+        "action": "https://www.relogiodagua.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.2"
+  },
+  {
+    "id": "saida",
+    "status": 200,
+    "url": "https://www.saidadeemergencia.com/",
+    "title": "Homepage - Saída de Emergência",
+    "forms": [
+      {
+        "action": "https://www.saidadeemergencia.com/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "search"
+          },
+          {
+            "name": "post_type",
+            "type": "hidden",
+            "value": "product"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.0.8"
+  },
+  {
+    "id": "antigona",
+    "status": 200,
+    "url": "https://antigona.pt/",
+    "title": "Antígona Editores Refractários",
+    "forms": [
+      {
+        "action": "https://antigona.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "type",
+            "type": "hidden",
+            "value": "product"
+          },
+          {
+            "name": "q",
+            "type": "search"
+          }
+        ]
+      },
+      {
+        "action": "https://antigona.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "type",
+            "type": "hidden",
+            "value": "product"
+          },
+          {
+            "name": "q",
+            "type": "search"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "continente",
+    "status": 200,
+    "url": "https://www.continente.pt/",
+    "title": "Continente Online | O seu supermercado online",
+    "forms": [
+      {
+        "action": "https://www.continente.pt/pesquisa/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "search"
+          },
+          {
+            "name": "lang",
+            "type": "hidden",
+            "value": "null"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "porto",
+    "status": 200,
+    "url": "https://www.portoeditora.pt/",
+    "title": "Abre Horizontes - Porto Editora",
+    "forms": [
+      {
+        "action": "https://www.portoeditora.pt/pesquisa?",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lyvros",
+    "status": 200,
+    "url": "https://www.lyvros.com/",
+    "title": "LYVROS",
+    "forms": [
+      {
+        "action": "https://www.lyvros.com/catalogo",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "category",
+            "type": "hidden",
+            "value": ""
+          },
+          {
+            "name": "search",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "action": "https://www.lyvros.com/catalogo",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "category",
+            "type": "hidden",
+            "value": ""
+          },
+          {
+            "name": "search",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "quetzal",
+    "status": 200,
+    "url": "https://www.quetzaleditores.pt/",
+    "title": "Quetzal Editores",
+    "forms": [
+      {
+        "action": "https://www.quetzaleditores.pt/pesquisa",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lello",
+    "status": 200,
+    "url": "https://livrarialello.pt/",
+    "title": "Livraria Lello - A Livraria Mais Bonita do Mundo - The Most Beautiful Bookstore in the World",
+    "forms": [
+      {
+        "action": "https://livrarialello.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "search"
+          }
+        ]
+      }
+    ],
+    "platform": "WPML ver:5.2.0 stt:1,41;"
+  },
+  {
+    "id": "snob",
+    "status": 200,
+    "url": "https://www.livrariasnob.pt/",
+    "title": "Livraria Snob",
+    "forms": [
+      {
+        "action": "https://www.livrariasnob.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "search"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kingpin",
+    "status": 200,
+    "url": "https://kingpinbooks.com/",
+    "title": "Kingpin Books – a maior loja de banda desenhada em Portugal",
+    "forms": [
+      {
+        "action": "https://kingpinbooks.com/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "search"
+          }
+        ]
+      },
+      {
+        "action": "https://kingpinbooks.com/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "search"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mundofantasma",
+    "status": 200,
+    "url": "https://mundofantasma.com/",
+    "title": "Mundo Fantasma… A banda desenhada quase toda… no Porto.",
+    "forms": []
+  },
+  {
+    "id": "devir",
+    "status": 200,
+    "url": "https://devir.pt/",
+    "title": "Jogos de Tabuleiro para toda a família | Devir Portugal - Vive, Joga!",
+    "forms": [
+      {
+        "action": "https://devir.pt/catalogsearch/result/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "text"
+          }
+        ]
+      }
+    ],
+    "platform": "Powered by Slider Revolution 6.6.7.1 - responsive, Mobile-Friendly Slider Plugin with comfortable drag and drop interface."
+  },
+  {
+    "id": "fnac",
+    "status": 403,
+    "url": "https://www.fnac.pt/",
+    "title": "fnac.pt",
+    "forms": []
+  },
+  {
+    "id": "amazon",
+    "status": 202,
+    "url": "https://www.amazon.es/",
+    "title": "",
+    "forms": []
+  },
+  {
+    "id": "kobo",
+    "status": 200,
+    "url": "https://www.kobo.com/pt/pt",
+    "title": "Kobo.com loja Portugal - eBooks, livros áudio, eReader e Aplicações de leitura",
+    "forms": []
+  },
+  {
+    "id": "google",
+    "status": 200,
+    "url": "https://play.google.com/store/books?hl=pt_PT&gl=PT",
+    "title": "Livros no Google Play",
+    "forms": []
+  },
+  {
+    "id": "worten",
+    "status": 200,
+    "url": "https://www.worten.pt/",
+    "title": "Worten | Black Friday - Tudo o que precisas em Worten.pt",
+    "forms": [
+      {
+        "action": "https://www.worten.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "query",
+            "type": "search"
+          }
+        ]
+      }
+    ],
+    "platform": "worten@9256d3c366dc474d64ec2ebe8f5d99a1dcffd4bc"
+  },
+  {
+    "id": "auchan",
+    "status": 200,
+    "url": "https://www.auchan.pt/",
+    "title": "Auchan Online | O seu supermercado online",
+    "forms": [
+      {
+        "action": "https://www.auchan.pt/pt/pesquisa",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "text"
+          },
+          {
+            "name": "lang",
+            "type": "hidden",
+            "value": "null"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "elcorteingles",
+    "status": 200,
+    "url": "https://www.elcorteingles.pt/",
+    "title": "El Corte Inglés: As melhores marcas aos melhores preços",
+    "forms": [],
+    "platform": "Moonshine"
+  },
+  {
+    "id": "tintadachina",
+    "status": 403,
+    "url": "https://tintadachina.pt/",
+    "title": "Just a moment...",
+    "forms": []
+  },
+  {
+    "id": "mbooks",
+    "status": 200,
+    "url": "https://mbooks.pt/",
+    "title": "Home - mbooks, Livraria Online - Livros novos e descontinuados, ao melhor preço do mercado",
+    "forms": [
+      {
+        "action": "https://mbooks.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "text"
+          },
+          {
+            "name": "post_type",
+            "type": "hidden",
+            "value": "product"
+          },
+          {
+            "name": "product_cat",
+            "type": "hidden",
+            "value": "0"
+          }
+        ]
+      },
+      {
+        "action": "https://mbooks.pt/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "text"
+          },
+          {
+            "name": "post_type",
+            "type": "hidden",
+            "value": "product"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.4"
+  },
+  {
+    "id": "reread",
+    "status": 200,
+    "url": "https://www.re-read.com/",
+    "title": "Re-Read",
+    "forms": [
+      {
+        "action": "https://www.re-read.com/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "search"
+          }
+        ]
+      },
+      {
+        "action": "https://www.re-read.com/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "s",
+            "type": "search"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.2"
+  },
+  {
+    "id": "traca",
+    "status": 200,
+    "url": "https://traca.pt/",
+    "title": "Traça",
+    "forms": [],
+    "platform": "WordPress 6.5.14"
+  },
+  {
+    "id": "abebooks",
+    "status": 200,
+    "url": "https://www.abebooks.com/",
+    "title": "AbeBooks | Shop for Books, Art & Collectibles",
+    "forms": []
+  },
+  {
+    "id": "iberlibro",
+    "status": 200,
+    "url": "https://www.iberlibro.com/",
+    "title": "IberLibro.com | Libros, arte y artículos de colección",
+    "forms": []
+  },
+  {
+    "id": "audible",
+    "status": 200,
+    "url": "https://www.audible.es/",
+    "title": "Audible | Escucha audiolibros, podcasts y originales",
+    "forms": []
+  },
+  {
+    "id": "storytel",
+    "status": 200,
+    "url": "https://www.storytel.com/tv",
+    "title": "Storytel International - Audiobooks and eBooks for everyone",
+    "forms": []
+  },
+  {
+    "id": "olx",
+    "status": 200,
+    "url": "https://www.olx.pt/",
+    "title": "Portugal Anúncios Classificados OLX",
+    "forms": []
+  },
+  {
+    "id": "vinted",
+    "status": 200,
+    "url": "https://www.vinted.pt/",
+    "title": "Vinted | A app tudo-em-um para segunda mão",
+    "forms": []
+  },
+  {
+    "id": "custojusto",
+    "status": 200,
+    "url": "https://www.custojusto.pt/",
+    "title": "CustoJusto Portugal | Anúncios grátis, classificados grátis",
+    "forms": []
+  },
+  {
+    "id": "apple",
+    "status": 404,
+    "url": "https://books.apple.com/pt",
+    "title": "Connecting to Apple Music.",
+    "forms": []
+  },
+  {
+    "id": "pingodoce",
+    "status": 200,
+    "url": "https://www.pingodoce.pt/?",
+    "title": "Pingo Doce | O supermercado online dos produtos frescos",
+    "forms": [
+      {
+        "action": "https://www.pingodoce.pt/on/demandware.store/Sites-pingo-doce-Site/default/Search-Show?q=",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "q",
+            "type": "text"
+          },
+          {
+            "name": "lang",
+            "type": "hidden",
+            "value": "null"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "intermarche",
+    "status": 403,
+    "url": "https://www.intermarche.pt/",
+    "title": "intermarche.pt",
+    "forms": []
+  },
+  {
+    "id": "dott",
+    "status": 200,
+    "url": "https://www.worten.pt/",
+    "title": "Worten | Black Friday - Tudo o que precisas em Worten.pt",
+    "forms": [
+      {
+        "action": "https://www.worten.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "query",
+            "type": "search"
+          }
+        ]
+      }
+    ],
+    "platform": "worten@9256d3c366dc474d64ec2ebe8f5d99a1dcffd4bc"
+  },
+  {
+    "id": "depository",
+    "status": 200,
+    "url": "https://www.amazon.com/b/ref=usbk_surl_books/?node=283155",
+    "title": "",
+    "forms": []
+  },
+  {
+    "id": "bulhosa",
+    "status": 200,
+    "url": "https://www.bulhosa.pt/",
+    "title": "This domain is for sale - Trust Domains",
+    "forms": []
+  },
+  {
+    "id": "cultura",
+    "status": 403,
+    "url": "https://www.cultura.com/",
+    "title": "Just a moment...",
+    "forms": []
+  },
+  {
+    "id": "blackwells",
+    "status": 200,
+    "url": "https://blackwells.co.uk/bookshop/home",
+    "title": "Blackwell's, books for life and for learning Blackwell's",
+    "forms": [
+      {
+        "action": "https://blackwells.co.uk/bookshop/search/",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "keyword",
+            "type": "search"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "waterstones",
+    "status": 200,
+    "url": "https://www.waterstones.com/",
+    "title": "Buy books, stationery and gifts, online and in store | Waterstones",
+    "forms": [
+      {
+        "action": "https://www.waterstones.com/reserve/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "isbn",
+            "type": "hidden",
+            "value": ""
+          },
+          {
+            "name": "lat",
+            "type": "hidden",
+            "value": ""
+          },
+          {
+            "name": "lng",
+            "type": "hidden",
+            "value": ""
+          },
+          {
+            "name": "search",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "asa",
+    "url": "https://asa.leya.com"
+  },
+  {
+    "id": "cavalo",
+    "status": 200,
+    "url": "https://www.hugedomains.com/domain_profile.cfm?d=cavalodeferro.com",
+    "title": "CavaloDeFerro.com is for sale | HugeDomains",
+    "forms": []
+  },
+  {
+    "id": "jumbo",
+    "url": "https://www.jumbo.pt"
+  },
+  {
+    "id": "tigre",
+    "status": 404,
+    "url": "https://tigrepapel.pt/loja/",
+    "title": "404 Not Found",
+    "forms": []
+  },
+  {
+    "id": "worten",
+    "status": 200,
+    "url": "https://www.worten.pt/search?query=A%20Criada",
+    "title": "Resultados de pesquisa | Worten.pt",
+    "forms": [
+      {
+        "action": "https://www.worten.pt/search",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "query",
+            "type": "search"
+          }
+        ]
+      }
+    ],
+    "platform": "worten@9256d3c366dc474d64ec2ebe8f5d99a1dcffd4bc"
+  },
+  {
+    "id": "elcorteingles",
+    "status": 200,
+    "url": "https://www.elcorteingles.pt/search-nwx/?s=9789895701124",
+    "title": "9789895701124 · Resultados da pesquisa · El Corte Inglés Portugal (0)",
+    "forms": [],
+    "platform": "Moonshine"
+  },
+  {
+    "id": "editoradevir",
+    "status": 200,
+    "url": "https://editoradevir.pt/",
+    "title": "Editora Devir - Manga, Comics e BD em Português",
+    "forms": [
+      {
+        "action": "https://editoradevir.pt/#",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "phrase",
+            "type": "search"
+          },
+          {
+            "name": "phrase",
+            "type": "text"
+          },
+          {
+            "name": "",
+            "type": "submit"
+          }
+        ]
+      },
+      {
+        "action": "https://editoradevir.pt/#",
+        "method": "get",
+        "inputs": [
+          {
+            "name": "phrase",
+            "type": "search"
+          },
+          {
+            "name": "phrase",
+            "type": "text"
+          },
+          {
+            "name": "",
+            "type": "submit"
+          }
+        ]
+      }
+    ],
+    "platform": "WordPress 7.1.4"
+  },
+  {
+    "id": "abebooks",
+    "status": 200,
+    "url": "https://www.abebooks.com/servlet/SearchResults?isbn=9789895701124",
+    "title": "ISBN: 9789895701124 - A Criada – AbeBooks",
+    "forms": []
+  },
+  {
+    "id": "apple",
+    "status": 200,
+    "url": "https://books.apple.com/pt/charts",
+    "title": "Top de livros - Apple Books (PT)",
+    "forms": []
+  }
+]

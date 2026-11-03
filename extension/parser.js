@@ -1,4 +1,5 @@
 import { isbn13, nodes, identity, offerFrom, safeUrl, euros } from './core.js';
+import { storeForUrl } from './stores.js';
 
 export function structured(doc) {
   return [...doc.querySelectorAll('script[type="application/ld+json"]')].flatMap(el => {
@@ -6,58 +7,98 @@ export function structured(doc) {
   });
 }
 
+function numberIn(value) {
+  const text = String(value || '');
+  const long = text.match(/97[89](?:[\s\p{Pd}]*\d){10}/u);
+  if (long) return isbn13(long[0]);
+  return isbn13(text.match(/\d(?:[\s\p{Pd}]*\d){8}[\s\p{Pd}]*[\dXx]/u)?.[0]);
+}
+
 export function pageIsbn(doc) {
-  const meta = [...doc.querySelectorAll('[itemprop="isbn"], [itemprop="gtin13"], meta[property="book:isbn"], [data-th="ISBN"]')]
+  const direct = [...doc.querySelectorAll('[itemprop="isbn"], [itemprop="gtin13"], meta[property="book:isbn"], [data-th="ISBN"]')]
     .map(el => isbn13(el.getAttribute('content') || el.textContent)).find(Boolean);
-  if (meta) return meta;
-  const explicit = doc.body?.textContent.match(/ISBN(?:-1[03])?\s*:?\s*([\d][\d\s-]{8,24}[\dXx])/);
-  return isbn13(explicit?.[1]);
+  if (direct) return direct;
+  // Labels may be in table cells, definition lists or a two-column publisher grid.
+  for (const label of doc.querySelectorAll('th, dt, span, strong, b, label')) {
+    if (!/^(?:ISBN(?:[\s-]*(?:10|13))?|(?:Ref\.\s*\/\s*)?EAN)\s*:?$/i.test(label.textContent.trim())) continue;
+    const candidates = [label.nextElementSibling, label.parentElement?.nextElementSibling, label.parentElement];
+    for (const candidate of candidates) {
+      const value = candidate?.textContent || '';
+      if (value.length > 250) continue;
+      const isbn = numberIn(value);
+      if (isbn) return isbn;
+    }
+  }
+  const body = doc.body?.cloneNode(true);
+  body?.querySelectorAll('script,style,nav,header,footer').forEach(el => el.remove());
+  const text = body?.textContent || '';
+  const labelled = text.match(/(?:ISBN(?:[\s-]*(?:10|13))?|\bEAN)\s*:?\s*((?:97[89](?:[\s\p{Pd}]*\d){10})|(?:\d(?:[\s\p{Pd}]*\d){8}[\s\p{Pd}]*[\dXx]))/u);
+  return isbn13(labelled?.[1]);
+}
+
+function nodeIdentity(node, store) {
+  return identity(node) || (store?.skuIsbn ? isbn13(node.sku) : null);
 }
 
 export function detectBook(doc, url = '') {
-  if (url.startsWith('https://bookcover.pt/product/')) {
-    const isbn = isbn13(doc.querySelector('.product_meta .sku')?.textContent);
-    if (isbn) return { isbn, title: String(doc.querySelector('h1')?.textContent || '').trim().slice(0, 200) };
-  }
-  const books = structured(doc).filter(n => identity(n));
-  const ids = [...new Set(books.map(identity))];
-  const isbn = pageIsbn(doc) || (ids.length === 1 ? ids[0] : null);
-  const book = books.find(n => identity(n) === isbn);
-  return { isbn, title: String(book?.name || doc.querySelector('h1')?.textContent || doc.title || '').trim().slice(0, 200) };
+  const store = storeForUrl(url);
+  const books = structured(doc).filter(n => nodeIdentity(n, store));
+  const ids = [...new Set(books.map(n => nodeIdentity(n, store)))];
+  const isbn = pageIsbn(doc) || (store?.skuIsbn && isbn13(doc.querySelector('.product_meta .sku')?.textContent)) || (ids.length === 1 ? ids[0] : null);
+  const book = books.find(n => nodeIdentity(n, store) === isbn);
+  return { isbn: isbn || null, title: String(book?.name || doc.querySelector('h1')?.textContent || doc.title || '').trim().slice(0, 200) };
+}
+
+function primaryPrice(doc, selector) {
+  const container = doc.querySelector(selector);
+  const element = container?.querySelector('ins') || container;
+  const displayed = element?.textContent.trim() || '';
+  return /€/.test(displayed) ? euros(displayed) : null;
 }
 
 export function parseOffer(doc, isbn, url) {
-  const all = structured(doc);
+  const store = storeForUrl(url);
   const source = new URL(url);
-  // Wook's Book offer omits currency. Read only the primary purchase box,
-  // which explicitly contains EUR; never infer currency from unrelated prices.
-  if (source.hostname === 'www.wook.pt' && source.pathname.startsWith('/livro/')) {
-    const book = all.find(n => identity(n) === isbn);
-    const displayed = doc.querySelector('#product-price .price')?.textContent || '';
-    const price = /€/.test(displayed) ? euros(displayed) : null;
-    if (book && price) return { price, url, availability: '', title: String(book.name || '').slice(0, 200) };
+  const all = structured(doc);
+  const productPage = !!store?.product.test(source.pathname);
+  const explicit = pageIsbn(doc);
+  const products = all.filter(n => [n['@type']].flat().some(t => t === 'Product' || t === 'Book') && (n.offers || nodeIdentity(n, store)));
+  const primary = products.find(n => nodeIdentity(n, store) === isbn && (!n.url || safeUrl(n.url, url)?.split('?')[0] === url.split('?')[0]));
+  const verifiedPage = productPage && (explicit === isbn || (products.length === 1 && primary));
+  const currencies = store?.currencies || ['EUR'];
+  let offer = null;
+  for (const node of products) {
+    if (nodeIdentity(node, store) === isbn) {
+      offer = offerFrom(node, url, currencies);
+      if (offer) break;
+    }
   }
-  for (const n of all) {
-    if (identity(n) !== isbn) continue;
-    const offer = offerFrom(n, url);
-    if (offer) return offer;
+  // Some shops keep the ISBN in a labelled field, outside Product JSON-LD.
+  if (!offer && verifiedPage && products.length === 1 && (!nodeIdentity(products[0], store) || nodeIdentity(products[0], store) === isbn)) {
+    offer = offerFrom(products[0], url, currencies);
   }
-  // Some shops put the ISBN on Book and the offer on a separate Product.
-  // This fallback is only allowed on a verified single-product page, never search pages.
-  if (pageIsbn(doc) !== isbn || /\/pesquisa(?:\/|\?)|catalogsearch|[?&]s=/.test(url)) return null;
-  const products = all.filter(n => [n['@type']].flat().includes('Product'));
-  if (products.length === 1 && (!identity(products[0]) || identity(products[0]) === isbn)) {
-    const offer = offerFrom(products[0], url);
-    if (offer) return offer;
+  if (verifiedPage) {
+    const selector = store?.id === 'wook' ? '#product-price .price' : store?.primaryPrice;
+    const displayed = selector ? primaryPrice(doc, selector) : null;
+    if (displayed) offer = { ...offer, price: displayed, currency: 'EUR', url, title: String(primary?.name || doc.querySelector('h1')?.textContent || '').trim().slice(0, 200) };
+    if (!offer) {
+      const amount = doc.querySelector('meta[property="product:price:amount"], meta[property="og:price:amount"]')?.content;
+      const currency = doc.querySelector('meta[property="product:price:currency"], meta[property="og:price:currency"]')?.content;
+      const price = euros(amount);
+      if (price && currencies.includes(currency)) offer = { price, currency, url, title: detectBook(doc, url).title };
+    }
   }
-  const price = euros(doc.querySelector('meta[property="product:price:amount"]')?.content);
-  const currency = doc.querySelector('meta[property="product:price:currency"]')?.content;
-  if (price && currency === 'EUR') return { price, url, availability: '', title: detectBook(doc).title };
-  return null;
+  if (!offer) return null;
+  return { ...offer, availability: store?.uncertainStock ? '' : offer.availability || '', condition: offer.condition || (store?.marketplace ? 'UnknownCondition' : 'NewCondition') };
 }
 
 export function productLinks(doc, store, base) {
-  const selector = store.id === 'almedina' ? 'a.product-item-link[href]' : 'a[href]';
-  return [...new Set([...doc.querySelectorAll(selector)].map(a => safeUrl(a.getAttribute('href'), base))
-    .filter(url => url && store.product.test(new URL(url).pathname)))].slice(0, 3);
+  const urls = [...doc.querySelectorAll(store.selector || 'a[href]')].map(a => safeUrl(a.getAttribute('href'), base));
+  for (const node of structured(doc)) if (typeof node.url === 'string') urls.push(safeUrl(node.url, base));
+  const valid = urls.filter(url => url && store.product.test(new URL(url).pathname)).map(url => {
+    const u = new URL(url); u.hash = '';
+    for (const key of [...u.searchParams.keys()]) if (/^(_|utm_)/.test(key)) u.searchParams.delete(key);
+    return u.href;
+  });
+  return [...new Set(valid)].slice(0, 5);
 }

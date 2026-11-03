@@ -18,6 +18,8 @@ On Windows without Make, use `npm run test:coverage`, `npm run test:integration`
 
 Use two-space indentation, ES modules and named functions. Keep parsing separate from network access. Use `textContent` for merchant/user data. Validate ISBN, currency and destination origin before showing an offer. Treat unknown stock and loyalty credit explicitly. Do not work around captchas or access restrictions.
 
+For a new shop, inspect its search and product pages first, then update `extension/stores.js`, optional manifest hosts, the coverage report and a minimal sanitized fixture. Keep internal SKUs distinct from ISBNs. Use `node scripts/live-smoke.mjs STORE_ID` to test a selected adapter in a local Chromium extension; no logged-in browser or private pages are needed. The temporary profile and generated results stay in ignored `work/`. Record only public sample identifiers, URLs and outcomes in the research evidence.
+
 Commit messages use a single scoped conventional title, for example `fix(parser): validate product ISBN before accepting price`. Keep PRs small, describe the changes in summary bullets, pass all checks, and update documentation when behavior changes. The PR template records change type, testing and the review checklist. Do not add attribution footers to commits or PRs.
 
 ## Release setup

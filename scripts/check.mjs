@@ -1,12 +1,15 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import assert from 'node:assert/strict';
+import { CATALOGUE, STORES } from '../extension/stores.js';
 const manifest = JSON.parse(readFileSync('extension/manifest.json'));
 const pkg = JSON.parse(readFileSync('package.json'));
 assert.equal(manifest.manifest_version, 3);
 assert.equal(manifest.version, pkg.version);
 assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage']);
 assert(!manifest.host_permissions, 'Store access must remain optional');
+assert.equal(new Set(CATALOGUE.map(s => s.id)).size, CATALOGUE.length, 'Store IDs must be unique');
+assert.deepEqual(manifest.optional_host_permissions.sort(), STORES.map(s => `${s.origin}/*`).sort());
 for (const path of Object.values(manifest.icons)) assert(existsSync(`extension/${path}`), `Missing icon ${path}`);
 for (const file of readdirSync('extension').filter(f => f.endsWith('.js'))) {
   execFileSync(process.execPath, ['--check', `extension/${file}`]);

@@ -1,0 +1,173 @@
+{
+  "note": "Minimal reconstructed fixtures from public fields observed 2026-11-03. Not full page snapshots. Selectors and values preserve the inspected ISBN/price structure; unrelated layout and content omitted.",
+  "cases": [
+    {
+      "store": "penguin",
+      "url": "https://penguinlivros.pt/loja/penguin/livro/o-diario-pessoal-do-papa-francisco/",
+      "isbn": "9789895968244",
+      "price": 1607,
+      "currency": "EUR",
+      "html": "<h1>O Diário Pessoal do Papa Francisco - Penguin Livros</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"O Diário Pessoal do Papa Francisco - Penguin Livros\",\"sku\":\"PC68244\",\"offers\":{\"@type\":\"Offer\",\"price\":\"16.07\",\"priceCurrency\":\"EUR\",\"priceValidUntil\":\"2027-12-31\",\"availability\":\"http://schema.org/InStock\",\"itemCondition\":\"NewCondition\",\"url\":\"https://penguinlivros.pt/loja/penguin/livro/o-diario-pessoal-do-papa-francisco/\",\"seller\":{\"@type\":\"Organization\",\"@id\":\"https://penguinlivros.pt/\",\"name\":\"Penguin Livros\",\"url\":\"https://penguinlivros.pt\"}}}]</script><meta property=\"product:price:amount\" content=\"16.07\"><meta property=\"product:price:currency\" content=\"EUR\"><div><span>ISBN:</span><span>9789895968244</span></div>"
+    },
+    {
+      "store": "presenca",
+      "url": "https://www.presenca.pt/products/harry-potter-e-o-principe-misterioso-edicao-ilustrada",
+      "isbn": "9789722378543",
+      "price": 3591,
+      "currency": "EUR",
+      "html": "<h1>Harry Potter e o Príncipe Misterioso - Edição Ilustrada</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"Harry Potter e o Príncipe Misterioso - Edição Ilustrada\",\"sku\":\"9789722378543\",\"offers\":{\"@id\":\"/products/harry-potter-e-o-principe-misterioso-edicao-ilustrada?variant=55125197455697#offer\",\"@type\":\"Offer\",\"availability\":\"http://schema.org/InStock\",\"price\":\"35.91\",\"priceCurrency\":\"EUR\",\"url\":\"https://www.presenca.pt/products/harry-potter-e-o-principe-misterioso-edicao-ilustrada?variant=55125197455697\"}}]</script><meta property=\"og:price:amount\" content=\"35,91\"><meta property=\"og:price:currency\" content=\"EUR\">"
+    },
+    {
+      "store": "guerraepaz",
+      "url": "https://www.guerraepaz.pt/produto/os-enigmas-dos-crimes-de-natal/",
+      "isbn": "9789895764808",
+      "price": 1620,
+      "currency": "EUR",
+      "html": "<h1>Os Enigmas dos Crimes de Natal - Guerra e Paz</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"Os Enigmas dos Crimes de Natal - Guerra e Paz\",\"sku\":\"9902016\",\"offers\":{\"@type\":\"Offer\",\"price\":\"16.20\",\"priceCurrency\":\"EUR\",\"priceValidUntil\":\"2027-12-31\",\"availability\":\"http://schema.org/InStock\",\"itemCondition\":\"NewCondition\",\"url\":\"https://www.guerraepaz.pt/produto/os-enigmas-dos-crimes-de-natal/\",\"seller\":{\"@type\":\"Organization\",\"@id\":\"https://www.guerraepaz.pt/\",\"name\":\"Guerra e Paz\",\"url\":\"https://www.guerraepaz.pt\"}}}]</script><meta property=\"product:price:amount\" content=\"16.20\"><meta property=\"product:price:currency\" content=\"EUR\"><div><span>ISBN:</span><span>9789895764808</span></div>"
+    },
+    {
+      "store": "gradiva",
+      "url": "https://www.gradiva.pt/produto/o-genocidio-ocultado-2/",
+      "isbn": "9789897855320",
+      "price": 1620,
+      "currency": "EUR",
+      "html": "<h1>O Genocídio Ocultado - Gradiva</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"O Genocídio Ocultado - Gradiva\",\"sku\":\"2601003116\",\"offers\":{\"@type\":\"Offer\",\"price\":\"16.20\",\"priceCurrency\":\"EUR\",\"priceValidUntil\":\"2027-12-31\",\"availability\":\"http://schema.org/InStock\",\"itemCondition\":\"NewCondition\",\"url\":\"https://www.gradiva.pt/produto/o-genocidio-ocultado-2/\",\"seller\":{\"@type\":\"Organization\",\"@id\":\"https://www.gradiva.pt/\",\"name\":\"Gradiva\",\"url\":\"https://www.gradiva.pt\"}}}]</script><meta property=\"product:price:amount\" content=\"16.20\"><meta property=\"product:price:currency\" content=\"EUR\"><div><span>ISBN:</span><span>9789897855320</span></div>"
+    },
+    {
+      "store": "relogiodagua",
+      "url": "https://www.relogiodagua.pt/produto/terra/",
+      "isbn": "9789897837449",
+      "price": 2160,
+      "currency": "EUR",
+      "html": "<h1>Terra - Relógio D&#039;Água</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"Terra - Relógio D&#039;Água\",\"offers\":{\"@type\":\"Offer\",\"price\":\"21.60\",\"priceCurrency\":\"EUR\",\"priceValidUntil\":\"2027-12-31\",\"availability\":\"http://schema.org/InStock\",\"itemCondition\":\"NewCondition\",\"url\":\"https://www.relogiodagua.pt/produto/terra/\",\"seller\":{\"@type\":\"Organization\",\"@id\":\"https://www.relogiodagua.pt/\",\"name\":\"Relógio D\\\\'Água\",\"url\":\"https://www.relogiodagua.pt\"}}}]</script><meta property=\"product:price:amount\" content=\"21.6\"><meta property=\"product:price:currency\" content=\"EUR\"><div><span>EAN:</span><span>9789897837449</span></div>"
+    },
+    {
+      "store": "antigona",
+      "url": "https://antigona.pt/products/marcas-de-batom",
+      "isbn": "9789726084495",
+      "price": 2430,
+      "currency": "EUR",
+      "html": "<h1>Marcas de Batom – Antígona</h1><meta property=\"og:price:amount\" content=\"24.30\"><meta property=\"og:price:currency\" content=\"EUR\"><meta itemprop=\"priceCurrency\" content=\"EUR\"><meta itemprop=\"price\" content=\"24.3\"><div><span>ISBN:</span><span>978‑972‑608‑449-5</span></div>"
+    },
+    {
+      "store": "snob",
+      "url": "https://www.livrariasnob.pt/product/exercicio-de-montagem",
+      "isbn": "9789893678862",
+      "price": 700,
+      "currency": "EUR",
+      "html": "<h1>EXERCÍCIO DE MONTAGEM</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"EXERCÍCIO DE MONTAGEM\",\"offers\":{\"@type\":\"Offer\",\"url\":\"https://www.livrariasnob.pt/product/exercicio-de-montagem\",\"priceCurrency\":\"EUR\",\"price\":7,\"priceValidUntil\":\"2027-11-03\",\"itemCondition\":\"https://schema.org/NewCondition\",\"seller\":{\"@type\":[\"BookStore\",\"OnlineStore\"],\"name\":\"Snob\",\"url\":\"https://www.livrariasnob.pt/\"},\"availability\":\"https://schema.org/InStock\",\"category\":[\"Editoras A-L > Artistas Unidos\",\"Problemas de Género > Teatro\"]}}]</script><meta property=\"og:price\" content=\"7.00\"><meta property=\"og:price:amount\" content=\"7.00\"><meta property=\"og:price:standard_amount\" content=\"7.00\"><meta property=\"og:price:currency\" content=\"EUR\"><meta property=\"product:price:amount\" content=\"7.00\"><div><span>ISBN:</span><span>9789893678862</span></div>"
+    },
+    {
+      "store": "kingpin",
+      "url": "https://kingpinbooks.com/collections/novidades/products/a-morte-do-tetraz-lira-by-david-combet",
+      "isbn": "9789895598571",
+      "price": 2800,
+      "currency": "EUR",
+      "html": "<h1>A Morte do Tetraz-Lira by David Combet</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"A Morte do Tetraz-Lira by David Combet\",\"sku\":\"9789895598571\",\"offers\":{\"@id\":\"/products/a-morte-do-tetraz-lira-by-david-combet?variant=55586172404053#offer\",\"@type\":\"Offer\",\"availability\":\"http://schema.org/InStock\",\"price\":\"28.00\",\"priceCurrency\":\"EUR\",\"url\":\"https://kingpinbooks.com/products/a-morte-do-tetraz-lira-by-david-combet?variant=55586172404053\"}}]</script><meta property=\"og:price:amount\" content=\"28,00\"><meta property=\"og:price:currency\" content=\"EUR\">"
+    },
+    {
+      "store": "continente",
+      "url": "https://www.continente.pt/produto/a-criada-de-freida-mcfadden-7781513.html",
+      "isbn": "9789895701124",
+      "price": 1750,
+      "currency": "EUR",
+      "html": "<h1>A Criada de Freida McFadden</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"A Criada de Freida McFadden\",\"gtin13\":\"9789895701124\",\"sku\":\"7781513\",\"offers\":{\"url\":\"https://www.continente.pt/produto/a-criada-de-freida-mcfadden-7781513.html\",\"@type\":\"Offer\",\"priceCurrency\":\"EUR\",\"price\":\"17.50\",\"priceValidUntil\":\"2031-12-31\",\"availability\":\"https://schema.org/InStock\"}}]</script><div><span>ISBN:</span><span>9789895701124</span></div>"
+    },
+    {
+      "store": "quetzal",
+      "url": "https://www.quetzaleditores.pt/produtos/ficha/a-montanha/28076053",
+      "isbn": "9789897228919",
+      "price": 1593,
+      "currency": "EUR",
+      "html": "<h1>A Montanha</h1><script type=\"application/ld+json\">[{\"@type\":\"Book\",\"name\":\"A Montanha\",\"isbn\":\"9789897228919\",\"offers\":{\"@type\":\"Offer\",\"priceCurrency\":\"EUR\",\"price\":\"15.93\",\"seller\":{\"@type\":\"Organization\",\"name\":\"quetzaleditores.pt\"}}}]</script><div><span>ISBN:</span><span>9789897228919</span></div>"
+    },
+    {
+      "store": "saida",
+      "url": "https://www.saidadeemergencia.com/produto/as-aliancas-perdidas/",
+      "isbn": "9789897108075",
+      "price": 1790,
+      "currency": "EUR",
+      "html": "<h1>As Alianças Perdidas</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"As Alianças Perdidas\",\"sku\":\"710807\",\"offers\":[{\"@type\":\"Offer\",\"priceValidUntil\":\"2027-12-31\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://www.saidadeemergencia.com/produto/as-aliancas-perdidas/\",\"seller\":{\"@type\":\"Organization\",\"name\":\"Saída de Emergência\",\"url\":\"https://www.saidadeemergencia.com\"},\"price\":\"19.90\",\"priceCurrency\":\"EUR\"}]}]</script><div><span>ISBN:</span><span>9789897108075</span></div><div class=\"summary\"><p class=\"price\"><del>19,90 €</del><ins>17,90 €</ins></p></div>"
+    },
+    {
+      "store": "mbooks",
+      "url": "https://mbooks.pt/produto/transforme-se-a-si-mesmo-ate-sexta/",
+      "isbn": "9789898297839",
+      "price": 500,
+      "currency": "EUR",
+      "html": "<h1>Transforme-se a si Mesmo até Sexta</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"Transforme-se a si Mesmo até Sexta\",\"sku\":\"829783\",\"offers\":[{\"@type\":\"Offer\",\"priceValidUntil\":\"2027-12-31\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://mbooks.pt/produto/transforme-se-a-si-mesmo-ate-sexta/\",\"seller\":{\"@type\":\"Organization\",\"name\":\"mbooks, Livraria Online - Livros novos e descontinuados, ao melhor preço do mercado\",\"url\":\"https://mbooks.pt\"},\"price\":\"5.00\",\"priceCurrency\":\"EUR\"}]}]</script><div><span>ISBN:</span><span>9789898297839</span></div>"
+    },
+    {
+      "store": "porto",
+      "url": "https://www.portoeditora.pt/produtos/ficha/a-leste-do-paraiso/15327895",
+      "isbn": "9789723830637",
+      "price": 2500,
+      "currency": "EUR",
+      "html": "<h1>A Leste do Paraíso, John Steinbeck - Porto Editora</h1><div><span>ISBN:</span><span>9789723830637</span></div><div class=\"product-price-content\"><span class=\"product-price-sale\">25,00€</span></div>"
+    },
+    {
+      "store": "lyvros",
+      "url": "https://www.lyvros.com/catalogo/a-rapariga-que-inventou-um-sonho",
+      "isbn": "9789895819812",
+      "price": 1791,
+      "currency": "EUR",
+      "html": "<h1>A Rapariga Que Inventou um Sonho</h1><script type=\"application/ld+json\">[{\"@type\":[\"Product\",\"Book\"],\"name\":\"A Rapariga Que Inventou um Sonho\",\"isbn\":\"9789895819812\",\"gtin13\":\"9789895819812\",\"sku\":\"159984\",\"offers\":{\"@type\":\"Offer\",\"availability\":\"https://schema.org/InStock\",\"priceCurrency\":\"EUR\",\"price\":\"17.91\",\"itemCondition\":\"https://schema.org/NewCondition\",\"url\":\"https://www.lyvros.com/catalogo/a-rapariga-que-inventou-um-sonho\",\"seller\":{\"@type\":\"Organization\",\"name\":\"Lyvros\"}}}]</script><meta property=\"product:price:amount\" content=\"17.91\"><meta property=\"product:price:currency\" content=\"EUR\"><div><span>ISBN:</span><span>9789895819812</span></div>"
+    },
+    {
+      "store": "blackwells",
+      "url": "https://blackwells.co.uk/bookshop/product/9781037210631",
+      "isbn": "9781037210631",
+      "price": 2029,
+      "currency": "EUR",
+      "html": "<h1>The Unselected Journals of Emma M. Lion. Vol. 3 : Beth Brower : 9781037210631 : Blackwell's</h1><td itemprop=\"isbn\" headers=\"field-data\">9781037210631</td><div><span>ISBN:</span><span>9781037210631</span></div><div class=\"product__price\"><div class=\"product-price\"><li class=\"product-price--current\">20,29€</li></div></div>"
+    },
+    {
+      "store": "waterstones",
+      "url": "https://www.waterstones.com/book/the-unselected-journals-of-emma-m-lion-vol-3/beth-brower/9781037210631",
+      "isbn": "9781037210631",
+      "price": 999,
+      "currency": "GBP",
+      "html": "<h1>The Unselected Journals of Emma M. Lion, vol. 3 - The Unselected Journals of Emma M. Lion</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"The Unselected Journals of Emma M. Lion, vol. 3 - The Unselected Journals of Emma M. Lion\",\"gtin13\":\"9781037210631\",\"sku\":\"9781037210631\",\"offers\":{\"@type\":\"Offer\",\"url\":\"https://www.waterstones.com/book/the-unselected-journals-of-emma-m-lion-vol-3/beth-brower/9781037210631\",\"availability\":\"https://schema.org/InStock\",\"itemCondition\":\"https://schema.org/NewCondition\",\"price\":\"9.99\",\"priceCurrency\":\"GBP\"}},{\"@type\":\"Book\",\"name\":\"The Unselected Journals of Emma M. Lion, vol. 3 - The Unselected Journals of Emma M. Lion\",\"isbn\":\"9781037210631\"}]</script><div><span>ISBN:</span><span>9781037210631</span></div>"
+    },
+    {
+      "store": "auchan",
+      "url": "https://www.auchan.pt/pt/papelaria-livraria-e-experiencias/livraria/literatura-e-ficcao/a-criada-de-freida-mcfadden/3633281.html",
+      "isbn": "9789895701124",
+      "price": 1751,
+      "currency": "EUR",
+      "html": "<h1>A CRIADA DE FREIDA MCFADDEN</h1><script type=\"application/ld+json\">[{\"@type\":\"Product\",\"name\":\"A CRIADA DE FREIDA MCFADDEN\",\"sku\":\"3633281\",\"offers\":{\"url\":{},\"@type\":\"Offer\",\"priceCurrency\":\"EUR\",\"price\":\"17.51\",\"availability\":\"http://schema.org/InStock\"}}]</script><div><span>Ref. / EAN:</span><span>9789895701124</span></div>"
+    },
+    {
+      "store": "iberlibro",
+      "url": "https://www.iberlibro.com/Criada-Mcfadden-Freida-Alma-dos-Livros/32519823586/bd",
+      "isbn": "9789895701124",
+      "price": 2200,
+      "currency": "EUR",
+      "html": "<h1>A Criada</h1><script type=\"application/ld+json\">[{\"@type\":\"Book\",\"name\":\"A Criada\",\"isbn\":\"9789895701124\"},{\"@type\":\"Product\",\"name\":\"A Criada\",\"gtin13\":\"9789895701124\",\"sku\":\"32519823586\",\"offers\":{\"@type\":\"Offer\",\"price\":22,\"priceCurrency\":\"EUR\",\"url\":\"https://www.iberlibro.com/Criada-Mcfadden-Freida-Alma-dos-Livros/32519823586/bd\",\"availability\":\"https://schema.org/InStock\",\"itemCondition\":\"https://schema.org/NewCondition\",\"seller\":{\"@type\":\"Organization\",\"name\":\"bookish.org\",\"url\":\"https://www.iberlibro.com/bookish.org-Barcelona/90595148/sf\"},\"sku\":\"32519823586\",\"gtin13\":\"9789895701124\"}}]</script><div><span>ISBN:</span><span>9789895701124</span></div>"
+    },
+    {
+      "store": "devir",
+      "url": "https://editoradevir.pt/livro/ichi-the-witch-01/",
+      "isbn": "9789895598762",
+      "price": 999,
+      "currency": "EUR",
+      "html": "<script type=\"application/ld+json\">{\"@type\":[\"Product\",\"Book\"],\"isbn\":\"9789895598762\",\"gtin13\":\"9789895598762\",\"sku\":\"BD779\",\"offers\":{\"@type\":\"Offer\",\"price\":\"9.99\",\"priceCurrency\":\"EUR\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://editoradevir.pt/livro/ichi-the-witch-01/\"}}</script>"
+    },
+    {
+      "store": "elcorteingles",
+      "url": "https://www.elcorteingles.pt/livros/A202577753-o-palacio-das-lagrimas-edicao-de-colecionador/",
+      "isbn": "9789895874132",
+      "price": 3200,
+      "currency": "EUR",
+      "html": "<script type=\"application/ld+json\">{\"@type\":\"Product\",\"sku\":\"9789895874132\",\"offers\":{\"@type\":\"Offer\",\"price\":\"32.00\",\"priceCurrency\":\"EUR\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://www.elcorteingles.pt/livros/A202577753-o-palacio-das-lagrimas-edicao-de-colecionador/\"}}</script>"
+    },
+    {
+      "store": "mundofantasma",
+      "url": "https://mundofantasma.com/produto/056086",
+      "isbn": "9781591163596",
+      "price": 1487,
+      "currency": "EUR",
+      "html": "<script type=\"application/ld+json\">{\"@type\":[\"Product\",\"Book\"],\"isbn\":\"1591163595\",\"sku\":\"056086\",\"offers\":{\"@type\":\"Offer\",\"price\":\"14.87\",\"priceCurrency\":\"EUR\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://mundofantasma.com/produto/056086\"}}</script>"
+    }
+  ]
+}

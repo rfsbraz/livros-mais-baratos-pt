@@ -8,29 +8,33 @@ Extensão Chrome para comparar preços de livros em livrarias portuguesas, pela 
 2. Abre `chrome://extensions` e ativa o **Modo de programador**.
 3. Clica em **Carregar expandida** e escolhe a pasta com `manifest.json` (a pasta `extension/` no repositório).
 4. Fixa a extensão na barra de ferramentas. Abre uma página de livro e clica no ícone.
-5. Confirma o ISBN e clica em **Comparar**. Autoriza o acesso às quatro livrarias quando o Chrome pedir.
+5. Confirma o ISBN, escolhe as lojas e clica em **Comparar**. Autoriza o acesso às lojas selecionadas quando o Chrome pedir. O título é opcional e ajuda nos catálogos que não pesquisam por ISBN.
 
 Não precisas de Node.js para instalar a extensão. Ainda não está publicada na Chrome Web Store.
 
 ## O que faz
 
 - Deteta ISBN-10/ISBN-13 em dados estruturados e campos da página, validando o dígito de controlo.
-- Consulta Wook, Bertrand, Almedina e Bookcover, apresentando apenas preços em euros associados ao ISBN pedido.
+- Inclui 26 adaptadores automáticos: Wook, Bertrand, Almedina, Bookcover, Continente, Porto Editora, Lyvros, Penguin, Presença, Guerra e Paz, Gradiva, Relógio d'Água, Saída de Emergência, Quetzal, Antígona, Snob, Kingpin, mbooks, Auchan, Blackwell's, Waterstones, IberLibro, AbeBooks, El Corte Inglés, Devir e Mundo Fantasma.
+- Permite escolher lojas, consultar até quatro em simultâneo e interromper a comparação.
+- Inclui 17 fontes de consulta manual e 17 entradas de referência para outros formatos, aliases, chancelas e endereços indisponíveis. Todas as lojas mencionadas no levantamento estão contabilizadas em [Cobertura das lojas](docs/store-coverage.md).
+- Verifica o ISBN do produto mesmo quando encontra candidatos pelo título. Não confunde códigos internos com ISBN.
 - Distingue preços com stock confirmado, sem stock e disponibilidade desconhecida.
+- Preserva moeda, condição e vendedor. Livros usados e preços GBP/USD não entram no mínimo de livros novos em EUR.
 - Guarda até 100 livros e o histórico local de consultas (até 90 dias, 200 edições e 360 observações por edição).
 - Permite apagar todos os dados locais.
 
-## Limitações desta primeira versão
+## Cobertura real e limitações
 
-Os adaptadores são experimentais. As lojas podem bloquear pedidos, alterar o HTML ou servir preços apenas após executar JavaScript. Os testes automáticos usam páginas sintéticas e um perfil Chromium com a extensão real. Em 3 de novembro de 2026, uma consulta real pela extensão confirmou o preço de um livro na Bookcover; as outras três lojas bloquearam os pedidos nesse ambiente. Os percursos de pesquisa e os dados de produto das quatro lojas foram também inspecionados num navegador. A cobertura real deve ser confirmada no teu Chrome. Uma loja sem preço verificável apresenta uma ligação para consulta manual, nunca um preço inventado.
+Os adaptadores são experimentais. Em 3 de novembro de 2026, testes reais na extensão local confirmaram preços em **18 das 26 lojas automáticas**. Os outros oito adaptadores não concluíram os pedidos nesse ambiente, embora as páginas de produto e os percursos tenham sido inspecionados num navegador. Uma amostra bem-sucedida não garante todo o catálogo. As lojas podem bloquear pedidos ou alterar páginas. Uma loja sem preço verificável apresenta uma ligação para consulta manual. Consulta os resultados e as particularidades de cada loja no [relatório de cobertura](docs/store-coverage.md).
 
-Os preços excluem portes. Saldo em cartão não é tratado como desconto. A extensão não calcula custos finais, não contorna captchas, não usa contas das lojas e não executa scripts recebidos das lojas. Segue os redirecionamentos normais da pesquisa, mas rejeita respostas cujo destino final esteja fora da loja. São examinados no máximo três candidatos por loja.
+Os preços excluem portes e taxas de importação. Saldo em cartão não é tratado como desconto. A extensão não calcula custos finais, não contorna captchas, não usa contas das lojas e não executa scripts recebidos das lojas. Segue redirecionamentos normais, rejeita destinos fora da loja e ignora ligações que alterem o carrinho. Examina até seis candidatos por loja, com prazo total de 35 segundos por loja. Uma oferta de marketplace não é uma garantia do mínimo de todos os vendedores.
 
 O histórico começa nas tuas consultas. Não há recolha contínua, notificações, campanhas automáticas, previsão legal de descontos, importação de listas ou servidor nesta versão. Mantém a janela aberta durante a consulta. Fechar o popup interrompe o trabalho em curso.
 
 ## Privacidade e permissões
 
-`activeTab` e `scripting` permitem ler a página atual quando abres a extensão. `storage` guarda a estante e o histórico apenas neste navegador. O acesso às quatro lojas é opcional e pedido ao comparar. Cada loja recebe o ISBN pesquisado e os dados de rede normais (incluindo o endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade, afiliados ou serviços externos. Consulta [PRIVACY.md](PRIVACY.md).
+`activeTab` e `scripting` permitem ler a página atual quando abres a extensão. `storage` guarda a estante, a seleção e o histórico apenas neste navegador. O acesso às lojas é opcional e pedido apenas para as selecionadas. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade ou afiliados. Consulta [PRIVACY.md](PRIVACY.md).
 
 ## Desenvolvimento
 

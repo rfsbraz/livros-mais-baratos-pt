@@ -1,8 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isbn13, euros, identity, offerFrom, safeUrl, remember, wooOffer } from '../extension/core.js';
+import { isbn13, euros, identity, offerFrom, safeUrl, remember, wooOffer, svelteProductLinks } from '../extension/core.js';
+import { pooled, compareStore } from '../extension/compare.js';
+import { STORES, searchUrl } from '../extension/stores.js';
 test('normalizes ISBN-10 and ISBN-13, including X check digit', () => {
   assert.equal(isbn13('978-0-306-40615-7'), '9780306406157');
+  assert.equal(isbn13('978‑972‑608‑449-5'), '9789726084495');
   assert.equal(isbn13('0-306-40615-2'), '9780306406157');
   assert.equal(isbn13('080442957X'), '9780804429573');
   assert.equal(isbn13('9780306406158'), null);
@@ -20,6 +23,41 @@ test('parses EUR into integer cents without silently interpreting ranges or disc
 test('restricts merchant URLs to the expected HTTPS origin', () => {
   assert.equal(safeUrl('/livro/teste', 'https://www.wook.pt'), 'https://www.wook.pt/livro/teste');
   for (const url of ['https://evil.test/', '//evil.test', 'javascript:alert(1)', 'http://www.wook.pt', 'https://a:b@www.wook.pt/']) assert.equal(safeUrl(url, 'https://www.wook.pt'), null);
+  for (const url of ['/livro/teste?add-to-cart=123', '/livro/teste?add_to_wishlist=123', '/livro/teste?wc-ajax=add_to_cart', '/livro/teste?remove_item=abc']) assert.equal(safeUrl(url, 'https://www.wook.pt'), null);
+});
+
+test('currencies and conditions remain separate in offers and history', () => {
+  const offer = offerFrom({ offers: { price: '9.99', priceCurrency: 'GBP', itemCondition: 'https://schema.org/UsedCondition', url: {} } }, 'https://www.waterstones.com/book/example', ['GBP']);
+  assert.equal(offer.currency, 'GBP'); assert.equal(offer.condition, 'UsedCondition'); assert.equal(offer.price, 999);
+  assert.equal(offer.url, 'https://www.waterstones.com/book/example');
+  const history = remember({}, 'book', [{ ...offer, id: 'waterstones', status: 'ok' }]);
+  assert.equal(history.book[0].currency, 'GBP'); assert.equal(history.book[0].condition, 'UsedCondition');
+});
+
+test('Svelte search extracts bounded product links, never trusts search prices or unsafe SKUs', () => {
+  const data = [{ products: 1 }, { data: 2 }, [3, 5, 7], { sku: 4 }, '056086', { sku: 6 }, '../cart?add-to-cart=1', { sku: 8 }, '101203'];
+  assert.deepEqual(svelteProductLinks({ nodes: [{ type: 'skip' }, { type: 'data', data }] }, 'https://mundofantasma.com'), ['https://mundofantasma.com/produto/056086', 'https://mundofantasma.com/produto/101203']);
+  for (const payload of [null, {}, { nodes: [] }, { nodes: [{ type: 'data', data: [{ products: -1 }] }] }]) assert.deepEqual(svelteProductLinks(payload, 'https://mundofantasma.com'), []);
+});
+
+test('pool bounds active requests and preserves result order', async () => {
+  let active = 0, peak = 0;
+  const result = await pooled([5, 1, 3, 2, 4, 6], async n => {
+    active++; peak = Math.max(peak, active);
+    await new Promise(resolve => setTimeout(resolve, n)); active--; return n * 2;
+  }, 2);
+  assert.equal(peak, 2); assert.deepEqual(result, [10, 2, 6, 4, 8, 12]);
+  assert.deepEqual(await pooled([], () => assert.fail()), []);
+});
+
+test('cancelled stores do not start requests and search text cannot inject query parameters', async () => {
+  const controller = new AbortController(); controller.abort();
+  const result = await compareStore(STORES[0], '9780306406157', controller.signal, () => assert.fail('Cancelled request started'));
+  assert.equal(result.status, 'unavailable');
+  const store = STORES.find(s => s.id === 'guerraepaz');
+  const url = new URL(searchUrl(store, 'Livros & post_type=other / ação', true));
+  assert.equal(url.searchParams.get('s'), 'Livros & post_type=other / ação');
+  assert.equal(url.searchParams.get('post_type'), 'product');
 });
 test('extracts only explicit EUR offers and preserves stock state', () => {
   const book = { name: 'Example', isbn: '0306406152', offers: { price: '15.45', priceCurrency: 'EUR', availability: 'https://schema.org/OutOfStock', url: '/livro/example' } };
