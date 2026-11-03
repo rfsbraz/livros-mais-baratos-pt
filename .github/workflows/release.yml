@@ -18,7 +18,7 @@ jobs:
       - name: Explain missing release configuration
         if: env.RELEASE_TOKEN == ''
         run: echo 'Configure RELEASE_PLEASE_TOKEN to enable releases.' >> "$GITHUB_STEP_SUMMARY"
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         if: env.RELEASE_TOKEN != ''
         id: release
         with:
