@@ -48,5 +48,5 @@ jobs:
         if: always()
         with:
           name: browser-evidence
-          path: work/
+          path: work/*.png
           if-no-files-found: ignore

@@ -7,6 +7,8 @@ const $ = id => document.getElementById(id);
 const money = (cents, currency = 'EUR') => new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
 let current = null, saved = {}, history = {}, controller = null, run = 0, activeOffers = [];
 let selected = new Set(STORES.map(s => s.id));
+let autoEnabled = false;
+function autoLabel() { $('auto-toggle').textContent = autoEnabled ? 'Desativar avisos automáticos' : 'Ativar avisos automáticos'; $('auto-toggle').setAttribute('aria-pressed', String(autoEnabled)); }
 let writes = Promise.resolve();
 const status = text => { $('status').textContent = text; };
 function persist() {
@@ -140,6 +142,18 @@ $('cancel').onclick = () => {
 };
 $('select-all').onclick = () => { selected = new Set(STORES.map(s => s.id)); renderShops(); persist().catch(() => status('Não foi possível guardar a seleção.')); };
 $('select-none').onclick = () => { selected.clear(); renderShops(); persist().catch(() => status('Não foi possível guardar a seleção.')); };
+$('auto-toggle').onclick = async () => {
+  try {
+    if (!autoEnabled) {
+      const stores = STORES.filter(s => selected.has(s.id));
+      if (!stores.length) { status('Seleciona pelo menos uma loja para ativar os avisos.'); return; }
+      if (!await chrome.permissions.request({ origins: stores.map(s => `${s.origin}/*`) })) { status('Acesso não autorizado. Os avisos continuam desativados.'); return; }
+    }
+    autoEnabled = !autoEnabled;
+    await chrome.storage.local.set({ autoEnabled }); autoLabel();
+    status(autoEnabled ? 'Avisos ativos nas lojas autorizadas e selecionadas. Abre um livro para procurar preços mais baixos.' : 'Avisos automáticos desativados.');
+  } catch { status('Não foi possível alterar os avisos automáticos.'); }
+};
 $('save').onclick = async () => {
   if (!current) return;
   if (!saved[current.isbn] && Object.keys(saved).length >= 100) { status('A estante tem 100 livros. Remove um para guardar outro.'); return; }
@@ -147,13 +161,14 @@ $('save').onclick = async () => {
   try { await persist(); status('Livro guardado. Volta à estante para atualizar o preço.'); } catch { status('Não foi possível guardar este livro.'); }
 };
 $('clear').onclick = async () => {
-  if (!confirm('Apagar a estante, o histórico e a seleção de lojas neste navegador?')) return;
+  if (!confirm('Apagar a estante, o histórico e a seleção de lojas, e desativar os avisos automáticos?')) return;
   ++run; controller?.abort(); $('cancel').hidden = true; saved = {}; history = {}; selected = new Set(STORES.map(s => s.id));
-  try { await persist(); renderSaved(); renderHistory(); renderShops(); saveLabel(); status('Estante e histórico apagados.'); } catch { status('Não foi possível apagar os dados. Tenta novamente.'); }
+  try { autoEnabled = false; await chrome.storage.local.set({ autoEnabled: false }); await persist(); autoLabel(); renderSaved(); renderHistory(); renderShops(); saveLabel(); status('Estante e histórico apagados.'); } catch { status('Não foi possível apagar os dados. Tenta novamente.'); }
 };
 async function init() {
   try {
-    const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores']);
+    const data = await chrome.storage.local.get(['saved', 'history', 'selectedStores', 'autoEnabled']);
+    autoEnabled = data.autoEnabled === true; autoLabel();
     saved = data.saved || {}; history = data.history || {};
     if (Array.isArray(data.selectedStores)) selected = new Set(data.selectedStores.filter(id => STORES.some(s => s.id === id)));
     renderSaved(); renderShops();

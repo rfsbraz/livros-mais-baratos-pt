@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Livros Mais Baratos PT",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Compara preços da mesma edição em livrarias portuguesas e guarda o histórico das tuas consultas.",
   "minimum_chrome_version": "120",
   "permissions": [
     "activeTab",
     "scripting",
-    "storage"
+    "storage",
+    "offscreen"
   ],
   "optional_host_permissions": [
     "https://www.wook.pt/*",
@@ -53,5 +54,48 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
-  }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content-main.js",
+        "parser.js",
+        "core.js",
+        "stores.js",
+        "auto-rules.js"
+      ],
+      "matches": [
+        "https://www.wook.pt/*",
+        "https://www.bertrand.pt/*",
+        "https://www.almedina.net/*",
+        "https://bookcover.pt/*",
+        "https://www.continente.pt/*",
+        "https://www.portoeditora.pt/*",
+        "https://www.lyvros.com/*",
+        "https://penguinlivros.pt/*",
+        "https://www.presenca.pt/*",
+        "https://www.guerraepaz.pt/*",
+        "https://www.gradiva.pt/*",
+        "https://www.relogiodagua.pt/*",
+        "https://www.saidadeemergencia.com/*",
+        "https://www.quetzaleditores.pt/*",
+        "https://antigona.pt/*",
+        "https://www.livrariasnob.pt/*",
+        "https://kingpinbooks.com/*",
+        "https://mbooks.pt/*",
+        "https://www.auchan.pt/*",
+        "https://blackwells.co.uk/*",
+        "https://www.waterstones.com/*",
+        "https://www.iberlibro.com/*",
+        "https://www.abebooks.com/*",
+        "https://www.elcorteingles.pt/*",
+        "https://mundofantasma.com/*",
+        "https://editoradevir.pt/*"
+      ]
+    }
+  ]
 }

@@ -3,6 +3,18 @@ import assert from 'node:assert/strict';
 import { isbn13, euros, identity, offerFrom, safeUrl, remember, wooOffer, svelteProductLinks } from '../extension/core.js';
 import { pooled, compareStore } from '../extension/compare.js';
 import { STORES, searchUrl } from '../extension/stores.js';
+import { validCurrent, cheaperOffer } from '../extension/auto-rules.js';
+
+test('automatic alerts require a product page and a cheaper in-stock new offer in the same currency', () => {
+  const current = { isbn: '9780306406157', price: 2000, currency: 'EUR', condition: 'NewCondition', url: 'https://www.wook.pt/livro/teste' };
+  assert(validCurrent(current, current.url));
+  assert(!validCurrent(current, 'https://www.wook.pt/pesquisa'));
+  assert(!validCurrent({ ...current, url: 'https://www.wook.pt/livro/other' }, current.url));
+  assert(!validCurrent({ ...current, condition: 'UsedCondition' }, current.url));
+  const offer = { id: 'bertrand', origin: 'https://www.bertrand.pt', status: 'ok', price: 1800, currency: 'EUR', condition: 'NewCondition', availability: 'InStock', url: 'https://www.bertrand.pt/livro/teste' };
+  assert.equal(cheaperOffer(current, [offer], 'wook'), offer);
+  for (const change of [{ price: 2000 }, { price: 2100 }, { availability: 'OutOfStock' }, { availability: '' }, { condition: 'UsedCondition' }, { currency: 'GBP' }, { marketplace: true }, { status: 'unverified' }, { url: 'https://evil.test/' }, { id: 'wook' }]) assert.equal(cheaperOffer(current, [{ ...offer, ...change }], 'wook'), null);
+});
 test('normalizes ISBN-10 and ISBN-13, including X check digit', () => {
   assert.equal(isbn13('978-0-306-40615-7'), '9780306406157');
   assert.equal(isbn13('978‑972‑608‑449-5'), '9789726084495');

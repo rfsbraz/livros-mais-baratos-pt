@@ -1,6 +1,16 @@
 # Architecture
 
-Manifest V3, plain ES modules, no runtime dependencies and no backend. The popup owns the lifetime of a comparison; closing it cancels the browser context. No periodic scraping or background worker is installed.
+Manifest V3, plain ES modules, no runtime dependencies and no backend. The popup owns manual comparisons. Optional automatic alerts use a service worker, dynamically registered content scripts and a hidden offscreen document for DOM parsing. No periodic scraping or scheduled monitoring is installed.
+
+## Automatic page alerts
+
+The popup requests selected host permissions in a user gesture before saving `autoEnabled`. The service worker registers `content.js` only on selected, granted hosts, including currently open tabs. Install/startup, permission changes and preference changes reconcile registration. Disabling or changing configuration closes the offscreen document to cancel requests and discard cache, and tells existing page scripts to remove stale notices.
+
+The content script parses the current product DOM using the existing ISBN and price adapters. It rejects search pages, marketplace sources, identified digital formats and unverifiable current prices. It observes delayed page content and URL changes, invalidates stale asynchronous results and supports back/forward cache restoration. The worker validates the sender's extension ID, top-level frame, source URL, selected/granted source and current-offer fields before forwarding only book metadata. Full page HTML is not sent outside the tab.
+
+The offscreen document uses the same comparison adapters. At most two distinct edition/selection jobs run with four shared store slots, a 90-second job deadline and 35-second store deadline. Concurrent identical requests share a job. Results are cached in memory for ten minutes with a 50-entry bound. Comparisons accept only a strictly cheaper, in-stock new EUR offer from another non-marketplace store. Alerts display the observation time, price difference and a shipping exclusion. Cached results are not historical observations. Page dismissal suppresses that ISBN for the current document.
+
+Browser tests exercise the native content-script, worker and offscreen-message flow in an isolated Chromium extension. Only the network boundary is replaced in the temporary test copy because Playwright page routing does not intercept hidden offscreen targets. Public shop access remains covered separately by the live smoke script. See Chrome's [offscreen API](https://developer.chrome.com/docs/extensions/reference/api/offscreen) and [dynamic content-script registration](https://developer.chrome.com/docs/extensions/reference/api/scripting#method-registerContentScripts).
 
 `stores.js` is the single catalogue for adapters, permissions, search routes, manual sources and aliases. `core.js` validates identifiers, normalizes amounts into integer minor units, checks links and bounds history. `parser.js` reads inert DOM documents and JSON-LD. `compare.js` tries ISBN and optional title search, visiting at most six unique product candidates with a 12-second request deadline. The popup limits concurrency to four stores and each store to 35 seconds. A generation token and cancellation prevent stale results replacing newer searches. Interrupted comparisons do not persist partial history. Storage writes are queued to avoid overwriting a later action with an earlier save.
 

@@ -26,7 +26,7 @@ try {
     window.__data = JSON.parse(localStorage.getItem('testData') || '{"selectedStores":["wook","bertrand","almedina","bookcover"]}');
     window.__permission = true;
     window.chrome = {
-      storage: { local: { get: async () => window.__data, set: async data => { window.__data = data; localStorage.setItem('testData', JSON.stringify(data)); } } },
+      storage: { local: { get: async () => window.__data, set: async data => { window.__data = { ...window.__data, ...data }; localStorage.setItem('testData', JSON.stringify(window.__data)); } } },
       permissions: { request: async request => { window.__requested = request; return window.__permission; } },
       tabs: { query: async () => [{ id: 1, url: 'https://www.wook.pt/livro/example' }] },
       scripting: { executeScript: async () => [{ result: { html } }] }
@@ -104,7 +104,15 @@ try {
   await page.evaluate(() => { window.__permission = false; });
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'Acesso não autorizado' }).waitFor();
+  await page.locator('#auto-toggle').click();
+  await page.getByRole('status').filter({ hasText: 'avisos continuam desativados' }).waitFor();
   await page.evaluate(() => { window.__permission = true; });
+  await page.locator('#auto-toggle').click();
+  await page.getByRole('status').filter({ hasText: 'Avisos ativos' }).waitFor();
+  assert.equal(await page.evaluate(() => window.__data.autoEnabled), true);
+  await page.locator('#auto-toggle').click();
+  await page.getByRole('status').filter({ hasText: 'Avisos automáticos desativados' }).waitFor();
+  assert.equal(await page.evaluate(() => window.__data.autoEnabled), false);
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   await mkdir('work', { recursive: true });

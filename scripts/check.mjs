@@ -6,10 +6,17 @@ const manifest = JSON.parse(readFileSync('extension/manifest.json'));
 const pkg = JSON.parse(readFileSync('package.json'));
 assert.equal(manifest.manifest_version, 3);
 assert.equal(manifest.version, pkg.version);
-assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage']);
+assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage', 'offscreen']);
+assert.equal(manifest.background.service_worker, 'background.js');
+assert.equal(manifest.background.type, 'module');
+assert(!manifest.content_scripts, 'Automatic scripts must be registered only after opt-in');
 assert(!manifest.host_permissions, 'Store access must remain optional');
 assert.equal(new Set(CATALOGUE.map(s => s.id)).size, CATALOGUE.length, 'Store IDs must be unique');
 assert.deepEqual(manifest.optional_host_permissions.sort(), STORES.map(s => `${s.origin}/*`).sort());
+for (const group of manifest.web_accessible_resources) {
+  assert.deepEqual([...group.matches].sort(), STORES.map(s => `${s.origin}/*`).sort());
+  for (const file of group.resources) assert(existsSync(`extension/${file}`), `Missing content module ${file}`);
+}
 for (const path of Object.values(manifest.icons)) assert(existsSync(`extension/${path}`), `Missing icon ${path}`);
 for (const file of readdirSync('extension').filter(f => f.endsWith('.js'))) {
   execFileSync(process.execPath, ['--check', `extension/${file}`]);

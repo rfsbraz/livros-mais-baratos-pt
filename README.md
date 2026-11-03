@@ -12,6 +12,12 @@ Extensão Chrome para comparar preços de livros em livrarias portuguesas, pela 
 
 Não precisas de Node.js para instalar a extensão. Ainda não está publicada na Chrome Web Store.
 
+## Avisos automáticos ao visitar um livro
+
+Abre a extensão uma vez, escolhe as lojas e clica em **Ativar avisos automáticos**. Autoriza o acesso quando o Chrome pedir. Depois podes fechar a extensão: ao visitar uma página de livro numa loja selecionada e autorizada, aparece um aviso no canto inferior direito se outra loja tiver a mesma edição nova mais barata, com stock confirmado. O aviso mostra os dois preços, a poupança e a ligação da oferta. Podes fechá-lo ou desativar os avisos na extensão.
+
+Os avisos exigem ISBN e preço atual verificáveis e comparam livros novos em EUR. Não se aplicam a páginas de pesquisa, ofertas usadas, marketplaces ou formatos digitais identificados. Portes não incluídos. Resultados de consultas recentes podem ser reutilizados durante dez minutos; a hora da consulta aparece no aviso. Se mudares a seleção para novas lojas, usa **Comparar** ou volta a ativar os avisos para conceder acesso aos novos domínios. Lojas bloqueadas continuam sem preço confirmado.
+
 ## O que faz
 
 - Deteta ISBN-10/ISBN-13 em dados estruturados e campos da página, validando o dígito de controlo.
@@ -30,11 +36,11 @@ Os adaptadores são experimentais. Em 3 de novembro de 2026, testes reais na ext
 
 Os preços excluem portes e taxas de importação. Saldo em cartão não é tratado como desconto. A extensão não calcula custos finais, não contorna captchas, não usa contas das lojas e não executa scripts recebidos das lojas. Segue redirecionamentos normais, rejeita destinos fora da loja e ignora ligações que alterem o carrinho. Examina até seis candidatos por loja, com prazo total de 35 segundos por loja. Uma oferta de marketplace não é uma garantia do mínimo de todos os vendedores.
 
-O histórico começa nas tuas consultas. Não há recolha contínua, notificações, campanhas automáticas, previsão legal de descontos, importação de listas ou servidor nesta versão. Mantém a janela aberta durante a consulta. Fechar o popup interrompe o trabalho em curso.
+O histórico começa nas comparações manuais. Não há monitorização agendada de livros guardados, notificações do sistema, campanhas automáticas, previsão legal de descontos, importação de listas ou servidor. Mantém a janela aberta durante uma comparação manual. Os avisos automáticos, quando ativados, funcionam independentemente da janela da extensão e não acrescentam observações ao histórico.
 
 ## Privacidade e permissões
 
-`activeTab` e `scripting` permitem ler a página atual quando abres a extensão. `storage` guarda a estante, a seleção e o histórico apenas neste navegador. O acesso às lojas é opcional e pedido apenas para as selecionadas. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade ou afiliados. Consulta [PRIVACY.md](PRIVACY.md).
+`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas quando ligas os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso às lojas é opcional. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade ou afiliados. Consulta [PRIVACY.md](PRIVACY.md).
 
 ## Desenvolvimento
 

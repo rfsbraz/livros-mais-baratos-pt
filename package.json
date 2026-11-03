@@ -1,13 +1,13 @@
 {
   "name": "livros-mais-baratos-pt",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "license": "MIT",
   "type": "module",
   "scripts": {
     "test": "node --test tests/core.test.js",
     "test:coverage": "node --test --experimental-test-coverage tests/core.test.js",
-    "test:integration": "node tests/browser.mjs && node tests/extension-smoke.mjs",
+    "test:integration": "node tests/browser.mjs && node tests/extension-smoke.mjs && node tests/automatic.mjs",
     "check": "node scripts/check.mjs",
     "build": "node scripts/build.mjs"
   },
