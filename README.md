@@ -7,16 +7,16 @@ Extensão Chrome para comparar preços de livros em livrarias portuguesas, pela 
 1. Descarrega e extrai o ZIP da extensão, ou clona este repositório.
 2. Abre `chrome://extensions` e ativa o **Modo de programador**.
 3. Clica em **Carregar expandida** e escolhe a pasta com `manifest.json` (a pasta `extension/` no repositório).
-4. Fixa a extensão na barra de ferramentas. Abre uma página de livro e clica no ícone.
-5. Confirma o ISBN, escolhe as lojas e clica em **Comparar**. Autoriza o acesso às lojas selecionadas quando o Chrome pedir. O título é opcional e ajuda nos catálogos que não pesquisam por ISBN.
+4. Aceita as permissões de acesso às lojas que o Chrome apresentar e visita uma página de livro suportada. As comparações começam automaticamente.
+5. Para comparar manualmente ou ajustar preferências, abre o ícone da extensão. Confirma o ISBN, escolhe as lojas e clica em **Comparar**. O título é opcional.
 
 Não precisas de Node.js para instalar a extensão. Ainda não está publicada na Chrome Web Store.
 
 ## Avisos automáticos ao visitar um livro
 
-Abre a extensão uma vez, escolhe as lojas e clica em **Ativar avisos automáticos**. Autoriza o acesso quando o Chrome pedir. Depois podes fechar a extensão: ao visitar uma página de livro numa loja selecionada e autorizada, aparece um aviso no canto inferior direito se outra loja tiver a mesma edição nova mais barata, com stock confirmado. O aviso mostra os dois preços, a poupança e a ligação da oferta. Podes fechá-lo ou desativar os avisos na extensão.
+Os avisos estão ativos por predefinição após a instalação, com acesso às lojas solicitado pelo Chrome nesse momento. Não precisas de abrir a extensão nem de fazer configuração adicional: ao visitar uma página de livro numa loja selecionada e autorizada, aparece um aviso no canto inferior direito se outra loja tiver a mesma edição nova mais barata, com stock confirmado. O aviso mostra os dois preços, a poupança e a ligação da oferta. Podes fechá-lo ou desativar os avisos na extensão.
 
-Os avisos exigem ISBN e preço atual verificáveis e comparam livros novos em EUR. Não se aplicam a páginas de pesquisa, ofertas usadas, marketplaces ou formatos digitais identificados. Portes não incluídos. Resultados de consultas recentes podem ser reutilizados durante dez minutos; a hora da consulta aparece no aviso. Se mudares a seleção para novas lojas, usa **Comparar** ou volta a ativar os avisos para conceder acesso aos novos domínios. Lojas bloqueadas continuam sem preço confirmado.
+Os avisos exigem ISBN e preço atual verificáveis e comparam livros novos em EUR. Não se aplicam a páginas de pesquisa, ofertas usadas, marketplaces ou formatos digitais identificados. Portes não incluídos. Resultados de consultas recentes podem ser reutilizados durante dez minutos; a hora da consulta aparece no aviso. Podes alterar a seleção de lojas ou desligar os avisos. Uma preferência guardada de desativação é preservada nas atualizações. Se o Chrome tiver restringido o acesso a um site, ajusta-o nas definições da extensão. Lojas bloqueadas continuam sem preço confirmado.
 
 ## O que faz
 
@@ -40,7 +40,7 @@ O histórico começa nas comparações manuais. Não há monitorização agendad
 
 ## Privacidade e permissões
 
-`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas quando ligas os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso às lojas é opcional. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade ou afiliados. Consulta [PRIVACY.md](PRIVACY.md).
+`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas por predefinição, respeitando a opção de desligar os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso aos domínios das 26 lojas é solicitado na instalação. Atualizações que adicionem permissões podem exigir aprovação no Chrome. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade ou afiliados. Consulta [PRIVACY.md](PRIVACY.md).
 
 ## Desenvolvimento
 

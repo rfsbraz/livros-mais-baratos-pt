@@ -1,42 +1,14 @@
 {
   "manifest_version": 3,
   "name": "Livros Mais Baratos PT",
-  "version": "0.1.2",
-  "description": "Compara preços da mesma edição em livrarias portuguesas e guarda o histórico das tuas consultas.",
+  "version": "0.1.3",
+  "description": "Compara preços de livros em Portugal e recebe automaticamente avisos de ofertas mais baratas da mesma edição.",
   "minimum_chrome_version": "120",
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
     "offscreen"
-  ],
-  "optional_host_permissions": [
-    "https://www.wook.pt/*",
-    "https://www.bertrand.pt/*",
-    "https://www.almedina.net/*",
-    "https://bookcover.pt/*",
-    "https://www.continente.pt/*",
-    "https://www.portoeditora.pt/*",
-    "https://www.lyvros.com/*",
-    "https://penguinlivros.pt/*",
-    "https://www.presenca.pt/*",
-    "https://www.guerraepaz.pt/*",
-    "https://www.gradiva.pt/*",
-    "https://www.relogiodagua.pt/*",
-    "https://www.saidadeemergencia.com/*",
-    "https://www.quetzaleditores.pt/*",
-    "https://antigona.pt/*",
-    "https://www.livrariasnob.pt/*",
-    "https://kingpinbooks.com/*",
-    "https://mbooks.pt/*",
-    "https://www.auchan.pt/*",
-    "https://blackwells.co.uk/*",
-    "https://www.waterstones.com/*",
-    "https://www.iberlibro.com/*",
-    "https://www.abebooks.com/*",
-    "https://www.elcorteingles.pt/*",
-    "https://mundofantasma.com/*",
-    "https://editoradevir.pt/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -97,5 +69,33 @@
         "https://editoradevir.pt/*"
       ]
     }
+  ],
+  "host_permissions": [
+    "https://www.wook.pt/*",
+    "https://www.bertrand.pt/*",
+    "https://www.almedina.net/*",
+    "https://bookcover.pt/*",
+    "https://www.continente.pt/*",
+    "https://www.portoeditora.pt/*",
+    "https://www.lyvros.com/*",
+    "https://penguinlivros.pt/*",
+    "https://www.presenca.pt/*",
+    "https://www.guerraepaz.pt/*",
+    "https://www.gradiva.pt/*",
+    "https://www.relogiodagua.pt/*",
+    "https://www.saidadeemergencia.com/*",
+    "https://www.quetzaleditores.pt/*",
+    "https://antigona.pt/*",
+    "https://www.livrariasnob.pt/*",
+    "https://kingpinbooks.com/*",
+    "https://mbooks.pt/*",
+    "https://www.auchan.pt/*",
+    "https://blackwells.co.uk/*",
+    "https://www.waterstones.com/*",
+    "https://www.iberlibro.com/*",
+    "https://www.abebooks.com/*",
+    "https://www.elcorteingles.pt/*",
+    "https://mundofantasma.com/*",
+    "https://editoradevir.pt/*"
   ]
 }

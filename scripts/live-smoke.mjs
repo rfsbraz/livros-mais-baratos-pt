@@ -1,13 +1,11 @@
 // Optional network check. Runs private source only in a local Chromium extension context.
-// The temporary test manifest pre-grants the configured hosts to avoid headless prompts.
+// The production manifest already declares the configured shop hosts.
 import { chromium } from 'playwright';
 import { cp, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 await mkdir('work/live-extension', { recursive: true });
 await cp('extension', 'work/live-extension', { recursive: true });
 const manifest = JSON.parse(await readFile('extension/manifest.json', 'utf8'));
-manifest.host_permissions = manifest.optional_host_permissions;
-delete manifest.optional_host_permissions;
 await writeFile('work/live-extension/manifest.json', JSON.stringify(manifest));
 const path = resolve('work/live-extension');
 const context = await chromium.launchPersistentContext(resolve('work/live-profile'), {

@@ -31,21 +31,16 @@ try {
   await context.route('https://www.bertrand.pt/**', route => { searches++; return route.fulfill({ contentType: 'text/html', body: html('18.00') }); });
   const settings = await context.newPage(); await settings.goto('chrome://extensions');
   const id = await settings.evaluate(async () => (await chrome.developerPrivate.getExtensionsInfo({})).find(e => e.name === 'Livros Mais Baratos PT').id);
-  const popup = await context.newPage(); await popup.goto(`chrome-extension://${id}/popup.html`);
-  await popup.evaluate(() => { window.autoRequests = 0; chrome.runtime.onMessage.addListener(m => { if(m.type === 'fixture-fetch') window.autoRequests++; }); });
-  await popup.evaluate(() => chrome.storage.local.set({ selectedStores: ['wook', 'bertrand'], autoEnabled: false }));
+  // Fresh installation: visit a book without opening the popup or writing any preferences.
   const shop = await context.newPage(); await shop.goto('https://www.wook.pt/livro/teste');
-  assert.equal(await shop.locator('#lmb-price-alert').count(), 0);
-  assert.equal(searches, 0, 'No automatic requests before opt-in');
-  await popup.evaluate(() => chrome.storage.local.set({ autoEnabled: true }));
-  try { await shop.getByText('Poupa 2,00').waitFor({ timeout: 20000 }); }
-  catch (error) {
-    console.log('Diagnostic:', await popup.evaluate(async () => ({ scripts: await chrome.scripting.getRegisteredContentScripts(), grants: await chrome.permissions.getAll(), contexts: await chrome.runtime.getContexts({}), data: await chrome.storage.local.get(null) })), 'searches', searches);
-    throw error;
-  }
+  await shop.getByText('Poupa 2,00').waitFor({ timeout: 20000 });
+  const popup = await context.newPage(); await popup.goto(`chrome-extension://${id}/popup.html`);
+  await popup.waitForFunction(() => document.querySelector('#auto-toggle').getAttribute('aria-pressed') === 'true');
+  assert.equal(await popup.evaluate(async () => (await chrome.storage.local.get('autoEnabled')).autoEnabled), undefined, 'Fresh install needs no activation preference');
+  await popup.evaluate(() => { window.autoRequests = 0; chrome.runtime.onMessage.addListener(m => { if(m.type === 'fixture-fetch') window.autoRequests++; }); });
   assert.equal(await shop.getByRole('link', { name: 'Ver oferta na Bertrand' }).getAttribute('href'), `https://www.bertrand.pt/pesquisa/${isbn}`);
   const afterFirst = await popup.evaluate(() => window.autoRequests);
-  assert.equal(afterFirst, 2);
+  assert.equal(afterFirst, 0);
   assert.equal(await shop.locator('#lmb-price-alert').evaluate(e => getComputedStyle(e).position), 'fixed');
   assert.equal(await shop.locator('#lmb-price-alert section').evaluate(e => getComputedStyle(e).backgroundColor), 'rgb(255, 255, 255)');
   await shop.getByRole('button', { name: 'Fechar aviso' }).click();
@@ -68,6 +63,11 @@ try {
   await shop.locator('#lmb-price-alert').waitFor({ state: 'detached' });
   await popup.waitForFunction(async () => !(await chrome.scripting.getRegisteredContentScripts()).length);
   assert.equal(await popup.evaluate(async () => (await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] })).length), 0);
+  await shop.reload();
+  await shop.waitForTimeout(1800);
+  assert.equal(await shop.locator('#lmb-price-alert').count(), 0, 'Saved off preference survives navigation');
+  await popup.reload();
+  await popup.waitForFunction(() => document.querySelector('#auto-toggle').getAttribute('aria-pressed') === 'false');
   await popup.evaluate(() => chrome.storage.local.set({ autoEnabled: true }));
   await shop.getByText('Poupa 2,00').waitFor();
   await mkdir('work', { recursive: true });
@@ -75,5 +75,5 @@ try {
   await popup.evaluate(() => chrome.storage.local.set({ selectedStores: ['wook'] }));
   await shop.locator('#lmb-price-alert').waitFor({ state: 'detached' });
   await popup.waitForFunction(async () => (await chrome.scripting.getRegisteredContentScripts())[0]?.matches.length === 1);
-  console.log('Automatic alerts passed: opt-in, existing tabs, real background/offscreen messaging, cheaper offer, dismissal, cache, price changes, SPA navigation, disable and re-enable.');
+  console.log('Automatic alerts passed: fresh installation without popup or setup, saved off preference, existing tabs, real background/offscreen messaging, cheaper offer, dismissal, cache, price changes, SPA navigation, disable and re-enable.');
 } finally { await context.close(); }

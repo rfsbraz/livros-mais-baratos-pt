@@ -10,7 +10,7 @@ async function settings() {
   const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores']);
   const grants = await chrome.permissions.getAll();
   const stores = STORES.filter(s => (!Array.isArray(data.selectedStores) || data.selectedStores.includes(s.id)) && grants.origins?.includes(`${s.origin}/*`));
-  return { enabled: data.autoEnabled === true, stores };
+  return { enabled: data.autoEnabled !== false, stores };
 }
 async function sync() {
   const { enabled, stores } = await settings();

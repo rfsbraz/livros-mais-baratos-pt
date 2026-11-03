@@ -27,7 +27,7 @@ try {
     window.__permission = true;
     window.chrome = {
       storage: { local: { get: async () => window.__data, set: async data => { window.__data = { ...window.__data, ...data }; localStorage.setItem('testData', JSON.stringify(window.__data)); } } },
-      permissions: { request: async request => { window.__requested = request; return window.__permission; } },
+      permissions: { contains: async request => { window.__requested = request; return window.__permission; } },
       tabs: { query: async () => [{ id: 1, url: 'https://www.wook.pt/livro/example' }] },
       scripting: { executeScript: async () => [{ result: { html } }] }
     };
@@ -104,6 +104,9 @@ try {
   await page.evaluate(() => { window.__permission = false; });
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'Acesso não autorizado' }).waitFor();
+  assert.equal(await page.locator('#auto-toggle').getAttribute('aria-pressed'), 'true');
+  await page.locator('#auto-toggle').click();
+  await page.getByRole('status').filter({ hasText: 'Avisos automáticos desativados' }).waitFor();
   await page.locator('#auto-toggle').click();
   await page.getByRole('status').filter({ hasText: 'avisos continuam desativados' }).waitFor();
   await page.evaluate(() => { window.__permission = true; });

@@ -9,10 +9,10 @@ assert.equal(manifest.version, pkg.version);
 assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage', 'offscreen']);
 assert.equal(manifest.background.service_worker, 'background.js');
 assert.equal(manifest.background.type, 'module');
-assert(!manifest.content_scripts, 'Automatic scripts must be registered only after opt-in');
-assert(!manifest.host_permissions, 'Store access must remain optional');
+assert(!manifest.content_scripts, 'Dynamic scripts must respect the saved off switch and shop selection');
+assert(!manifest.optional_host_permissions, 'Shop access is requested at installation');
 assert.equal(new Set(CATALOGUE.map(s => s.id)).size, CATALOGUE.length, 'Store IDs must be unique');
-assert.deepEqual(manifest.optional_host_permissions.sort(), STORES.map(s => `${s.origin}/*`).sort());
+assert.deepEqual(manifest.host_permissions.sort(), STORES.map(s => `${s.origin}/*`).sort());
 for (const group of manifest.web_accessible_resources) {
   assert.deepEqual([...group.matches].sort(), STORES.map(s => `${s.origin}/*`).sort());
   for (const file of group.resources) assert(existsSync(`extension/${file}`), `Missing content module ${file}`);
