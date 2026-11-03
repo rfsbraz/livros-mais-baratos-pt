@@ -1,15 +1,7 @@
 name: Live store page checks
 on:
   schedule:
-    - cron: '23 6 * * *'
-  push:
-    branches: [main]
-    paths:
-      - 'extension/**'
-      - 'scripts/*health*'
-      - 'scripts/live-monitor.mjs'
-      - 'package*.json'
-      - '.github/workflows/store-health.yml'
+    - cron: '17 * * * *'
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,7 +12,11 @@ jobs:
   probe:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      issues: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,9 +25,26 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { pathToFileURL } = require('node:url');
+            const { resolve } = require('node:path');
+            const { mkdir, writeFile } = require('node:fs/promises');
+            const { selectedStores } = await import(pathToFileURL(resolve('scripts/health-schedule.mjs')).href);
+            const { findMonitorIssue, readFailures } = await import(pathToFileURL(resolve('scripts/report-store-health.mjs')).href);
+            const { data: run } = await github.rest.actions.getWorkflowRun({ ...context.repo, run_id: context.runId });
+            const issues = await github.paginate(github.rest.issues.listForRepo, { ...context.repo, state: 'all', per_page: 100 });
+            const stores = selectedStores(['--hourly'], new Date(run.created_at));
+            const failures = readFailures(findMonitorIssue(issues)?.body);
+            await mkdir('work', { recursive: true });
+            await writeFile('work/store-plan.json', JSON.stringify({ stores, failures }));
+            core.info('Planned stores: ' + stores.join(', '));
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: timeout 1200 npm run test:live
+      - run: timeout 780 npm run test:live
+        env:
+          HEALTH_PLAN: work/store-plan.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
