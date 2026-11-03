@@ -95,3 +95,17 @@ test('WooCommerce matches the ISBN SKU, currency and minor units without using p
   assert.equal(wooOffer([{ ...product, prices: { ...product.prices, currency_minor_unit: 0 } }], product.sku, 'https://bookcover.pt'), null);
   assert.equal(wooOffer([{ ...product, permalink: 'https://evil.test/' }], product.sku, 'https://bookcover.pt'), null);
 });
+
+
+test('affiliate destinations require an eligible click, preserve attribution and exact HTTPS host', async () => {
+  const { affiliateUrl } = await import('../extension/affiliate.js');
+  const raw = 'https://www.wook.pt/livro/exemplo/123?x=1#details';
+  assert.equal(affiliateUrl(raw, true, true), 'https://www.wook.pt/livro/exemplo/123?x=1&a_aid=5d3ee4327c2fd#details');
+  assert.equal(affiliateUrl(raw, false, true), raw);
+  assert.equal(affiliateUrl(raw, true, false), raw);
+  for (const url of ['https://www.wook.pt/livro/x?a_aid=existing', 'https://www.wook.pt.evil.test/x',
+    'http://www.wook.pt/x', 'https://user@www.wook.pt/x', 'https://www.wook.pt:8443/x',
+    'https://www.bertrand.pt/livro/x', 'javascript:alert(1)', 'invalid']) {
+    assert.equal(affiliateUrl(url, true, true), url);
+  }
+});

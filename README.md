@@ -40,7 +40,7 @@ O histórico começa nas comparações manuais. Não há monitorização agendad
 
 ## Privacidade e permissões
 
-`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas por predefinição, respeitando a opção de desligar os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso aos domínios das 26 lojas é solicitado na instalação. Atualizações que adicionem permissões podem exigir aprovação no Chrome. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria, publicidade ou afiliados. Consulta [PRIVACY.md](PRIVACY.md).
+`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas por predefinição, respeitando a opção de desligar os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso aos domínios das 26 lojas é solicitado na instalação. Atualizações que adicionem permissões podem exigir aprovação no Chrome. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria. Ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas na extensão. Só acrescentamos o código ao clicar numa oferta confirmada mais barata; não altera preços, ordenação nem pedidos de comparação. Consulta [PRIVACY.md](PRIVACY.md).
 
 ## Desenvolvimento
 

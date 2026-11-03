@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir, cp } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import assert from 'node:assert/strict';
-const out = resolve('../outputs/chrome-web-store-pack-0.1.3');
+const out = resolve('../outputs/chrome-web-store-pack-0.1.4');
 for (const dir of ['icons','promo','screenshots','metadata','website','source','upload']) await mkdir(`${out}/${dir}`,{recursive:true});
 const root=resolve('extension');
 const server=createServer(async(req,res)=>{try{
@@ -87,13 +87,13 @@ try {
  await preview.screenshot({path:`${out}/preview.png`,fullPage:true});await preview.close();
  const pngs=[...imgs.map(x=>`screenshots/${x.file}`),'promo/small-440x280.png','promo/marquee-1400x560.png',...([16,32,48,64,128,256,512].map(n=>`icons/icon-${n}.png`))];
  const inventory=[];for(const file of pngs){const b=await readFile(`${out}/${file}`);const w=b.readUInt32BE(16),h=b.readUInt32BE(20);if(file.startsWith('screenshots'))assert(w===1280&&h===800);inventory.push({file,width:w,height:h,bytes:b.length,colorType:b[25]});}
- await writeFile(`${out}/asset-manifest.json`,JSON.stringify({generated:'2026-11-03',version:'0.1.3',assets:inventory},null,2));
+ await writeFile(`${out}/asset-manifest.json`,JSON.stringify({generated:'2026-11-03',version:'0.1.4',assets:inventory},null,2));
  await cp('extension',`${out}/source/extension`,{recursive:true});
  for(const size of [16,32,48,128])await cp(`${out}/icons/icon-${size}.png`,`${out}/source/extension/icons/${size}.png`);
  const manifest=JSON.parse(await readFile(`${out}/source/extension/manifest.json`,'utf8'));
  manifest.description='Compara preços de livros em Portugal e recebe automaticamente avisos de ofertas mais baratas da mesma edição.';
  assert(manifest.description.length<=132);await writeFile(`${out}/source/extension/manifest.json`,JSON.stringify(manifest,null,2)+'\n');
  await cp('LICENSE',`${out}/source/extension/LICENSE`);
- await cp('dist/livros-mais-baratos-pt-0.1.3.zip',`${out}/upload/livros-mais-baratos-pt-0.1.3-store.zip`);
+ await cp('dist/livros-mais-baratos-pt-0.1.4.zip',`${out}/upload/livros-mais-baratos-pt-0.1.4-store.zip`);
  console.log(JSON.stringify({output:out,assets:inventory.length,summaryCharacters:manifest.description.length}));
 } finally {await browser.close();server.close();}

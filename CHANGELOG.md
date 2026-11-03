@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Add optional affiliate support, enabled by default, for deliberate clicks on verified cheaper Wook offers.
+- Disclose commissions in the interface and store listing; preserve opt-outs and existing attribution.
+
 ## Unreleased
 
 - Enable automatic comparisons on fresh installation with required access to the 26 configured shops, without opening the popup or an activation step.
