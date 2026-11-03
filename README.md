@@ -1,79 +1,158 @@
 # Livros Mais Baratos PT
 
-Extensão Chrome para comparar preços de livros em livrarias portuguesas, pela mesma edição (ISBN), e guardar o histórico das tuas consultas.
+[![CI](https://github.com/rfsbraz/livros-mais-baratos-pt/actions/workflows/ci.yml/badge.svg)](https://github.com/rfsbraz/livros-mais-baratos-pt/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Instalar no Chrome
+A browser extension for Chrome, Firefox and Edge that compares book prices across Portuguese bookshops. Find the same edition by ISBN, see cheaper offers automatically, and track prices for books you want to buy. The interface is in Portuguese (Portugal).
 
-1. Descarrega e extrai o ZIP da extensão, ou clona este repositório.
-2. Abre `chrome://extensions` e ativa o **Modo de programador**.
-3. Clica em **Carregar expandida** e escolhe a pasta com `manifest.json` (a pasta `dist/chrome/` no repositório).
-4. Aceita as permissões de acesso às lojas que o Chrome apresentar e visita uma página de livro suportada. As comparações começam automaticamente.
-5. Para comparar manualmente ou ajustar preferências, abre o ícone da extensão. Confirma o ISBN, escolhe as lojas e clica em **Comparar**. O título é opcional.
+![Automatic cheaper-offer notice with illustrative prices](store-listing/screenshots/01-aviso-automatico-1280x800.png)
 
-Não precisas de Node.js para instalar a extensão. Ainda não está publicada na Chrome Web Store.
+_Screenshot uses illustrative prices, not live offers._
 
-## Avisos automáticos ao visitar um livro
+## Features
 
-Os avisos estão ativos por predefinição após a instalação, com acesso às lojas solicitado pelo Chrome nesse momento. Não precisas de abrir a extensão nem de fazer configuração adicional: ao visitar uma página de livro numa loja selecionada e autorizada, aparece um aviso no canto inferior direito se outra loja tiver a mesma edição nova mais barata, com stock confirmado. O aviso mostra os dois preços, a poupança e a ligação da oferta. Podes fechá-lo ou desativar os avisos na extensão.
+- **Automatic cheaper-offer alerts** - Visit a supported book page and see a notice when another selected shop has the same new edition in stock for less. No popup or initial setup is needed after granting site access.
+- **Six shops by default** - Wook, Bertrand, Almedina, Continente, Porto Editora and Presença keep comparisons focused. Choose from 26 automatic adapters in **Definições**; saved selections survive updates.
+- **Compare the same edition** - Validates ISBN-10 and ISBN-13, checks product pages and keeps used books, other currencies and unknown availability separate from confirmed new EUR offers.
+- **Prices ready when you open the menu** - Recent background, scheduled and manual results are cached locally, with the time checked and an indication when they may be outdated.
+- **Shipping estimates** - Configure delivery fees, free-shipping minimums and dated promotions, with mainland Portugal as the default destination. Unknown shipping is never treated as free.
+- **Saved books and target alerts** - Save up to 100 books, set item-price or delivered-price targets, and receive notifications from approximately daily checks while the browser is running.
+- **Your own price history** - Charts use only prices observed by this installation. Preferences, saved books, cache and history stay in your browser, with a setting to erase them.
+- **Separate settings** - Search, prices and saved books stay in the main view. Shop selection, shipping, alerts and affiliate preferences live in **Definições**.
 
-Os avisos exigem ISBN e preço atual verificáveis e comparam livros novos em EUR. Não se aplicam a páginas de pesquisa, ofertas usadas, marketplaces ou formatos digitais identificados. Portes não incluídos. Resultados de consultas recentes podem ser reutilizados durante dez minutos; a hora da consulta aparece no aviso. Podes alterar a seleção de lojas ou desligar os avisos. Uma preferência guardada de desativação é preservada nas atualizações. Se o Chrome tiver restringido o acesso a um site, ajusta-o nas definições da extensão. Lojas bloqueadas continuam sem preço confirmado.
+See [shop coverage](docs/store-coverage.md) for all automatic adapters, manual sources and reference entries, and [targets, shipping and history](docs/targets-shipping-history.md) for calculation rules.
 
-## O que faz
+## Installation
 
-- Deteta ISBN-10/ISBN-13 em dados estruturados e campos da página, validando o dígito de controlo.
-- O menu principal mostra pesquisa, preços e estante. Abre **Definições** para escolher lojas, portes, avisos, afiliados ou apagar dados; **Voltar aos preços** regressa aos resultados.
-- Por predefinição consulta apenas Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Podes escolher outras lojas ou usar «Usar as 6 predefinidas». Seleções guardadas são preservadas.
-- Inclui 26 adaptadores automáticos: Wook, Bertrand, Almedina, Bookcover, Continente, Porto Editora, Lyvros, Penguin, Presença, Guerra e Paz, Gradiva, Relógio d'Água, Saída de Emergência, Quetzal, Antígona, Snob, Kingpin, mbooks, Auchan, Blackwell's, Waterstones, IberLibro, AbeBooks, El Corte Inglés, Devir e Mundo Fantasma.
-- Permite escolher lojas, consultar até quatro em simultâneo e interromper a comparação.
-- Inclui 17 fontes de consulta manual e 17 entradas de referência para outros formatos, aliases, chancelas e endereços indisponíveis. Todas as lojas mencionadas no levantamento estão contabilizadas em [Cobertura das lojas](docs/store-coverage.md).
-- Verifica o ISBN do produto mesmo quando encontra candidatos pelo título. Não confunde códigos internos com ISBN.
-- Distingue preços com stock confirmado, sem stock e disponibilidade desconhecida.
-- Preserva moeda, condição e vendedor. Livros usados e preços GBP/USD não entram no mínimo de livros novos em EUR.
-- Guarda até 100 livros e o histórico local de consultas (até 90 dias, 200 edições e 360 observações por edição).
-- Permite apagar todos os dados locais.
+### Browser Extension Stores
 
-## Cobertura real e limitações
+The extension is not yet published on the Chrome Web Store, Firefox Add-ons or Edge Add-ons. Store links will be added when listings are available. The source repository remains private; access to its packages requires repository access.
 
-Os adaptadores são experimentais. Em 3 de novembro de 2026, testes reais na extensão local confirmaram preços em **18 das 26 lojas automáticas**. Os outros oito adaptadores não concluíram os pedidos nesse ambiente, embora as páginas de produto e os percursos tenham sido inspecionados num navegador. Uma amostra bem-sucedida não garante todo o catálogo. As lojas podem bloquear pedidos ou alterar páginas. Uma loja sem preço verificável apresenta uma ligação para consulta manual. Consulta os resultados e as particularidades de cada loja no [relatório de cobertura](docs/store-coverage.md).
+### Manual Installation
 
-Os preços excluem portes e taxas de importação. Saldo em cartão não é tratado como desconto. A extensão não calcula custos finais, não contorna captchas, não usa contas das lojas e não executa scripts recebidos das lojas. Segue redirecionamentos normais, rejeita destinos fora da loja e ignora ligações que alterem o carrinho. Examina até seis candidatos por loja, com prazo total de 35 segundos por loja. Uma oferta de marketplace não é uma garantia do mínimo de todos os vendedores.
+#### Chrome / Edge
 
-Define preços-alvo nos livros guardados, com ou sem portes. As verificações são aproximadamente diárias enquanto o Chrome está aberto e mostram notificações ao atingir o alvo. Os gráficos contêm apenas preços observados nesta instalação, em consultas manuais e agendadas. Não há históricos externos, deteção automática de campanhas, previsão legal de descontos, importação de listas ou servidor. Mantém a janela aberta durante uma comparação manual. Os avisos automáticos, quando ativados, funcionam independentemente da janela da extensão e não acrescentam observações ao histórico.
+1. Obtain the matching `-chrome.zip` or `-edge.zip` package from the supplied download or a successful [CI run](https://github.com/rfsbraz/livros-mais-baratos-pt/actions/workflows/ci.yml) (`extension-package` artifact).
+2. Extract the browser package into a folder.
+3. Open `chrome://extensions` or `edge://extensions`.
+4. Enable **Developer mode**, choose **Load unpacked**, and select the folder containing `manifest.json`.
+5. Grant the requested site access and visit a book page in one of the selected shops.
 
-## Privacidade e permissões
+No Node.js installation is needed to load a prepared package. To build from a checkout, follow the development instructions below.
 
-`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas por predefinição, respeitando a opção de desligar os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `alarms` agenda verificações de alvos e `notifications` mostra os avisos do sistema. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso aos domínios das 26 lojas é solicitado na instalação. Atualizações que adicionem permissões podem exigir aprovação no Chrome. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria. Ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas na extensão. Só acrescentamos o código ao clicar numa oferta confirmada mais barata; não altera preços, ordenação nem pedidos de comparação. Consulta [PRIVACY.md](PRIVACY.md).
+#### Firefox
 
-## Desenvolvimento
+1. Obtain and extract the `-firefox.zip` package.
+2. Open `about:debugging#/runtime/this-firefox`.
+3. Choose **Load Temporary Add-on** and select the extracted `manifest.json`.
+4. Grant the requested site access and data-transmission permissions.
 
-Requer Node.js 22 ou superior.
+Firefox 140 or later is required. Temporary add-ons are removed when Firefox restarts. Normal installation requires a Mozilla-signed package, which is not yet provided.
+
+## Usage
+
+1. Visit a supported book product page in a selected shop. If the ISBN and current price can be verified, the extension compares offers in the background and shows a dismissible notice for a qualifying cheaper edition.
+2. Open the extension icon to view cached prices or compare manually. Confirm or enter the ISBN and choose **Comparar** to refresh results. Keep the menu open during a manual comparison.
+3. Choose **Guardar** to save a book. Set a target based on the item price or estimated delivered total, and view the history of your own manual and scheduled observations.
+4. Open **Definições** to choose shops, configure **Entrega e portes**, change alert or affiliate preferences, or erase local data. **Voltar aos preços** returns to the same results.
+
+### Prices, shipping and availability
+
+Automatic notices compare new books in EUR with confirmed stock, excluding shipping. They do not appear on search pages or for identified used books, digital formats or marketplace offers. A notice is not guaranteed: prices, stock and shop access change.
+
+Shipping estimates use your current rules. Initial verified rules are supplied for Wook and Presença and expire after 30 days; other shops need a rule before a delivered total can be estimated. Free-shipping promotions are entered manually. Automatic promotion detection is not implemented. Import charges and loyalty credit are not included as immediate savings.
+
+Cached results cover up to 50 ISBNs. Results older than ten minutes are marked potentially outdated; results older than 24 hours are hidden and pruned on the next write. Viewing cached prices does not create a history observation. Automatic page alerts do not add history observations either. History is limited to 90 days, 200 editions and 360 observations per edition.
+
+The adapters are experimental. On 3 November 2026, local live checks confirmed prices in 18 of the 26 automatic shops; eight did not complete requests in that environment. A successful sample does not guarantee the whole catalogue. Failed shops retain a manual link and never receive an invented price. See the [coverage report](docs/store-coverage.md) for evidence and limitations.
+
+### Privacy and permissions
+
+Site access is requested at installation and remains under the browser's control. Automatic alerts are enabled by default, and a saved preference to disable them is preserved. Each queried shop receives the ISBN and, when needed, title, together with normal network information such as your IP address. Comparison requests omit session cookies. There is no telemetry or external price-history service.
+
+`activeTab` supports manual detection; `scripting` supports automatic detection on authorized shops; `storage` keeps local data; `alarms` schedules target checks; and `notifications` shows system alerts. Chrome and Edge use `offscreen` for background parsing. Firefox uses a local background page and parser frame. The extension does not bypass captchas, sign into shop accounts or execute downloaded scripts.
+
+Wook affiliate links are enabled by default and can be disabled in **Definições**. The affiliate code is added only when you deliberately click an eligible confirmed cheaper Wook offer. It does not affect comparisons, ranking or background requests. See the [privacy policy](PRIVACY.md).
+
+## Development
+
+### Prerequisites
+
+- Node.js 22.13 or later
+- npm
+- Repository access
+
+### Setup
 
 ```sh
+# Clone the repository
+git clone https://github.com/rfsbraz/livros-mais-baratos-pt.git
+cd livros-mais-baratos-pt
+
+# Install dependencies and test browsers
 npm ci
-npx playwright install chromium
-npm run check
-npm test
-npm run test:integration
-npm run build
+npx playwright install chromium firefox msedge
 ```
 
-O ZIP fica em `dist/`. A extensão não tem dependências de execução nem precisa de compilação. O Playwright é usado apenas nos testes. Consulta [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) e [docs/architecture.md](docs/architecture.md).
+On Linux, add `--with-deps` to the Playwright installation command to install browser system dependencies.
 
-O repositório permanece privado, mas segue práticas de colaboração abertas e usa a [licença MIT](LICENSE).
+### Commands
 
-## Portes e preços-alvo
+```sh
+# Run linting and formatting checks
+npm run lint
+npm run format:check
 
-Em Entrega e portes, escolhe o destino e configura custos, mínimos para portes grátis e campanhas com datas. Existem regras iniciais verificadas para Wook e Presença, com validade de 30 dias. Nas restantes lojas, os portes são desconhecidos até introduzires uma regra. Nunca são tratados como grátis. Consulta [o funcionamento e as fontes](docs/targets-shipping-history.md).
+# Fix linting and formatting
+npm run lint:fix
+npm run format
 
-## Monitorização das lojas
+# Validate the extension and run unit tests with coverage
+npm run check
+npm run test:coverage
 
-As 26 lojas automáticas estão distribuídas por 24 horários diários: uma ou duas lojas por hora, com atrasos aleatórios entre pedidos. Os limites HTTP 429 são distinguidos dos bloqueios 403. Falhas atualizam uma issue sem apagar resultados de lojas ainda não verificadas; os avisos fecham após recuperação. Consulta [a documentação](docs/store-monitoring.md).
+# Build all browser folders and ZIP packages
+npm run build:all
 
-Confirmed background, scheduled and manual results are cached locally for up to 50 ISBNs. Opening the menu on a detected book restores selected-store prices immediately, with the check time. Results older than ten minutes are marked potentially outdated; results older than 24 hours are hidden and pruned on the next write. Comparar explicitly refreshes prices. Cached displays do not create history observations. Clear data deletes this cache and invalidates pending background writes. Shipping totals are recomputed using current rules.
+# Run native Chromium, Firefox and Edge tests after building
+npm run test:e2e
 
-## Desenvolvimento e outros navegadores
+# Rebuild store metadata and demonstration screenshots
+npm run store-listing:build
+npm run test:e2e:screenshots
+npm run store-listing:check
+```
 
-`npm run build:all` cria pacotes Chrome, Firefox e Edge em `dist/`. Os ficheiros da extensão estão na raiz do repositório; testes em `tests/unit` e `tests/e2e`, materiais das lojas em `store-listing`. Consulta [arquitetura e publicação](docs/reference-alignment.md). Firefox requer assinatura AMO para instalação permanente.
+`npm run build` and `npm run build:zip` build Chrome. `npm run build:firefox` and `npm run build:edge` build individual browsers. Packages are written to `dist/`.
+
+### Loading for Development
+
+1. Run `npm run build:all`.
+2. Open `chrome://extensions`, `edge://extensions` or `about:debugging#/runtime/this-firefox`.
+3. For Chrome or Edge, enable **Developer mode**, choose **Load unpacked**, and select `dist/chrome` or `dist/edge`.
+4. For Firefox, choose **Load Temporary Add-on** and select `dist/firefox/manifest.json`.
+5. After editing source files, rebuild and reload the extension in the browser.
+
+Runtime files live at the repository root, tests in `tests/unit` and `tests/e2e`, build tooling in `scripts`, and store materials in `store-listing`. There is no server or runtime dependency. Firefox's content entry point is bundled during the build. See [architecture](docs/architecture.md) and [cross-browser builds and publishing](docs/reference-alignment.md).
+
+CI runs lint, formatting, unit tests, all-browser builds and native browser tests. Separate live shop monitoring spreads the 26 shops across 24 hourly slots with jitter and tracks failures in issues. See [shop monitoring](docs/store-monitoring.md). Store publishing remains gated until this extension's listing IDs, credentials and public privacy/support URLs are configured.
+
+## Contributing
+
+Contributions are welcome from collaborators with repository access. Read the [Contributing Guide](CONTRIBUTING.md) for setup, checks and pull request conventions. The repository remains private while following open-source collaboration practices.
+
+## Security
+
+For security concerns and private reporting instructions, see the [Security Policy](SECURITY.md).
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+## Acknowledgments
+
+- [Geocaching Friends Logs](https://github.com/rfsbraz/Geocaching.com-Friends-Logs) provides the reference repository and workflow structure.
+- [Playwright](https://playwright.dev/) and [playwright-webextext](https://github.com/ueokande/playwright-webextext) support browser testing.
 
 ## ☕ Support
 
