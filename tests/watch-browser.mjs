@@ -66,6 +66,7 @@ try {
   await page.locator('#history-section').evaluate(el => { el.open = true; });
   await page.locator('#history svg').waitFor();
   assert.equal(await page.locator('#history circle').count(), 2);
+  await page.locator('#open-settings').click();
   await page.locator('#watch-toggle').uncheck();
   await poll(async () => !(await chrome.alarms.get('saved-book-check')));
   await page.screenshot({ path: 'work/targets-history.png', fullPage: true });

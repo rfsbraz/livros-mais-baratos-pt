@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
+
 - Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
 
 - Show locally cached background, scheduled and manual prices immediately in the menu, with freshness labels and explicit refresh.
@@ -19,6 +21,8 @@
 - Disclose commissions in the interface and store listing; preserve opt-outs and existing attribution.
 
 ## Unreleased
+
+- Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
 
 - Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
 

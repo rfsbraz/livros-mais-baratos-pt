@@ -15,6 +15,22 @@ let priceCache = {}, comparing = false;
 let current = null, saved = {}, history = {}, controller = null, run = 0, activeOffers = [];
 let selected = new Set(DEFAULT_STORE_IDS);
 let autoEnabled = true, affiliateEnabled = false, shipping = { region: 'mainland' }, priceOrder = 'delivered';
+let mainScroll = 0;
+function settingsView(open) {
+  if (open) mainScroll = window.scrollY;
+  $('main-view').hidden = open; $('settings-view').hidden = !open;
+  $('open-settings').hidden = open; $('close-settings').hidden = !open;
+  $('open-settings').setAttribute('aria-expanded', String(open));
+  // Keep feedback visible in either view without duplicating live regions.
+  (open ? $('settings-view') : $('main-view')).prepend($('status'));
+  (open ? $('settings-title') : $('open-settings')).focus({ preventScroll: true });
+  window.scrollTo(0, open ? 0 : mainScroll);
+}
+$('open-settings').onclick = () => settingsView(true);
+$('close-settings').onclick = () => settingsView(false);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !$('settings-view').hidden) { event.preventDefault(); settingsView(false); }
+});
 function autoLabel() { $('auto-toggle').textContent = autoEnabled ? 'Desativar avisos automáticos' : 'Ativar avisos automáticos'; $('auto-toggle').setAttribute('aria-pressed', String(autoEnabled)); }
 const status = text => { $('status').textContent = text; };
 function applyData(data) { saved = data.saved || {}; history = data.history || {}; }
@@ -108,7 +124,7 @@ async function start(book) {
   const isbn = isbn13(book.isbn);
   if (!isbn) { status('Introduz um ISBN-10 ou ISBN-13 válido. Encontras o número junto ao código de barras.'); $('isbn').focus(); return; }
   const stores = STORES.filter(s => selected.has(s.id));
-  if (!stores.length) { status('Seleciona pelo menos uma loja para comparar.'); $('shops').open = true; return; }
+  if (!stores.length) { status('Seleciona pelo menos uma loja para comparar.'); settingsView(true); $('shops').open = true; return; }
   comparing = true;
   const permission = chrome.permissions.contains({ origins: stores.map(s => `${s.origin}/*`) });
   controller?.abort(); controller = new AbortController(); const signal = controller.signal; const token = ++run;

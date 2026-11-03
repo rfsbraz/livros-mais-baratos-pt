@@ -65,9 +65,9 @@ try {
     if(mode==='compare')await f.locator('#book').evaluate(el=>window.scrollTo(0,el.offsetTop-18));
     else {await page.addStyleTag({content:'.frame{top:150px;height:500px}iframe{height:500px}'});await f.locator('#history-section').evaluate(el=>el.open=true);await f.locator('#history-section').evaluate(el=>window.scrollTo(0,el.offsetTop-18));}
    }
-   if(mode==='shipping'){await f.locator('#delivery-settings').evaluate(el=>el.open=true);await f.locator('#shipping-store').selectOption('bertrand');await f.locator('#shipping-minimum').fill('25.00');await f.locator('#shipping-promo').check();await f.locator('#promo-end').fill('2026-11-10T23:59');await f.locator('#shipping-form').evaluate(el=>window.scrollTo(0,el.offsetTop-10));}
+   if(mode==='shipping'){await f.locator('#open-settings').click();await f.locator('#delivery-settings').evaluate(el=>el.open=true);await f.locator('#shipping-store').selectOption('bertrand');await f.locator('#shipping-minimum').fill('25.00');await f.locator('#shipping-promo').check();await f.locator('#promo-end').fill('2026-11-10T23:59');await f.locator('#shipping-form').evaluate(el=>window.scrollTo(0,el.offsetTop-10));}
    if(mode==='targets'){await page.addStyleTag({content:'.frame{top:140px;height:480px}iframe{height:480px}'});await f.locator('body').evaluate(el=>el.style.paddingBottom='400px');await f.locator('.saved').evaluate(el=>window.scrollTo(0,el.offsetTop-20));}
-   if(mode==='shops'){await f.locator('#shops').evaluate(el=>el.open=true);await f.locator('#shops').evaluate(el=>window.scrollTo(0,el.offsetTop));}
+   if(mode==='shops'){await f.locator('#open-settings').click();await f.locator('#shops').evaluate(el=>el.open=true);await f.locator('#shops').evaluate(el=>window.scrollTo(0,el.offsetTop));}
    if(mode==='enable'){assert.equal(await f.locator('#auto-toggle').getAttribute('aria-pressed'),'true');await page.addStyleTag({content:'.frame{top:105px;height:550px}iframe{height:550px}'});}
    await page.screenshot({path:`${out}/screenshots/${name}-1280x800.png`});
    await writeFile(`${out}/source/${name}.html`,stage(title,copy,caption));await page.close();

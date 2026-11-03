@@ -57,7 +57,12 @@ try {
   }
   assert(!(await page.locator('#results a').filter({ hasText: 'Wook' }).getAttribute('href')).includes('a_aid'));
   assert((await captureWookClick()).includes('a_aid=5d3ee4327c2fd'));
+  assert.equal(await page.locator('#settings-view').isVisible(), false);
+  await page.locator('#open-settings').click();
+  assert.equal(await page.locator('#main-view').isVisible(), false);
   await page.locator('#affiliate-toggle').uncheck();
+  await page.locator('#close-settings').click();
+  assert.equal(await page.locator('#results .offer').count(), 3);
   await page.waitForFunction(() => window.__data.affiliateEnabled === false);
   assert(!(await captureWookClick()).includes('a_aid'));
   await page.reload();
@@ -130,6 +135,7 @@ try {
   await page.evaluate(() => { window.__permission = false; });
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'Acesso não autorizado' }).waitFor();
+  await page.locator('#open-settings').click();
   assert.equal(await page.locator('#auto-toggle').getAttribute('aria-pressed'), 'true');
   await page.locator('#auto-toggle').click();
   await page.getByRole('status').filter({ hasText: 'Avisos automáticos desativados' }).waitFor();
@@ -142,11 +148,13 @@ try {
   await page.locator('#auto-toggle').click();
   await page.getByRole('status').filter({ hasText: 'Avisos automáticos desativados' }).waitFor();
   assert.equal(await page.evaluate(() => window.__data.autoEnabled), false);
+  await page.locator('#close-settings').click();
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   await mkdir('work', { recursive: true });
   await page.screenshot({ path: 'work/extension-preview.png', fullPage: true });
   // Shipping edits, promotion windows and unknown destinations affect delivered ranking.
+  await page.locator('#open-settings').click();
   await page.locator('#delivery-settings > summary').click();
   await page.locator('#shipping-store').selectOption('wook');
   await page.locator('#shipping-fee').fill('3');
@@ -172,6 +180,7 @@ try {
   // Selection survives reload, requests only selected origins, and cancellation does not save partial history.
   await page.locator('#shops > summary').click();
   await page.locator('#select-none').click();
+  await page.locator('#close-settings').click();
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'pelo menos uma loja' }).waitFor();
   await page.locator('input[value="wook"]').check();
@@ -189,6 +198,7 @@ try {
   await page.getByRole('status').filter({ hasText: 'Consulta interrompida' }).waitFor();
   assert.equal(await page.evaluate(() => JSON.stringify(window.__data.history)), beforeCancel);
   assert.deepEqual(await page.evaluate(() => window.__requested.origins), ['https://www.wook.pt/*']);
+  await page.locator('#open-settings').click();
   page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', { name: 'Apagar dados' }).click();
   await page.getByRole('status').filter({ hasText: 'apagados' }).waitFor();
