@@ -17,3 +17,5 @@ After an affiliate click, Wook receives the affiliate identifier and normal brow
 ## Targets, shipping and local charts
 
 Target prices, item/delivered basis, schedules, notification deduplication state, destination region and shipping rules/promotions are saved locally. No street address is requested. Alarms schedule checks and notifications show target matches. Notices remain in the extension if system notifications are blocked. Checks are spread over time and stop when targets are paused/removed or scheduled checking is disabled. Clear data removes shelf, observations and target notices, invalidates pending jobs and disables both alert types; shipping preferences and affiliate preference remain. Shipping promotions are entered by the user, not automatically scraped. Charts use the book prices observed by this installation only, without recalculating historical shipping costs.
+
+Without a saved selection, only Wook, Bertrand, Almedina, Continente, Porto Editora and Presença are checked. Saved selections, including an empty selection, are preserved. Resetting data restores these six; all other adapters remain optional.

@@ -1,3 +1,4 @@
+import { DEFAULT_STORE_IDS } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { isbn13, remember } from './core.js';
 import { STORES } from './stores.js';
@@ -30,7 +31,7 @@ export function reduceData(data, action, now = Date.now()) {
   } else if (action.type === 'clear') {
     next.priceCache = {}; next.cacheEpoch = (next.cacheEpoch || 0) + 1;
     next.saved = {}; next.history = {}; next.watchNotices = []; next.watchJob = null;
-    next.selectedStores = STORES.map(s => s.id); next.autoEnabled = false; next.watchEnabled = false;
+    next.selectedStores = [...DEFAULT_STORE_IDS]; next.autoEnabled = false; next.watchEnabled = false;
   }
   return next;
 }

@@ -1,3 +1,4 @@
+import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
 import { quoteDelivery, shippingRule, REGIONS } from './shipping.js';
@@ -12,7 +13,7 @@ const $ = id => document.getElementById(id);
 const money = (cents, currency = 'EUR') => new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
 let priceCache = {}, comparing = false;
 let current = null, saved = {}, history = {}, controller = null, run = 0, activeOffers = [];
-let selected = new Set(STORES.map(s => s.id));
+let selected = new Set(DEFAULT_STORE_IDS);
 let autoEnabled = true, affiliateEnabled = false, shipping = { region: 'mainland' }, priceOrder = 'delivered';
 function autoLabel() { $('auto-toggle').textContent = autoEnabled ? 'Desativar avisos automáticos' : 'Ativar avisos automáticos'; $('auto-toggle').setAttribute('aria-pressed', String(autoEnabled)); }
 const status = text => { $('status').textContent = text; };
@@ -151,6 +152,7 @@ $('cancel').onclick = () => {
   renderOffers(activeOffers.map(o => ['queued', 'loading'].includes(o.status) ? { ...o, status: 'cancelled' } : o));
   status('Consulta interrompida. Os resultados parciais não foram guardados no histórico.');
 };
+$('select-defaults').onclick = () => { selected = new Set(DEFAULT_STORE_IDS); renderShops(); persist().catch(() => status('Não foi possível guardar a seleção.')); };
 $('select-all').onclick = () => { selected = new Set(STORES.map(s => s.id)); renderShops(); persist().catch(() => status('Não foi possível guardar a seleção.')); };
 $('select-none').onclick = () => { selected.clear(); renderShops(); persist().catch(() => status('Não foi possível guardar a seleção.')); };
 $('auto-toggle').onclick = async () => {
@@ -185,7 +187,7 @@ $('save').onclick = async () => {
 };
 $('clear').onclick = async () => {
   if (!confirm('Apagar a estante, o histórico e a seleção de lojas, e desativar todos os avisos e verificações agendadas?')) return;
-  ++run; comparing = false; controller?.abort(); $('cancel').hidden = true; saved = {}; history = {}; selected = new Set(STORES.map(s => s.id));
+  ++run; comparing = false; controller?.abort(); $('cancel').hidden = true; saved = {}; history = {}; selected = new Set(DEFAULT_STORE_IDS);
   try { applyData(await changeData({ type: 'clear' })); priceCache = {}; activeOffers = []; renderOffers([]); autoEnabled = false; $('watch-toggle').checked = false; autoLabel(); renderSaved(); renderHistory(); renderShops(); renderNotices([]); saveLabel(); status('Estante e histórico apagados.'); } catch { status('Não foi possível apagar os dados. Tenta novamente.'); }
 };
 async function init() {
@@ -194,7 +196,7 @@ async function init() {
     autoEnabled = data.autoEnabled !== false; autoLabel();
     affiliateEnabled = data.affiliateEnabled !== false; $('affiliate-toggle').checked = affiliateEnabled;
     saved = data.saved || {}; history = data.history || {}; priceCache = data.priceCache || {};
-    if (Array.isArray(data.selectedStores)) selected = new Set(data.selectedStores.filter(id => STORES.some(s => s.id === id)));
+    selected = new Set(selectedStoreIds(data.selectedStores));
     shipping = data.shipping || { region: 'mainland' }; priceOrder = data.priceOrder || 'delivered';
     initShipping(); $('watch-toggle').checked = data.watchEnabled !== false; renderNotices(data.watchNotices || []);
     renderSaved(); renderShops();

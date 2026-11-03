@@ -103,3 +103,14 @@ test('price cache expires, filters stores, bounds storage and clears with user d
   assert.equal(Object.keys(many).length, 50);
   assert.deepEqual(reduceData({priceCache: cache}, {type:'clear'}, now).priceCache, {});
 });
+
+
+test('default selection contains six automatic stores and preserves explicit preferences', async () => {
+  const { STORES, DEFAULT_STORE_IDS, selectedStoreIds } = await import('../extension/stores.js');
+  assert.equal(DEFAULT_STORE_IDS.length, 6);
+  assert(DEFAULT_STORE_IDS.every(id => STORES.some(s => s.id === id)));
+  assert.deepEqual(selectedStoreIds(undefined), [...DEFAULT_STORE_IDS]);
+  assert.deepEqual(selectedStoreIds([]), []);
+  assert.deepEqual(selectedStoreIds(['bookcover', 'wook']), ['bookcover', 'wook']);
+  assert.deepEqual(reduceData({}, {type:'clear'}).selectedStores, [...DEFAULT_STORE_IDS]);
+});

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
+
 - Show locally cached background, scheduled and manual prices immediately in the menu, with freshness labels and explicit refresh.
 
 ## 0.1.5
@@ -17,6 +19,8 @@
 - Disclose commissions in the interface and store listing; preserve opt-outs and existing attribution.
 
 ## Unreleased
+
+- Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
 
 - Enable automatic comparisons on fresh installation with required access to the 26 configured shops, without opening the popup or an activation step.
 - Preserve a saved disabled preference and refresh store screenshots, listing copy, privacy disclosures and install instructions.

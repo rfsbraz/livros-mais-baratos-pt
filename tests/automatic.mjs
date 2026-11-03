@@ -36,6 +36,7 @@ try {
   await shop.getByText('Poupa 2,00').waitFor({ timeout: 20000 });
   const popup = await context.newPage(); await popup.goto(`chrome-extension://${id}/popup.html`);
   await popup.waitForFunction(() => document.querySelector('#auto-toggle').getAttribute('aria-pressed') === 'true');
+  assert.equal(await popup.locator('#shop-list input:checked').count(), 6);
   assert.equal(await popup.evaluate(async () => (await chrome.storage.local.get('autoEnabled')).autoEnabled), undefined, 'Fresh install needs no activation preference');
   await popup.evaluate(() => { window.autoRequests = 0; chrome.runtime.onMessage.addListener(m => { if(m.type === 'fixture-fetch') window.autoRequests++; }); });
   assert.equal(await shop.getByRole('link', { name: 'Ver oferta na Bertrand' }).getAttribute('href'), `https://www.bertrand.pt/pesquisa/${isbn}`);

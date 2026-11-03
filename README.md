@@ -21,6 +21,7 @@ Os avisos exigem ISBN e preço atual verificáveis e comparam livros novos em EU
 ## O que faz
 
 - Deteta ISBN-10/ISBN-13 em dados estruturados e campos da página, validando o dígito de controlo.
+- Por predefinição consulta apenas Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Podes escolher outras lojas ou usar «Usar as 6 predefinidas». Seleções guardadas são preservadas.
 - Inclui 26 adaptadores automáticos: Wook, Bertrand, Almedina, Bookcover, Continente, Porto Editora, Lyvros, Penguin, Presença, Guerra e Paz, Gradiva, Relógio d'Água, Saída de Emergência, Quetzal, Antígona, Snob, Kingpin, mbooks, Auchan, Blackwell's, Waterstones, IberLibro, AbeBooks, El Corte Inglés, Devir e Mundo Fantasma.
 - Permite escolher lojas, consultar até quatro em simultâneo e interromper a comparação.
 - Inclui 17 fontes de consulta manual e 17 entradas de referência para outros formatos, aliases, chancelas e endereços indisponíveis. Todas as lojas mencionadas no levantamento estão contabilizadas em [Cobertura das lojas](docs/store-coverage.md).

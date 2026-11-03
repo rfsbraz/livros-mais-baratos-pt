@@ -1,3 +1,4 @@
+import { selectedStoreIds } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { writeData } from './data.js';
 import { installWatch } from './watch.js';
@@ -12,7 +13,7 @@ async function offscreen() {
 async function settings() {
   const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores', 'shipping', 'cacheEpoch']);
   const grants = await chrome.permissions.getAll();
-  const stores = STORES.filter(s => (!Array.isArray(data.selectedStores) || data.selectedStores.includes(s.id)) && grants.origins?.includes(`${s.origin}/*`));
+  const stores = STORES.filter(s => selectedStoreIds(data.selectedStores).includes(s.id) && grants.origins?.includes(`${s.origin}/*`));
   return { cacheEpoch: data.cacheEpoch || 0, enabled: data.autoEnabled !== false, stores, shipping: data.shipping || {} };
 }
 async function sync() {

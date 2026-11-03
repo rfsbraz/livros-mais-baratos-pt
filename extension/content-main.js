@@ -1,3 +1,4 @@
+import { selectedStoreIds } from './stores.js';
 import { bindAffiliateLink } from './affiliate.js';
 import { detectBook, parseOffer, structured } from './parser.js';
 import { storeForUrl } from './stores.js';
@@ -35,7 +36,7 @@ export function start() {
     const data = await chrome.storage.local.get(['autoEnabled', 'selectedStores', 'affiliateEnabled']);
     if (stopped || location.href !== url) return;
     affiliateEnabled = data.affiliateEnabled !== false;
-    if (data.autoEnabled === false || (Array.isArray(data.selectedStores) && !data.selectedStores.includes(store?.id))) { remove(); key = ''; generation++; return; }
+    if (data.autoEnabled === false || !selectedStoreIds(data.selectedStores).includes(store?.id)) { remove(); key = ''; generation++; return; }
     let book = null;
     if (store && !store.marketplace && store.product.test(location.pathname) && !/ebook|e-book|audiobook|audiolivro/i.test(location.pathname)) {
       const detected = detectBook(document, url);

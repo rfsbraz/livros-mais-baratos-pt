@@ -73,3 +73,8 @@ export const STORES = CATALOGUE.filter(s => s.mode === 'auto').map(s => ({ ...s,
 export function storeForUrl(url) {
   try { return STORES.find(s => new URL(url).origin === s.origin); } catch { return undefined; }
 }
+
+export const DEFAULT_STORE_IDS = Object.freeze(['wook', 'bertrand', 'almedina', 'continente', 'porto', 'presenca']);
+export function selectedStoreIds(value) {
+  return Array.isArray(value) ? value.filter(id => STORES.some(s => s.id === id)) : [...DEFAULT_STORE_IDS];
+}

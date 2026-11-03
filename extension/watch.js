@@ -1,3 +1,4 @@
+import { selectedStoreIds } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { STORES } from './stores.js';
 import { remember, safeUrl } from './core.js';
@@ -16,7 +17,7 @@ export function completeWatch(data, message, now = Date.now()) {
   const next = structuredClone(data), watch = next.saved[book.isbn].watch;
   const offers = (message.offers || []).filter(o => {
     const s = STORES.find(s => s.id === o.id);
-    return s && (o.status !== 'ok' || (Number.isSafeInteger(o.price) && o.price > 0 && /^[A-Z]{3}$/.test(o.currency || ''))) && job.storeIds.includes(s.id) && (!data.selectedStores || data.selectedStores.includes(s.id)) &&
+    return s && (o.status !== 'ok' || (Number.isSafeInteger(o.price) && o.price > 0 && /^[A-Z]{3}$/.test(o.currency || ''))) && job.storeIds.includes(s.id) && selectedStoreIds(data.selectedStores).includes(s.id) &&
       (!o.url || safeUrl(o.url, s.origin));
   });
   next.watchJob = null;
@@ -50,7 +51,7 @@ export function installWatch(offscreen) {
     await writeData(data => {
       const book = nextDue(data);
       if (!book) return null;
-      const stores = STORES.filter(s => (!data.selectedStores || data.selectedStores.includes(s.id)) && grants.origins?.includes(s.origin + '/*'));
+      const stores = STORES.filter(s => selectedStoreIds(data.selectedStores).includes(s.id) && grants.origins?.includes(s.origin + '/*'));
       if (!stores.length) return null;
       const token = crypto.randomUUID();
       data.watchLastStart = Date.now();
