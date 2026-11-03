@@ -59,6 +59,10 @@ O ZIP fica em `dist/`. A extensão não tem dependências de execução nem prec
 
 O repositório permanece privado, mas segue práticas de colaboração abertas e usa a [licença MIT](LICENSE).
 
+## Monitorização das lojas
+
+As 26 lojas automáticas são verificadas diariamente e após alterações relevantes em main. Falhas após uma repetição abrem ou atualizam uma issue com diagnóstico; a issue fecha quando todas passam. Consulta [a documentação](docs/store-monitoring.md).
+
 ## ☕ Support
 
 If you find this useful and want to support development, you can [buy me a coffee](https://buymeacoffee.com/rfsbraz) - no pressure at all, just a nice way to say thanks.
