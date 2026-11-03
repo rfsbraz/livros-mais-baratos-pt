@@ -1,0 +1,210 @@
+{
+  "checkedOn": "2026-11-03",
+  "method": "Isolated local Chromium running the unpacked extension; selected host access pre-granted in a temporary test copy. One sample ISBN per store. Not a catalogue-wide guarantee.",
+  "runs": [
+    "2026-11-03T16:14:31.596Z",
+    "2026-11-03T16:27:55.044Z"
+  ],
+  "results": [
+    {
+      "store": "wook",
+      "isbn": "9789895701124",
+      "status": "unavailable",
+      "url": "https://www.wook.pt/pesquisa?keyword=9789895701124"
+    },
+    {
+      "store": "bertrand",
+      "isbn": "9789895701124",
+      "status": "unavailable",
+      "url": "https://www.bertrand.pt/pesquisa/9789895701124"
+    },
+    {
+      "store": "almedina",
+      "isbn": "9789895701124",
+      "status": "unavailable",
+      "url": "https://www.almedina.net/catalogsearch/result/?q=9789895701124"
+    },
+    {
+      "store": "bookcover",
+      "isbn": "9789899267411",
+      "status": "ok",
+      "price": 1800,
+      "title": "As três da manhã",
+      "url": "https://bookcover.pt/product/as-tres-da-manha/"
+    },
+    {
+      "store": "continente",
+      "isbn": "9789895701124",
+      "status": "ok",
+      "price": 1750,
+      "title": "A Criada de Freida McFadden",
+      "url": "https://www.continente.pt/produto/a-criada-de-freida-mcfadden-7781513.html"
+    },
+    {
+      "store": "porto",
+      "isbn": "9789723830637",
+      "status": "unavailable",
+      "url": "https://www.portoeditora.pt/pesquisa?q=9789723830637"
+    },
+    {
+      "store": "lyvros",
+      "isbn": "9789895819812",
+      "status": "ok",
+      "price": 1791,
+      "title": "A Rapariga Que Inventou um Sonho",
+      "url": "https://www.lyvros.com/catalogo/a-rapariga-que-inventou-um-sonho"
+    },
+    {
+      "store": "penguin",
+      "isbn": "9789895968244",
+      "status": "ok",
+      "price": 1607,
+      "title": "O Diário Pessoal do Papa Francisco - Penguin Livros",
+      "url": "https://penguinlivros.pt/loja/penguin/livro/o-diario-pessoal-do-papa-francisco/"
+    },
+    {
+      "store": "presenca",
+      "isbn": "9789722378543",
+      "status": "ok",
+      "price": 3591,
+      "title": "Harry Potter e o Príncipe Misterioso - Edição Ilustrada",
+      "url": "https://www.presenca.pt/products/harry-potter-e-o-principe-misterioso-edicao-ilustrada?variant=55125197455697"
+    },
+    {
+      "store": "guerraepaz",
+      "isbn": "9789895764808",
+      "status": "ok",
+      "price": 1620,
+      "title": "Os Enigmas dos Crimes de Natal - Guerra e Paz",
+      "url": "https://www.guerraepaz.pt/produto/os-enigmas-dos-crimes-de-natal/"
+    },
+    {
+      "store": "gradiva",
+      "isbn": "9789897855320",
+      "status": "ok",
+      "price": 1620,
+      "title": "O Genocídio Ocultado - Gradiva",
+      "url": "https://www.gradiva.pt/produto/o-genocidio-ocultado-2/"
+    },
+    {
+      "store": "relogiodagua",
+      "isbn": "9789897837449",
+      "status": "ok",
+      "price": 2160,
+      "title": "Terra - Relógio D&#039;Água",
+      "url": "https://www.relogiodagua.pt/produto/terra/"
+    },
+    {
+      "store": "saida",
+      "isbn": "9789897108075",
+      "status": "ok",
+      "price": 1790,
+      "title": "As Alianças Perdidas",
+      "url": "https://www.saidadeemergencia.com/produto/as-aliancas-perdidas/"
+    },
+    {
+      "store": "quetzal",
+      "isbn": "9789897228919",
+      "status": "unavailable",
+      "url": "https://www.quetzaleditores.pt/pesquisa?q=9789897228919"
+    },
+    {
+      "store": "antigona",
+      "isbn": "9789726084495",
+      "status": "ok",
+      "price": 2430,
+      "title": "Marcas de Batom",
+      "url": "https://antigona.pt/products/marcas-de-batom"
+    },
+    {
+      "store": "snob",
+      "isbn": "9789893678862",
+      "status": "ok",
+      "price": 700,
+      "title": "EXERCÍCIO DE MONTAGEM",
+      "url": "https://www.livrariasnob.pt/product/exercicio-de-montagem"
+    },
+    {
+      "store": "kingpin",
+      "isbn": "9789895598571",
+      "status": "ok",
+      "price": 2800,
+      "title": "A Morte do Tetraz-Lira by David Combet",
+      "url": "https://kingpinbooks.com/products/a-morte-do-tetraz-lira-by-david-combet?variant=55586172404053"
+    },
+    {
+      "store": "mbooks",
+      "isbn": "9789898297839",
+      "status": "ok",
+      "price": 500,
+      "title": "Transforme-se a si Mesmo até Sexta",
+      "url": "https://mbooks.pt/produto/transforme-se-a-si-mesmo-ate-sexta/"
+    },
+    {
+      "store": "auchan",
+      "isbn": "9789895701124",
+      "status": "ok",
+      "price": 1751,
+      "title": "A CRIADA DE FREIDA MCFADDEN",
+      "url": "https://www.auchan.pt/pt/papelaria-livraria-e-experiencias/livraria/literatura-e-ficcao/a-criada-de-freida-mcfadden/3633281.html"
+    },
+    {
+      "store": "blackwells",
+      "isbn": "9781037210631",
+      "status": "unavailable",
+      "url": "https://blackwells.co.uk/bookshop/search/?keyword=9781037210631"
+    },
+    {
+      "store": "waterstones",
+      "isbn": "9781037210631",
+      "status": "unavailable",
+      "url": "https://www.waterstones.com/books/search/term/9781037210631"
+    },
+    {
+      "store": "iberlibro",
+      "isbn": "9789895701124",
+      "status": "ok",
+      "price": 2468,
+      "currency": "EUR",
+      "condition": "UsedCondition",
+      "title": "A Criada",
+      "url": "https://www.iberlibro.com/Criada-Freida-McFadden-Alma-dos-Livros/32076607122/bd"
+    },
+    {
+      "store": "abebooks",
+      "isbn": "9789895701124",
+      "status": "ok",
+      "price": 2762,
+      "currency": "USD",
+      "condition": "UsedCondition",
+      "title": "A Criada",
+      "url": "https://www.abebooks.com/Criada-Freida-McFadden-Alma-dos-Livros/32076607122/bd"
+    },
+    {
+      "store": "elcorteingles",
+      "isbn": "9789895874132",
+      "status": "unavailable",
+      "url": "https://www.elcorteingles.pt/search/?s=9789895874132"
+    },
+    {
+      "store": "mundofantasma",
+      "isbn": "9781591163596",
+      "status": "ok",
+      "price": 1487,
+      "currency": "EUR",
+      "condition": "NewCondition",
+      "title": "Naruto Vol. 5",
+      "url": "https://mundofantasma.com/produto/056086"
+    },
+    {
+      "store": "devir",
+      "isbn": "9789895598762",
+      "status": "ok",
+      "price": 999,
+      "currency": "EUR",
+      "condition": "NewCondition",
+      "title": "Ichi the Witch 01 - Manga | Devir",
+      "url": "https://editoradevir.pt/livro/ichi-the-witch-01/"
+    }
+  ]
+}

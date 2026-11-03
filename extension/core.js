@@ -1,5 +1,5 @@
 export function isbn13(value) {
-  const s = String(value ?? '').replace(/[\s-]/g, '').toUpperCase();
+  const s = String(value ?? '').replace(/[\s\p{Pd}]/gu, '').toUpperCase();
   if (/^\d{9}[\dX]$/.test(s)) {
     const sum = [...s].reduce((a, c, i) => a + (c === 'X' ? 10 : Number(c)) * (10 - i), 0);
     if (sum % 11) return null;
@@ -30,29 +30,48 @@ export function identity(node) {
 
 export function safeUrl(value, base) {
   try {
+    if (typeof value !== 'string' || !value) return null;
     const u = new URL(value, base);
+    // Product cards can contain GET links that mutate carts or wishlists.
+    if ([...u.searchParams.keys()].some(key => /^(add[-_]to[-_](cart|wishlist)|remove[-_]item|wc-ajax|action)$/i.test(key))) return null;
     return u.protocol === 'https:' && u.origin === new URL(base).origin && !u.username && !u.password ? u.href : null;
   } catch { return null; }
 }
 
-export function offerFrom(node, base) {
+export function offerFrom(node, base, currencies = ['EUR']) {
   const offers = Array.isArray(node.offers) ? node.offers : [node.offers];
   return offers.filter(Boolean).flatMap(o => {
     // AggregateOffer.lowPrice can describe a different seller or format; do not use it.
     const price = euros(o.price);
-    const url = safeUrl(o.url || node.url || base, base);
-    if (!price || o.priceCurrency !== 'EUR' || !url) return [];
+    const rawUrl = typeof o.url === 'string' ? o.url : typeof node.url === 'string' ? node.url : base;
+    const url = safeUrl(rawUrl, base);
+    if (!price || !currencies.includes(o.priceCurrency) || !url) return [];
     const availability = String(o.availability || '').split(/[\/#]/).pop();
-    return [{ price, url, availability, title: String(node.name || '').slice(0, 200) }];
+    const condition = String(o.itemCondition || '').split(/[\/#]/).pop();
+    return [{ price, currency: o.priceCurrency, condition, seller: String(o.seller?.name || '').slice(0, 100), url, availability, title: String(node.name || '').slice(0, 200) }];
   }).sort((a, b) => a.price - b.price)[0] ?? null;
 }
 
-export const STORES = [
-  { id: 'wook', name: 'Wook', origin: 'https://www.wook.pt', search: isbn => `https://www.wook.pt/pesquisa?keyword=${isbn}`, product: /\/livro\// },
-  { id: 'bertrand', name: 'Bertrand', origin: 'https://www.bertrand.pt', search: isbn => `https://www.bertrand.pt/pesquisa/${isbn}`, product: /\/livro\// },
-  { id: 'almedina', name: 'Almedina', origin: 'https://www.almedina.net', search: isbn => `https://www.almedina.net/catalogsearch/result/?q=${isbn}`, product: /\.html$|\/[^/]+-\d+\.html|\/[^/]+-\d+$/ },
-  { id: 'bookcover', name: 'Bookcover', origin: 'https://bookcover.pt', search: isbn => `https://bookcover.pt/?s=${isbn}&post_type=product`, product: /\/product\// }
-];
+export { STORES } from './stores.js';
+
+// Read only the observed Svelte search index. Never evaluate embedded page code.
+// Search SKU discovers a page; the product page must independently verify the ISBN.
+export function svelteProductLinks(payload, origin) {
+  const links = [];
+  for (const node of Array.isArray(payload?.nodes) ? payload.nodes : []) {
+    const data = node?.data;
+    if (node?.type !== 'data' || !Array.isArray(data)) continue;
+    const at = index => Number.isInteger(index) && index >= 0 ? data[index] : undefined;
+    const products = at(data[0]?.products);
+    const indices = at(products?.data);
+    if (!Array.isArray(indices)) continue;
+    for (const index of indices.slice(0, 5)) {
+      const sku = at(at(index)?.sku);
+      if (typeof sku === 'string' && /^[a-zA-Z0-9_-]{1,64}$/.test(sku)) links.push(`${origin}/produto/${sku}`);
+    }
+  }
+  return [...new Set(links)].slice(0, 5);
+}
 
 export function wooOffer(products, isbn, origin) {
   if (!Array.isArray(products)) return null;
@@ -61,13 +80,13 @@ export function wooOffer(products, isbn, origin) {
   const price = Number(product.prices.price);
   const url = safeUrl(product.permalink, origin);
   if (!Number.isSafeInteger(price) || price <= 0 || !url) return null;
-  return { price, url, title: String(product.name || '').slice(0, 200), availability: product.is_in_stock === true ? 'InStock' : product.is_in_stock === false ? 'OutOfStock' : '' };
+  return { price, currency: 'EUR', condition: 'NewCondition', url, title: String(product.name || '').slice(0, 200), availability: product.is_in_stock === true ? 'InStock' : product.is_in_stock === false ? 'OutOfStock' : '' };
 }
 
 export function remember(history, isbn, offers, now = Date.now()) {
   const next = { ...history };
   const previous = next[isbn] || [];
-  const observations = offers.filter(o => o.status === 'ok').map(o => ({ store: o.id, price: o.price, availability: o.availability, at: now }));
+  const observations = offers.filter(o => o.status === 'ok').map(o => ({ store: o.id, price: o.price, currency: o.currency || 'EUR', condition: o.condition || '', availability: o.availability, at: now }));
   if (observations.length) next[isbn] = [...previous, ...observations].filter(o => o.at >= now - 90 * 86400000).slice(-360);
   const entries = Object.entries(next).sort((a, b) => (b[1].at(-1)?.at || 0) - (a[1].at(-1)?.at || 0));
   return Object.fromEntries(entries.slice(0, 200));
