@@ -61,7 +61,7 @@ O repositório permanece privado, mas segue práticas de colaboração abertas e
 
 ## Monitorização das lojas
 
-As 26 lojas automáticas são verificadas diariamente e após alterações relevantes em main. Falhas após uma repetição abrem ou atualizam uma issue com diagnóstico; a issue fecha quando todas passam. Consulta [a documentação](docs/store-monitoring.md).
+As 26 lojas automáticas estão distribuídas por 24 horários diários: uma ou duas lojas por hora, com atrasos aleatórios entre pedidos. Os limites HTTP 429 são distinguidos dos bloqueios 403. Falhas atualizam uma issue sem apagar resultados de lojas ainda não verificadas; os avisos fecham após recuperação. Consulta [a documentação](docs/store-monitoring.md).
 
 ## ☕ Support
 

@@ -11,9 +11,23 @@ export function inspectOffer(store, offer) {
 
 export function failureCode(check, requests) {
   if (check === 'ok') return 'ok';
-  if (requests.some(r => [401, 403, 429].includes(r.status))) return 'access-blocked';
+  if (requests.some(r => r.status === 429)) return 'rate-limited';
+  if (requests.some(r => r.status === 401)) return 'authentication-required';
+  if (requests.some(r => r.status === 403)) return 'access-forbidden';
+  if (requests.some(r => r.status === 405)) return 'method-not-allowed';
   if (requests.some(r => r.status >= 500)) return 'shop-server-error';
   if (requests.some(r => r.error)) return 'network-error';
   if (requests.some(r => r.status === 404 || r.status === 410)) return 'page-missing';
   return check;
+}
+
+export function retryAfterUntil(value, now = Date.now()) {
+  if (!value) return null;
+  const time = /^\d+$/.test(value.trim()) ? now + Number(value) * 1000 : Date.parse(value);
+  return Number.isFinite(time) && time > now ? time : null;
+}
+
+export function canRetry(status, requests) {
+  return !['rate-limited', 'authentication-required', 'access-forbidden', 'method-not-allowed'].includes(status)
+    && !requests.some(r => r.retryAfterUntil > Date.now());
 }
