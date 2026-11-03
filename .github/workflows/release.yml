@@ -1,0 +1,41 @@
+name: Release
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RELEASE_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+    steps:
+      - name: Explain missing release configuration
+        if: env.RELEASE_TOKEN == ''
+        run: echo 'Configure RELEASE_PLEASE_TOKEN to enable releases.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: googleapis/release-please-action@v4
+        if: env.RELEASE_TOKEN != ''
+        id: release
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+      - uses: actions/checkout@v4
+        if: steps.release.outputs.release_created
+        with:
+          ref: ${{ steps.release.outputs.tag_name }}
+      - uses: actions/setup-node@v4
+        if: steps.release.outputs.release_created
+        with:
+          node-version: 22
+          cache: npm
+      - if: steps.release.outputs.release_created
+        run: npm ci && npm run check && npm test && npm run build
+      - if: steps.release.outputs.release_created
+        run: gh release upload "$TAG" dist/*.zip
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag_name }}

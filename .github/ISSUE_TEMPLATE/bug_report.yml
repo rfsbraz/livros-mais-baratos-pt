@@ -1,0 +1,29 @@
+name: Bug report
+description: Report an incorrect price, ISBN match or extension problem
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Include store URL and ISBN, without personal information.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Chrome version, extension version and unpacked/packaged installation (Docker/native if relevant).
+    validations:
+      required: true

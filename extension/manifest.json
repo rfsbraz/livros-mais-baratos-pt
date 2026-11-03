@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Livros Mais Baratos PT",
+  "version": "0.1.0",
+  "description": "Compara preços da mesma edição em livrarias portuguesas e guarda o histórico das tuas consultas.",
+  "minimum_chrome_version": "120",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "optional_host_permissions": ["https://www.wook.pt/*", "https://www.bertrand.pt/*", "https://www.almedina.net/*", "https://bookcover.pt/*"],
+  "action": { "default_popup": "popup.html", "default_title": "Comparar preços de livros", "default_icon": { "16": "icons/16.png", "32": "icons/32.png" } },
+  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "content_security_policy": { "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'" }
+}
