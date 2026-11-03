@@ -29,9 +29,15 @@ export function pageIsbn(doc) {
       if (isbn) return isbn;
     }
   }
-  const body = doc.body?.cloneNode(true);
-  body?.querySelectorAll('script,style,nav,header,footer').forEach(el => el.remove());
-  const text = body?.textContent || '';
+  // Read text without cloning retailer elements or activating their resource/event lifecycle.
+  const parts = [];
+  if (doc.body) {
+    const walker = doc.createTreeWalker(doc.body, 4, {
+      acceptNode: node => node.parentElement?.closest('script,style,nav,header,footer,svg,math,template') ? 2 : 1
+    });
+    while (walker.nextNode()) parts.push(walker.currentNode.textContent);
+  }
+  const text = parts.join('');
   const labelled = text.match(/(?:ISBN(?:[\s-]*(?:10|13))?|\bEAN)\s*:?\s*((?:97[89](?:[\s\p{Pd}]*\d){10})|(?:\d(?:[\s\p{Pd}]*\d){8}[\s\p{Pd}]*[\dXx]))/u);
   return isbn13(labelled?.[1]);
 }

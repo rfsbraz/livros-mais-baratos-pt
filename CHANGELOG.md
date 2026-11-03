@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Read fallback ISBN text without cloning retailer SVGs or other elements with inline event handlers.
+
 - Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
 
 - Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
@@ -21,6 +23,8 @@
 - Disclose commissions in the interface and store listing; preserve opt-outs and existing attribution.
 
 ## Unreleased
+
+- Read fallback ISBN text without cloning retailer SVGs or other elements with inline event handlers.
 
 - Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
 
