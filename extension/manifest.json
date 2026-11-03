@@ -1,18 +1,20 @@
 {
   "manifest_version": 3,
   "name": "Livros Mais Baratos PT",
-  "version": "0.1.4",
-  "description": "Compara preÃ§os de livros em Portugal e recebe automaticamente avisos de ofertas mais baratas da mesma ediÃ§Ã£o.",
+  "version": "0.1.5",
+  "description": "Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.",
   "minimum_chrome_version": "120",
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
-    "offscreen"
+    "offscreen",
+    "alarms",
+    "notifications"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Comparar preÃ§os de livros",
+    "default_title": "Comparar preços de livros",
     "default_icon": {
       "16": "icons/16.png",
       "32": "icons/32.png"

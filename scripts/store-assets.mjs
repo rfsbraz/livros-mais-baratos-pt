@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir, cp } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
 import assert from 'node:assert/strict';
-const out = resolve('../outputs/chrome-web-store-pack-0.1.4');
+const out = resolve('../outputs/chrome-web-store-pack-0.1.5');
 for (const dir of ['icons','promo','screenshots','metadata','website','source','upload']) await mkdir(`${out}/${dir}`,{recursive:true});
 const root=resolve('extension');
 const server=createServer(async(req,res)=>{try{
@@ -38,14 +38,17 @@ try {
  await promo.setViewportSize({width:1400,height:560});await promo.setContent(marquee);await promo.screenshot({path:`${out}/promo/marquee-1400x560.png`});
  await writeFile(`${out}/source/promo-marquee.html`,marquee);await promo.close();
  const scenes=[
-  ['02-comparar-edicao','Compara a mesma<br>edição.','O ISBN identifica o livro certo.<br>Vê preços e disponibilidade lado a lado.','Interface real · comparação manual','compare'],
-  ['03-escolher-lojas','As tuas lojas.<br>A tua escolha.','Seleciona onde queres comparar.<br>O acesso é autorizado<br>na instalação.','Interface real · seleção de lojas','shops'],
-  ['04-estante-historico','Guarda o livro.<br>Volta a comparar.','A tua estante e o histórico das<br>consultas ficam neste navegador.','Interface real · dados de demonstração','history'],
-  ['05-sem-configuracao','Instala.<br>Abre um livro.','As comparações começam<br>automaticamente, sem abrir<br>a extensão.','Interface real · avisos ativos por predefinição','enable']
+  ['02-comparar-edicao','Compara o total.<br>Inclui os portes.','A mesma edição, com portes estimados.<br>Custos desconhecidos ficam identificados.','Interface real · comparação manual','compare'],
+  ['03-portes-e-campanhas','Portes claros.<br>Campanhas com fim.','Define os portes e mínimos da loja.<br>As campanhas só valem<br>dentro das datas indicadas.','Interface real · regras introduzidas pelo utilizador','shipping'],
+  ['04-estante-historico','O preço ao longo<br>das tuas consultas.','Só observações desta instalação.<br>Sem históricos de terceiros.','Interface real · dados de demonstração','history'],
+  ['05-precos-alvo','Define o preço.<br>Recebe um aviso.','Guarda um alvo para o livro<br>ou para o total com portes.<br>As consultas são agendadas.','Interface real · preços-alvo da estante','targets']
  ];
  for(const [name,title,copy,caption,mode] of scenes){
    const page=await browser.newPage({viewport:{width:1280,height:800},deviceScaleFactor:1});
    const data={selectedStores:['wook','bertrand','continente','bookcover'],autoEnabled:true,saved:{'9789895701124':{isbn:'9789895701124',title:'A Criada'},'9789723830637':{isbn:'9789723830637',title:'A Leste do Paraíso'},'9789722369718':{isbn:'9789722369718',title:'Antes que o Café Arrefeça'}},history:{'9789895701124':[{store:'wook',price:1946,currency:'EUR',condition:'NewCondition',availability:'InStock',at:Date.UTC(2026,10,2,12)},{store:'bertrand',price:1751,currency:'EUR',condition:'NewCondition',availability:'InStock',at:Date.UTC(2026,10,2,12)}]}};
+   data.shipping={region:'mainland',rules:{mainland:{bertrand:{source:'manual',fee:350,expiresAt:Date.now()+86400000},continente:{source:'manual',fee:499,expiresAt:Date.now()+86400000}}}};
+   data.history['9789895701124'].unshift({store:'wook',price:2240,currency:'EUR',condition:'NewCondition',at:Date.UTC(2026,9,28,12),source:'manual'});
+   if(mode==='targets'){data.saved={'9789895701124':{isbn:'9789895701124',title:'A Criada',watch:{enabled:true,target:1850,basis:'delivered'}}};}
    if(mode==='enable'){delete data.selectedStores;delete data.autoEnabled;data.saved={};data.history={};}
    await page.addInitScript(({data,html})=>{
     let state=structuredClone(data);window.chrome={storage:{local:{get:async()=>state,set:async x=>{state={...state,...x}}}},permissions:{contains:async()=>true},tabs:{query:async()=>[{id:1,url:'https://www.wook.pt/livro/a-criada'}]},scripting:{executeScript:async()=>[{result:{html}}]}};
@@ -62,6 +65,8 @@ try {
     if(mode==='compare')await f.locator('#book').evaluate(el=>window.scrollTo(0,el.offsetTop-18));
     else {await page.addStyleTag({content:'.frame{top:150px;height:500px}iframe{height:500px}'});await f.locator('#history-section').evaluate(el=>el.open=true);await f.locator('#history-section').evaluate(el=>window.scrollTo(0,el.offsetTop-18));}
    }
+   if(mode==='shipping'){await f.locator('#delivery-settings').evaluate(el=>el.open=true);await f.locator('#shipping-store').selectOption('bertrand');await f.locator('#shipping-minimum').fill('25.00');await f.locator('#shipping-promo').check();await f.locator('#promo-end').fill('2026-11-10T23:59');await f.locator('#shipping-form').evaluate(el=>window.scrollTo(0,el.offsetTop-10));}
+   if(mode==='targets'){await page.addStyleTag({content:'.frame{top:140px;height:480px}iframe{height:480px}'});await f.locator('body').evaluate(el=>el.style.paddingBottom='400px');await f.locator('.saved').evaluate(el=>window.scrollTo(0,el.offsetTop-20));}
    if(mode==='shops'){await f.locator('#shops').evaluate(el=>el.open=true);await f.locator('#shops').evaluate(el=>window.scrollTo(0,el.offsetTop));}
    if(mode==='enable'){assert.equal(await f.locator('#auto-toggle').getAttribute('aria-pressed'),'true');await page.addStyleTag({content:'.frame{top:105px;height:550px}iframe{height:550px}'});}
    await page.screenshot({path:`${out}/screenshots/${name}-1280x800.png`});
@@ -82,18 +87,18 @@ try {
  await page.locator('#lmb-price-alert').evaluate(el=>{el.style.right='86px';el.style.bottom='100px';el.style.width='430px';});
  await page.screenshot({path:`${out}/screenshots/01-aviso-automatico-1280x800.png`});await page.close();
  const preview=await browser.newPage({viewport:{width:1440,height:1100}});
- const imgs=[];for(const file of ['01-aviso-automatico','02-comparar-edicao','03-escolher-lojas','04-estante-historico','05-sem-configuracao'])imgs.push({file:`${file}-1280x800.png`,src:`data:image/png;base64,${(await readFile(`${out}/screenshots/${file}-1280x800.png`)).toString('base64')}`});
+ const imgs=[];for(const file of ['01-aviso-automatico','02-comparar-edicao','03-portes-e-campanhas','04-estante-historico','05-precos-alvo'])imgs.push({file:`${file}-1280x800.png`,src:`data:image/png;base64,${(await readFile(`${out}/screenshots/${file}-1280x800.png`)).toString('base64')}`});
  await preview.setContent(`<style>body{background:#e5ebf4;font:16px Arial;margin:25px;color:#172e59}main{display:grid;grid-template-columns:1fr 1fr;gap:20px}img{width:100%;border-radius:8px}p{margin:6px 0}</style><h1>Livros Mais Baratos PT · Chrome Web Store</h1><main>${imgs.map(x=>`<div><img src="${x.src}"><p>${x.file}</p></div>`).join('')}</main>`);
  await preview.screenshot({path:`${out}/preview.png`,fullPage:true});await preview.close();
  const pngs=[...imgs.map(x=>`screenshots/${x.file}`),'promo/small-440x280.png','promo/marquee-1400x560.png',...([16,32,48,64,128,256,512].map(n=>`icons/icon-${n}.png`))];
  const inventory=[];for(const file of pngs){const b=await readFile(`${out}/${file}`);const w=b.readUInt32BE(16),h=b.readUInt32BE(20);if(file.startsWith('screenshots'))assert(w===1280&&h===800);inventory.push({file,width:w,height:h,bytes:b.length,colorType:b[25]});}
- await writeFile(`${out}/asset-manifest.json`,JSON.stringify({generated:'2026-11-03',version:'0.1.4',assets:inventory},null,2));
+ await writeFile(`${out}/asset-manifest.json`,JSON.stringify({generated:'2026-11-03',version:'0.1.5',assets:inventory},null,2));
  await cp('extension',`${out}/source/extension`,{recursive:true});
  for(const size of [16,32,48,128])await cp(`${out}/icons/icon-${size}.png`,`${out}/source/extension/icons/${size}.png`);
  const manifest=JSON.parse(await readFile(`${out}/source/extension/manifest.json`,'utf8'));
- manifest.description='Compara preços de livros em Portugal e recebe automaticamente avisos de ofertas mais baratas da mesma edição.';
+ manifest.description='Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.';
  assert(manifest.description.length<=132);await writeFile(`${out}/source/extension/manifest.json`,JSON.stringify(manifest,null,2)+'\n');
  await cp('LICENSE',`${out}/source/extension/LICENSE`);
- await cp('dist/livros-mais-baratos-pt-0.1.4.zip',`${out}/upload/livros-mais-baratos-pt-0.1.4-store.zip`);
+ await cp('dist/livros-mais-baratos-pt-0.1.5.zip',`${out}/upload/livros-mais-baratos-pt-0.1.5-store.zip`);
  console.log(JSON.stringify({output:out,assets:inventory.length,summaryCharacters:manifest.description.length}));
 } finally {await browser.close();server.close();}

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.5
+
+- Add saved-book price targets, staggered scheduled checks and deduplicated notifications.
+- Compare estimated delivered totals using destination-specific shipping fees, free-shipping thresholds and dated promotions.
+- Draw history charts exclusively from locally observed manual and scheduled prices.
+- Preserve concurrent shelf/history changes and invalidate pending jobs when data is cleared.
+
 ## 0.1.4
 
 - Add optional affiliate support, enabled by default, for deliberate clicks on verified cheaper Wook offers.

@@ -36,11 +36,11 @@ Os adaptadores são experimentais. Em 3 de novembro de 2026, testes reais na ext
 
 Os preços excluem portes e taxas de importação. Saldo em cartão não é tratado como desconto. A extensão não calcula custos finais, não contorna captchas, não usa contas das lojas e não executa scripts recebidos das lojas. Segue redirecionamentos normais, rejeita destinos fora da loja e ignora ligações que alterem o carrinho. Examina até seis candidatos por loja, com prazo total de 35 segundos por loja. Uma oferta de marketplace não é uma garantia do mínimo de todos os vendedores.
 
-O histórico começa nas comparações manuais. Não há monitorização agendada de livros guardados, notificações do sistema, campanhas automáticas, previsão legal de descontos, importação de listas ou servidor. Mantém a janela aberta durante uma comparação manual. Os avisos automáticos, quando ativados, funcionam independentemente da janela da extensão e não acrescentam observações ao histórico.
+Define preços-alvo nos livros guardados, com ou sem portes. As verificações são aproximadamente diárias enquanto o Chrome está aberto e mostram notificações ao atingir o alvo. Os gráficos contêm apenas preços observados nesta instalação, em consultas manuais e agendadas. Não há históricos externos, deteção automática de campanhas, previsão legal de descontos, importação de listas ou servidor. Mantém a janela aberta durante uma comparação manual. Os avisos automáticos, quando ativados, funcionam independentemente da janela da extensão e não acrescentam observações ao histórico.
 
 ## Privacidade e permissões
 
-`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas por predefinição, respeitando a opção de desligar os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso aos domínios das 26 lojas é solicitado na instalação. Atualizações que adicionem permissões podem exigir aprovação no Chrome. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria. Ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas na extensão. Só acrescentamos o código ao clicar numa oferta confirmada mais barata; não altera preços, ordenação nem pedidos de comparação. Consulta [PRIVACY.md](PRIVACY.md).
+`activeTab` permite a deteção manual. `scripting` também ativa a deteção nas lojas autorizadas por predefinição, respeitando a opção de desligar os avisos. `offscreen` permite processar páginas das lojas sem manter a janela da extensão aberta. `alarms` agenda verificações de alvos e `notifications` mostra os avisos do sistema. `storage` guarda a estante, as preferências e o histórico apenas neste navegador. O acesso aos domínios das 26 lojas é solicitado na instalação. Atualizações que adicionem permissões podem exigir aprovação no Chrome. Cada loja consultada recebe o ISBN e, quando necessário, o título, além dos dados normais de rede (incluindo endereço IP). Os pedidos não enviam cookies de sessão. Sem telemetria. Ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas na extensão. Só acrescentamos o código ao clicar numa oferta confirmada mais barata; não altera preços, ordenação nem pedidos de comparação. Consulta [PRIVACY.md](PRIVACY.md).
 
 ## Desenvolvimento
 
@@ -58,6 +58,10 @@ npm run build
 O ZIP fica em `dist/`. A extensão não tem dependências de execução nem precisa de compilação. O Playwright é usado apenas nos testes. Consulta [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) e [docs/architecture.md](docs/architecture.md).
 
 O repositório permanece privado, mas segue práticas de colaboração abertas e usa a [licença MIT](LICENSE).
+
+## Portes e preços-alvo
+
+Em Entrega e portes, escolhe o destino e configura custos, mínimos para portes grátis e campanhas com datas. Existem regras iniciais verificadas para Wook e Presença, com validade de 30 dias. Nas restantes lojas, os portes são desconhecidos até introduzires uma regra. Nunca são tratados como grátis. Consulta [o funcionamento e as fontes](docs/targets-shipping-history.md).
 
 ## Monitorização das lojas
 

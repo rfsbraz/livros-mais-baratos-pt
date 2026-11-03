@@ -8,7 +8,7 @@ The manifest declares exactly the 26 configured shop origins in `host_permission
 
 The content script parses the current product DOM using the existing ISBN and price adapters. It rejects search pages, marketplace sources, identified digital formats and unverifiable current prices. It observes delayed page content and URL changes, invalidates stale asynchronous results and supports back/forward cache restoration. The worker validates the sender's extension ID, top-level frame, source URL, selected/granted source and current-offer fields before forwarding only book metadata. Full page HTML is not sent outside the tab.
 
-The offscreen document uses the same comparison adapters. At most two distinct edition/selection jobs run with four shared store slots, a 90-second job deadline and 35-second store deadline. Concurrent identical requests share a job. Results are cached in memory for ten minutes with a 50-entry bound. Comparisons accept only a strictly cheaper, in-stock new EUR offer from another non-marketplace store. Alerts display the observation time, price difference and a shipping exclusion. Cached results are not historical observations. Page dismissal suppresses that ISBN for the current document.
+The offscreen document uses the same comparison adapters. At most two distinct edition/selection jobs run with four shared store slots, a 90-second job deadline and 35-second store deadline. Concurrent identical requests share a job. Results are cached in memory for ten minutes with a 50-entry bound. Comparisons accept only a strictly cheaper, in-stock new EUR offer from another non-marketplace store. Alerts display the observation time and price difference, distinguishing estimated delivered totals from item-only comparisons with unknown shipping. Cached results are not historical observations. Page dismissal suppresses that ISBN for the current document.
 
 Browser tests exercise the native content-script, worker and offscreen-message flow in an isolated Chromium extension. Only the network boundary is replaced in the temporary test copy because Playwright page routing does not intercept hidden offscreen targets. Public shop access remains covered separately by the live smoke script. See Chrome's [offscreen API](https://developer.chrome.com/docs/extensions/reference/api/offscreen) and [dynamic content-script registration](https://developer.chrome.com/docs/extensions/reference/api/scripting#method-registerContentScripts).
 
@@ -32,7 +32,7 @@ Run `npm run build`, `node scripts/store-assets.mjs` and `node scripts/store-met
 
 ## Future work
 
-Validate adapters against live pages and store terms before broad release. Add recorded, sanitized fixtures with date/provenance when permission permits. Add shipping-aware totals and loyalty-credit breakdowns before advertising total-price comparison. Background price alerts, campaign tracking, wishlist import and any legal discount timing require a separate design and validation step.
+Validate adapters against live pages and store terms before broad release. Add recorded, sanitized fixtures with date/provenance when permission permits. Shipping totals, target checks and local charts are described in targets-shipping-history.md. Automatic campaign detection, loyalty-credit breakdowns, wishlist import and any legal discount timing remain future work.
 
 ## Design
 

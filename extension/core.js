@@ -83,10 +83,10 @@ export function wooOffer(products, isbn, origin) {
   return { price, currency: 'EUR', condition: 'NewCondition', url, title: String(product.name || '').slice(0, 200), availability: product.is_in_stock === true ? 'InStock' : product.is_in_stock === false ? 'OutOfStock' : '' };
 }
 
-export function remember(history, isbn, offers, now = Date.now()) {
+export function remember(history, isbn, offers, now = Date.now(), source = 'manual') {
   const next = { ...history };
   const previous = next[isbn] || [];
-  const observations = offers.filter(o => o.status === 'ok').map(o => ({ store: o.id, price: o.price, currency: o.currency || 'EUR', condition: o.condition || '', availability: o.availability, at: now }));
+  const observations = offers.filter(o => o.status === 'ok').map(o => ({ store: o.id, price: o.price, currency: o.currency || 'EUR', condition: o.condition || '', availability: o.availability, at: now, source }));
   if (observations.length) next[isbn] = [...previous, ...observations].filter(o => o.at >= now - 90 * 86400000).slice(-360);
   const entries = Object.entries(next).sort((a, b) => (b[1].at(-1)?.at || 0) - (a[1].at(-1)?.at || 0));
   return Object.fromEntries(entries.slice(0, 200));

@@ -20,11 +20,11 @@ export function start() {
     const close = document.createElement('button'); close.textContent = '×'; close.setAttribute('aria-label', 'Fechar aviso'); close.onclick = () => { dismissed.add(book.isbn); remove(); };
     const brand = document.createElement('div'); brand.className = 'brand'; brand.textContent = 'LIVROS MAIS BARATOS PT';
     const title = document.createElement('h2'); title.textContent = `Poupa ${money(result.saving)} neste livro`;
-    const detail = document.createElement('p'); detail.textContent = `${result.name}: ${money(result.price)} · Nesta loja: ${money(book.price)}`;
+    const detail = document.createElement('p'); detail.textContent = `${result.name}: ${money(result.price)} · Nesta loja: ${money(result.currentPrice ?? book.price)}`;
     const edition = document.createElement('small'); edition.textContent = `Mesma edição · ISBN ${book.isbn} · Novo, em stock`;
     const link = document.createElement('a'); link.textContent = `Ver oferta na ${result.name}`; link.href = result.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
     bindAffiliateLink(link, () => affiliateEnabled, true);
-    const note = document.createElement('small'); note.textContent = `Preços sem portes. Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
+    const note = document.createElement('small'); note.textContent = `${result.basis === 'delivered' ? 'Total estimado com portes. ' : 'Preço do livro; portes por confirmar. '}Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
     const disclosure = document.createElement('small');
     disclosure.textContent = new URL(result.url).hostname === 'www.wook.pt' && affiliateEnabled ? 'Ligação de afiliado: podemos receber uma comissão ao clicares. Podes desativar na extensão.' : '';
     panel.append(close, brand, title, detail, edition, link, disclosure, note); shadow.append(style, panel); document.documentElement.append(host);
@@ -58,7 +58,7 @@ export function start() {
   observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['content'] });
   const interval = setInterval(() => { if (location.href !== lastUrl) { lastUrl = location.href; key = ''; generation++; remove(); schedule(); } }, 1000);
   function changed(changes, area) {
-    if (area !== 'local' || (!changes.autoEnabled && !changes.selectedStores && !changes.affiliateEnabled)) return;
+    if (area !== 'local' || (!changes.autoEnabled && !changes.selectedStores && !changes.affiliateEnabled && !changes.shipping)) return;
     if (changes.affiliateEnabled) affiliateEnabled = changes.affiliateEnabled.newValue !== false;
     generation++; key = ''; remove(); schedule();
   }

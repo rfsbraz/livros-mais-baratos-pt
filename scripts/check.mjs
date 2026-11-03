@@ -6,7 +6,7 @@ const manifest = JSON.parse(readFileSync('extension/manifest.json'));
 const pkg = JSON.parse(readFileSync('package.json'));
 assert.equal(manifest.manifest_version, 3);
 assert.equal(manifest.version, pkg.version);
-assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage', 'offscreen']);
+assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage', 'offscreen', 'alarms', 'notifications']);
 assert.equal(manifest.background.service_worker, 'background.js');
 assert.equal(manifest.background.type, 'module');
 assert(!manifest.content_scripts, 'Dynamic scripts must respect the saved off switch and shop selection');

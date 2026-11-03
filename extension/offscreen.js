@@ -1,3 +1,4 @@
+import { quoteDelivery, eligibleOffer } from './shipping.js';
 import { STORES } from './stores.js';
 import { compareStore, pooled } from './compare.js';
 import { cheaperOffer } from './auto-rules.js';
@@ -32,11 +33,44 @@ async function compare(message) {
     }
     entry = await pending.get(key);
   }
-  const best = cheaperOffer(book, entry.offers, sourceId);
-  return best ? { isbn: book.isbn, name: best.name, url: best.url, price: best.price, currency: best.currency, saving: book.price - best.price, checkedAt: entry.at } : null;
+  const currentDelivery = quoteDelivery({ ...book, id: sourceId }, message.shipping || {});
+  let best, total, saving, basis = 'item';
+  if (currentDelivery.known) {
+    const candidates = entry.offers.filter(o => eligibleOffer(o) && o.id !== sourceId).map(o => ({ ...o, delivery: quoteDelivery(o, message.shipping || {}) }))
+      .filter(o => o.delivery.known && o.delivery.total < currentDelivery.total).sort((a, b) => a.delivery.total - b.delivery.total);
+    best = candidates[0]; basis = 'delivered'; total = best?.delivery.total; saving = currentDelivery.total - total;
+    if (!best) {
+      best = cheaperOffer(book, entry.offers.filter(o => !quoteDelivery(o, message.shipping || {}).known), sourceId);
+      basis = 'item'; total = best?.price; saving = book.price - total;
+    }
+  } else {
+    best = cheaperOffer(book, entry.offers, sourceId); total = best?.price; saving = book.price - total;
+  }
+  return best ? { isbn: book.isbn, name: best.name, url: best.url, price: total, itemPrice: best.price, currentPrice: basis === 'delivered' ? currentDelivery.total : book.price,
+    currency: best.currency, saving, basis, checkedAt: entry.at } : null;
 }
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (message?.target !== 'offscreen' || message.type !== 'compare' || sender.id !== chrome.runtime.id || sender.tab) return;
   compare(message).then(reply).catch(() => reply(null));
   return true;
+});
+
+let watchRunning = false;
+async function watchBook(message) {
+  const deadline = AbortSignal.timeout(90000);
+  const offers = await pooled(STORES.filter(s => message.storeIds.includes(s.id)), store => withSlot(async () => {
+    await new Promise(resolve => setTimeout(resolve, 500 + Math.floor(Math.random() * 1000)));
+    if (deadline.aborted) return { id: store.id, status: 'unavailable' };
+    const offer = await compareStore(store, message.book.isbn, AbortSignal.any([deadline, AbortSignal.timeout(35000)]), undefined, message.book.title || '');
+    return Object.fromEntries(['id', 'status', 'price', 'currency', 'condition', 'availability', 'marketplace', 'url', 'title'].filter(k => offer[k] !== undefined).map(k => [k, offer[k]]));
+  }), 2);
+  await chrome.runtime.sendMessage({ target: 'background', type: 'watch-result', token: message.token, isbn: message.book.isbn, offers });
+}
+chrome.runtime.onMessage.addListener((message, sender, reply) => {
+  if (message?.target !== 'offscreen' || message.type !== 'watch-book' || sender.id !== chrome.runtime.id || sender.tab) return;
+  if (watchRunning) { reply({ accepted: false }); return; }
+  watchRunning = true;
+  reply({ accepted: true });
+  watchBook(message).catch(() => chrome.runtime.sendMessage({ target: 'background', type: 'watch-result', token: message.token, isbn: message.book.isbn, offers: [] }).catch(() => {}))
+    .finally(() => { watchRunning = false; });
 });

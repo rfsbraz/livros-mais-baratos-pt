@@ -24,6 +24,7 @@ function product(price, currency = 'EUR', stock = 'InStock', id = isbn) {
 try {
   await page.addInitScript(({ html }) => {
     window.__data = JSON.parse(localStorage.getItem('testData') || '{"selectedStores":["wook","bertrand","almedina","bookcover"]}');
+    window.__data.shipping ||= { region: 'mainland', rules: { mainland: { bertrand: { fee: 0, expiresAt: 4102444800000 } } } };
     window.__permission = true;
     window.chrome = {
       storage: { local: { get: async () => window.__data, set: async data => { window.__data = { ...window.__data, ...data }; localStorage.setItem('testData', JSON.stringify(window.__data)); } } },
@@ -143,6 +144,29 @@ try {
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   await mkdir('work', { recursive: true });
   await page.screenshot({ path: 'work/extension-preview.png', fullPage: true });
+  // Shipping edits, promotion windows and unknown destinations affect delivered ranking.
+  await page.locator('#delivery-settings > summary').click();
+  await page.locator('#shipping-store').selectOption('wook');
+  await page.locator('#shipping-fee').fill('3');
+  await page.locator('#shipping-minimum').fill('');
+  await page.getByRole('button', { name: 'Guardar regra de portes', exact: true }).click();
+  await page.locator('#shipping-store').selectOption('bertrand');
+  await page.locator('#shipping-fee').fill('6');
+  await page.locator('#shipping-minimum').fill('');
+  await page.getByRole('button', { name: 'Guardar regra de portes', exact: true }).click();
+  assert.equal(await page.locator('.best a').textContent(), 'Wook');
+  await page.locator('#shipping-promo').check();
+  await page.locator('#promo-start').fill('2020-01-01T00:00');
+  await page.locator('#promo-end').fill('2099-01-01T00:00');
+  await page.getByRole('button', { name: 'Guardar regra de portes', exact: true }).click();
+  assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
+  assert.match(await page.locator('.best').textContent(), /Campanha de portes grátis/);
+  await page.locator('#delivery-region').selectOption('other');
+  assert.equal(await page.locator('.best').count(), 0, 'unknown shipping cannot win delivered ranking');
+  await page.locator('#price-order').selectOption('item');
+  assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
+  await page.locator('#delivery-region').selectOption('mainland');
+  await page.locator('#delivery-settings > summary').click();
   // Selection survives reload, requests only selected origins, and cancellation does not save partial history.
   await page.locator('#shops > summary').click();
   await page.locator('#select-none').click();
