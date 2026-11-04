@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-03",
+  "demoDate": "2026-11-04",
   "version": "0.1.5",
   "assets": [
     {
@@ -20,14 +20,14 @@
       "file": "screenshots/03-portes-e-campanhas-1280x800.png",
       "width": 1280,
       "height": 800,
-      "bytes": 89619,
+      "bytes": 88679,
       "colorType": 2
     },
     {
       "file": "screenshots/04-estante-historico-1280x800.png",
       "width": 1280,
       "height": 800,
-      "bytes": 81493,
+      "bytes": 81328,
       "colorType": 2
     },
     {
@@ -59,6 +59,13 @@
       "colorType": 6
     },
     {
+      "file": "icons/icon-24.png",
+      "width": 24,
+      "height": 24,
+      "bytes": 374,
+      "colorType": 6
+    },
+    {
       "file": "icons/icon-32.png",
       "width": 32,
       "height": 32,
@@ -80,6 +87,13 @@
       "colorType": 6
     },
     {
+      "file": "icons/icon-96.png",
+      "width": 96,
+      "height": 96,
+      "bytes": 1011,
+      "colorType": 6
+    },
+    {
       "file": "icons/icon-128.png",
       "width": 128,
       "height": 128,
@@ -94,10 +108,24 @@
       "colorType": 6
     },
     {
+      "file": "icons/icon-300.png",
+      "width": 300,
+      "height": 300,
+      "bytes": 3020,
+      "colorType": 6
+    },
+    {
       "file": "icons/icon-512.png",
       "width": 512,
       "height": 512,
       "bytes": 5160,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-1024.png",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 11970,
       "colorType": 6
     }
   ]

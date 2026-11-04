@@ -2,7 +2,7 @@ Compare the same book edition across Portuguese bookshops and selected internati
 
 Optional Wook affiliate links are enabled by default. Clicking a confirmed cheaper offer may earn us a commission. You can disable this in the extension.
 
-Install the extension, accept Chrome’s shop permissions, and browse supported book pages. Automatic alerts are enabled by default with no additional setup or toolbar interaction. When a verified new copy of the same ISBN is cheaper in EUR and in stock elsewhere, an on-page notice shows the saving and a link to the offer.
+Install the extension, accept the browser’s shop permissions, and browse supported book pages. Automatic alerts are enabled by default with no additional setup or toolbar interaction. When a verified new copy of the same ISBN is cheaper in EUR and in stock elsewhere, an on-page notice shows the saving and a link to the offer.
 
 You can also compare manually by ISBN, choose shops, save books and keep a local history of your manual checks. Title search helps discover candidates, but each offer must still match the ISBN.
 
@@ -10,6 +10,6 @@ The default selection is Wook, Bertrand, Almedina, Continente, Porto Editora and
 
 No account or telemetry. Optional Wook affiliate links are enabled by default and can be disabled in the extension. Clicking a verified cheaper offer may earn us a commission. Rankings and comparison requests are unaffected. Wook may use cookies after navigation under its own policy. Saved books, preferences and locally observed price history stay in this browser. Comparisons send the ISBN and, when necessary, title directly to the selected shops; those shops receive normal connection information such as IP address. Page HTML is processed locally and extension requests omit session cookies.
 
-Saved books can have item-price or delivered-total targets. Checks run approximately daily while Chrome is open and are staggered. System notifications and in-extension notices appear when a target is met, then only for a lower price. Delivered targets require known shipping. Charts use only observations made locally by this installation, never external or pre-installation history. You can disable automatic alerts, change the selected shops or delete local data. A previously saved off preference remains off after an update. The extension interface is in European Portuguese.
+Saved books can have item-price or delivered-total targets. Checks run approximately daily while the browser is open and are staggered. System notifications and in-extension notices appear when a target is met, then only for a lower price. Delivered targets require known shipping. Charts use only observations made locally by this installation, never external or pre-installation history. You can disable automatic alerts, change the selected shops or delete local data. A previously saved off preference remains off after an update. The extension interface is in European Portuguese.
 
 Support: rfsbraz@proton.me

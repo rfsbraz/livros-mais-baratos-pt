@@ -6,51 +6,12 @@ const out = resolve(process.env.STORE_OUTPUT || 'store-listing');
 for (const dir of ['metadata', 'website', 'source']) {
   await mkdir(out + '/' + dir, { recursive: true });
 }
-const summary =
-  'Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.';
-const description = `O mesmo livro. Um preço melhor.
-
-Livros Mais Baratos PT ajuda-te a comparar preços da mesma edição em livrarias portuguesas e em catálogos internacionais selecionados. O ISBN identifica a edição, para não confundires livros com o mesmo título.
-
-AFILIADOS OPCIONAIS
-Afiliados Wook ativos por predefinição. Ao clicares numa oferta confirmada mais barata podemos receber uma comissão. Podes desativar na extensão.
-
-AVISOS NA PÁGINA DO LIVRO
-Instala a extensão e aceita as permissões de acesso às lojas no Chrome. Os avisos ficam ativos por predefinição, sem configuração adicional. Ao visitar uma página de livro suportada, a extensão procura ofertas noutras lojas selecionadas. Se confirmar uma edição nova mais barata, em EUR e com stock, mostra um aviso discreto com a poupança e a ligação para a oferta. Podes fechar o aviso ou desativar a função.
-
-COMPARAÇÃO MANUAL
-Abre a extensão numa página de livro ou introduz um ISBN-10 ou ISBN-13. O título é opcional e ajuda em lojas cuja pesquisa não reconhece ISBN. Cada preço continua a exigir a edição certa. Seleciona as lojas, compara preços e disponibilidade, e abre a oferta que te interessa.
-
-A TUA ESTANTE
-Guarda um livro e define um preço-alvo: só o livro ou total estimado com portes. A extensão verifica os alvos aproximadamente uma vez por dia enquanto o Chrome está aberto, distribui as consultas no tempo e notifica ao atingir o alvo ou baixar mais. Podes pausar cada alvo ou todas as verificações. Os gráficos usam apenas observações feitas por esta instalação em comparações manuais e agendadas. Não importam históricos externos nem inventam preços anteriores.
-
-COBERTURA
-Por predefinição consulta Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. As restantes lojas são opcionais e as seleções guardadas são preservadas. Inclui 26 adaptadores experimentais, entre eles Wook, Bertrand, Almedina, Continente, Auchan, Bookcover, Lyvros, Penguin, Presença, Porto Editora, Devir e Mundo Fantasma. Há também ligações para consulta manual e outros formatos. A disponibilidade varia por loja, edição e restrições de acesso. Uma loja sem preço verificável não recebe um preço estimado.
-
-PREÇOS COM CONTEXTO
-Os totais estimados incluem portes quando existe uma regra válida para o destino. Portugal continental é a predefinição; Madeira, Açores e outros destinos são selecionáveis. Podes introduzir portes, mínimos para portes grátis e campanhas com início e fim. Há regras publicadas iniciais para Wook e Presença; outras lojas ficam com portes por confirmar. As regras expiram e a deteção automática de campanhas é trabalho futuro. As estimativas são para um livro com entrega normal e não incluem taxas de importação ou extras. Saldo em cartão não é tratado como desconto imediato. Livros usados, marketplaces e moedas diferentes mantêm a sua identificação na comparação manual e não entram nos avisos de menor preço novo em EUR. Consultas automáticas recentes podem ser reutilizadas durante dez minutos; o aviso indica a hora da consulta. Confirma sempre a oferta na loja.
-
-CONTROLO E PRIVACIDADE
-Sem conta ou telemetria. Afiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata podemos receber uma comissão. Não altera a ordenação nem os pedidos de comparação. Após o clique, a Wook pode usar cookies segundo a sua política. A estante, as preferências e o histórico ficam no armazenamento local do Chrome. Ao comparar, o ISBN e, quando necessário, o título são enviados diretamente às lojas selecionadas, que também recebem os dados normais de ligação, como o endereço IP. O HTML da página é processado localmente. Os pedidos da extensão não enviam cookies de sessão.
-
-O acesso às lojas é pedido na instalação. Os avisos começam ativos, mas podes desativá-los. Podes desativá-los, revogar permissões ou apagar os dados locais a qualquer momento.
-
-Interface em português de Portugal. Suporte: rfsbraz@proton.me.`;
-const english = `Compare the same book edition across Portuguese bookshops and selected international catalogues.
-
-Optional Wook affiliate links are enabled by default. Clicking a confirmed cheaper offer may earn us a commission. You can disable this in the extension.
-
-Install the extension, accept Chrome’s shop permissions, and browse supported book pages. Automatic alerts are enabled by default with no additional setup or toolbar interaction. When a verified new copy of the same ISBN is cheaper in EUR and in stock elsewhere, an on-page notice shows the saving and a link to the offer.
-
-You can also compare manually by ISBN, choose shops, save books and keep a local history of your manual checks. Title search helps discover candidates, but each offer must still match the ISBN.
-
-The default selection is Wook, Bertrand, Almedina, Continente, Porto Editora and Presença; saved selections are preserved. Other shops remain optional. The extension includes 26 experimental automatic adapters plus manual links. Shop access and catalogue coverage vary; blocked or unverified offers are not replaced with estimates. Delivered estimates use valid shipping rules for the selected region. Mainland Portugal is the default. Users can enter fees, free-shipping thresholds and dated promotions; initial published rules cover Wook and Presença. Unknown shipping is never assumed free. Automatic promotion detection is not yet implemented. Estimates cover one book with standard delivery, excluding import charges and extras. Loyalty credit is not counted as an immediate discount. Used items, marketplace offers and other currencies stay distinct and do not qualify for automatic alerts. Automatic comparisons may reuse results for up to ten minutes, with the check time shown.
-
-No account or telemetry. Optional Wook affiliate links are enabled by default and can be disabled in the extension. Clicking a verified cheaper offer may earn us a commission. Rankings and comparison requests are unaffected. Wook may use cookies after navigation under its own policy. Saved books, preferences and locally observed price history stay in this browser. Comparisons send the ISBN and, when necessary, title directly to the selected shops; those shops receive normal connection information such as IP address. Page HTML is processed locally and extension requests omit session cookies.
-
-Saved books can have item-price or delivered-total targets. Checks run approximately daily while Chrome is open and are staggered. System notifications and in-extension notices appear when a target is met, then only for a lower price. Delivered targets require known shipping. Charts use only observations made locally by this installation, never external or pre-installation history. You can disable automatic alerts, change the selected shops or delete local data. A previously saved off preference remains off after an update. The extension interface is in European Portuguese.
-
-Support: rfsbraz@proton.me`;
+const config = JSON.parse(await readFile('store-listing/listing.json', 'utf8'));
+const pt = JSON.parse(await readFile('store-listing/locales/pt-PT.json', 'utf8'));
+const en = JSON.parse(await readFile('store-listing/locales/en.json', 'utf8'));
+const summary = pt.summary;
+const description = pt.description.join('\n');
+const english = en.description.join('\n');
 await writeFile(
   `${out}/metadata/listing-pt-PT.txt`,
   `Nome\nLivros Mais Baratos PT\n\nResumo (${summary.length}/132 caracteres)\n${summary}\n\nDescrição detalhada\n${description}\n`
@@ -58,10 +19,7 @@ await writeFile(
 await writeFile(`${out}/metadata/description-pt-PT.txt`, description + '\n');
 await writeFile(`${out}/metadata/description-en.txt`, english + '\n');
 await writeFile(`${out}/metadata/summary-pt-PT.txt`, summary + '\n');
-await writeFile(
-  `${out}/metadata/summary-en.txt`,
-  'Automatically compare the same book edition across Portuguese shops and get cheaper-offer alerts while browsing.\n'
-);
+await writeFile(`${out}/metadata/summary-en.txt`, en.summary + '\n');
 await writeFile(
   `${out}/metadata/listing.json`,
   JSON.stringify(
@@ -81,9 +39,9 @@ await writeFile(
       description,
       interfaceLanguages: ['pt-PT'],
       optionalEnglishListing: english,
-      privacyPolicyUrl: null,
-      supportUrl: null,
-      homepageUrl: null,
+      privacyPolicyUrl: config.privacyPolicyUrl,
+      supportUrl: config.supportUrl,
+      homepageUrl: config.homepageUrl,
       youtubeVideoUrl: null,
       websiteVerified: false,
       distribution: 'Not submitted; choose visibility and regions in the developer dashboard',
@@ -111,7 +69,7 @@ A extensão compara preços da mesma edição de um livro por ISBN, mostra aviso
 
 ## Dados tratados no navegador
 
-Na comparação manual, a extensão lê a página atual após a abrires. Os avisos estão ativos por predefinição após a instalação, identificando páginas de livro nas lojas selecionadas com o acesso autorizado pelo Chrome. Não é necessário abrir a extensão para iniciar estas consultas. O URL e o conteúdo da página são processados localmente para obter o ISBN, título, preço, moeda e disponibilidade. Não recolhe o histórico geral de navegação nem envia o HTML da página para um servidor do responsável.
+Na comparação manual, a extensão lê a página atual após a abrires. Os avisos estão ativos por predefinição após a instalação, identificando páginas de livro nas lojas selecionadas com o acesso autorizado pelo navegador. Não é necessário abrir a extensão para iniciar estas consultas. O URL e o conteúdo da página são processados localmente para obter o ISBN, título, preço, moeda e disponibilidade. Não recolhe o histórico geral de navegação nem envia o HTML da página para um servidor do responsável.
 
 Os ISBN, títulos guardados, preços-alvo, regras de portes, destino, notificações, preços observados, preferências de lojas e estado dos avisos são guardados no armazenamento local da extensão, não no Chrome Sync. As ações de guardar/remover livros e escolher lojas servem apenas para executar estas funções. Não há registo de cliques, movimentos do rato ou outras interações para análise de utilização.
 
@@ -133,7 +91,7 @@ As consultas automáticas usam uma cache em memória com até 50 combinações d
 
 ## Controlo e eliminação
 
-O acesso às lojas é solicitado na instalação e os avisos automáticos estão inicialmente ativos. Uma preferência anterior de desativação é preservada nas atualizações. Podes selecionar lojas, desativar os avisos e revogar permissões nas definições do Chrome. A opção Apagar dados elimina a estante e o histórico, repõe a seleção de lojas e desativa os avisos. Desinstalar a extensão remove o armazenamento local. Livros com alvo ativo têm verificações aproximadamente diárias enquanto o Chrome está aberto. Alvos, destino e regras de portes são guardados localmente.
+O acesso às lojas é solicitado na instalação e os avisos automáticos estão inicialmente ativos. Uma preferência anterior de desativação é preservada nas atualizações. Podes selecionar lojas, desativar os avisos e revogar permissões nas definições do navegador. A opção Apagar dados elimina a estante e o histórico, repõe a seleção de lojas e desativa os avisos. Desinstalar a extensão remove o armazenamento local. Livros com alvo ativo têm verificações aproximadamente diárias enquanto o navegador está aberto. Alvos, destino e regras de portes são guardados localmente.
 
 ## Contacto de suporte
 
@@ -147,7 +105,7 @@ const support = `# Suporte
 
 ## Contacto
 
-Escreve para rfsbraz@proton.me. Inclui a versão da extensão, a versão do Chrome, a loja e o ISBN afetado. Se enviares uma captura de ecrã, remove primeiro qualquer informação pessoal. Não envies palavras-passe nem dados de pagamento.
+Escreve para rfsbraz@proton.me. Inclui a versão da extensão, a versão do navegador, a loja e o ISBN afetado. Se enviares uma captura de ecrã, remove primeiro qualquer informação pessoal. Não envies palavras-passe nem dados de pagamento.
 
 ## Avisos automáticos sem configuração
 
@@ -163,7 +121,7 @@ Quando existe uma regra válida, mostramos um total estimado com portes para o d
 
 ## Como apagar os dados?
 
-Usa Apagar dados na extensão para limpar a estante e o histórico e desativar os avisos. Podes também revogar as permissões nas definições do Chrome ou desinstalar a extensão.
+Usa Apagar dados na extensão para limpar a estante e o histórico e desativar os avisos. Podes também revogar as permissões nas definições do navegador ou desinstalar a extensão.
 
 ## Histórico de preços
 
@@ -223,7 +181,7 @@ await writeFile(
 );
 await writeFile(
   `${out}/metadata/reviewer-notes.txt`,
-  `Livros Mais Baratos PT ${version}\n\nOpen Definições for shop selection, shipping, alert preferences, affiliate preferences and data deletion. Voltar aos preços returns to the same results. The main view contains search, prices and saved books.\n\nNo login, subscription, API key or payment is required. The interface is in Portuguese (Portugal).\n\nAffiliate links:\nEnabled by default, with the Apoiar através de ligações de afiliado opt-out. Only a deliberate click on a confirmed cheaper Wook offer adds a_aid=5d3ee4327c2fd. Background requests and ranking are unaffected. Existing affiliate attribution is preserved. Disable the setting to open clean offer links. Wook may use cookies after navigation.\n\nTargets, shipping and history:\nSave a book, set an item or delivered target, and keep Chrome open. The first scheduled check starts within a few minutes, subject to ten-minute spacing. Disable with Verificar preços-alvo da estante. Delivery rules and dated promotions are under Entrega e portes. Charts contain only local observations. Alarms and notifications permissions are declared at installation/update.\n\nManual comparison:\n1. Open the extension and enter a valid ISBN, such as 9789895598762 or 9789899267411.\n2. Select shops and choose Comparar. Shop access was requested at installation; no additional permission prompt is requested here.\n3. Confirmed offers show a price and availability. Access failures have no invented price and retain a link to the shop.\n4. Guardar saves a book locally. Histórico neste navegador shows observations from manual comparisons.\n\nAutomatic alerts:\n1. Install the extension and accept Chrome’s declared site permissions. Do not open the toolbar popup or write any preferences. Six shops are selected by default (Wook, Bertrand, Almedina, Continente, Porto Editora and Presença) and alerts are enabled by default on a fresh installation.\n2. Visit a supported product page, for example https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345 or another selected-shop book page with an ISBN and price.\n3. The toolbar popup does not need to be opened. A dismissible on-page notice appears only if another selected authorized shop returns a strictly cheaper new EUR offer for the same ISBN, with confirmed stock.\n4. No notice is expected when no qualifying cheaper offer is found. Live prices and access restrictions vary. The extension does not guarantee a discount for the example ISBN.\n5. Close a notice with ×. Disable alerts with Desativar avisos automáticos. Apagar dados removes shelf/history, resets selection and disables alerts.\n\nThe screenshots use the actual popup and notification components with labelled illustrative prices. Demo responses are not included in the upload package. Network and browser regression fixtures remain outside the runtime package.\n\nAutomatic comparisons are bounded, cache results in memory for ten minutes, omit session cookies and never execute downloaded scripts. Target checks for saved books run approximately daily while Chrome is open. Only observed prices enter local history.\n\nSupport: rfsbraz@proton.me\n`
+  `Livros Mais Baratos PT ${version}\n\nOpen Definições for shop selection, shipping, alert preferences, affiliate preferences and data deletion. Voltar aos preços returns to the same results. The main view contains search, prices and saved books.\n\nNo login, subscription, API key or payment is required. The interface is in Portuguese (Portugal).\n\nAffiliate links:\nEnabled by default, with the Apoiar através de ligações de afiliado opt-out. Only a deliberate click on a confirmed cheaper Wook offer adds a_aid=5d3ee4327c2fd. Background requests and ranking are unaffected. Existing affiliate attribution is preserved. Disable the setting to open clean offer links. Wook may use cookies after navigation.\n\nTargets, shipping and history:\nSave a book, set an item or delivered target, and keep Chrome open. The first scheduled check starts within a few minutes, subject to ten-minute spacing. Disable with Verificar preços-alvo da estante. Delivery rules and dated promotions are under Entrega e portes. Charts contain only local observations. Alarms and notifications permissions are declared at installation/update.\n\nManual comparison:\n1. Open the extension and enter a valid ISBN, such as 9789895598762 or 9789899267411.\n2. Select shops and choose Comparar. Shop access was requested at installation; no additional permission prompt is requested here.\n3. Confirmed offers show a price and availability. Access failures have no invented price and retain a link to the shop.\n4. Guardar saves a book locally. Histórico neste navegador shows observations from manual comparisons.\n\nAutomatic alerts:\n1. Install the extension and accept Chrome’s declared site permissions. Do not open the toolbar popup or write any preferences. Six shops are selected by default (Wook, Bertrand, Almedina, Continente, Porto Editora and Presença) and alerts are enabled by default on a fresh installation.\n2. Visit a supported product page, for example https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345 or another selected-shop book page with an ISBN and price.\n3. The toolbar popup does not need to be opened. A dismissible on-page notice appears only if another selected authorized shop returns a strictly cheaper new EUR offer for the same ISBN, with confirmed stock.\n4. No notice is expected when no qualifying cheaper offer is found. Live prices and access restrictions vary. The extension does not guarantee a discount for the example ISBN.\n5. Close a notice with ×. Disable alerts with Desativar avisos automáticos. Apagar dados removes shelf/history, resets selection and disables alerts.\n\nThe screenshots use the actual popup and notification components with labelled illustrative prices. Demo responses are not included in the upload package. Network and browser regression fixtures remain outside the runtime package.\n\nAutomatic comparisons are bounded, cache results in memory for ten minutes, omit session cookies and never execute downloaded scripts. Target checks for saved books run approximately daily while the browser is open. Only observed prices enter local history.\n\nSupport: rfsbraz@proton.me\n`
 );
 await writeFile(
   `${out}/metadata/release-notes-pt-PT.txt`,
@@ -231,7 +189,7 @@ await writeFile(
 );
 await writeFile(
   `${out}/README.md`,
-  `# Chrome Web Store submission pack\n\nLivros Mais Baratos PT · ${version} · Prepared 3 November 2026\n\n## Upload map\n\n| Dashboard field | File |\n|---|---|\n| Extension package | upload/livros-mais-baratos-pt-${version}-store.zip |\n| Store icon | icons/icon-128.png |\n| Screenshots, in order | screenshots/01... through 05... (1280×800 each) |\n| Small promotional tile | promo/small-440x280.png |\n| Marquee promotional tile | promo/marquee-1400x560.png |\n| Name and short summary | metadata/listing-pt-PT.txt |\n| Detailed description | metadata/description-pt-PT.txt |\n| Optional English listing | metadata/description-en.txt (UI remains Portuguese) |\n| Privacy and permission answers | metadata/privacy-and-permissions.md |\n| Reviewer instructions | metadata/reviewer-notes.txt |\n| Support email | rfsbraz@proton.me |\n| Category and language | Shopping; Portuguese (Portugal) |\n\n## Before submission\n\nHost the three files in website/ on a public HTTPS site. Enter the privacy.html URL in the dashboard; support.html can be the support URL and index.html the website URL. These URLs are intentionally null in listing.json because no domain has been supplied. Do not use the private repository as a public support or privacy link. No public deployment or store submission has been performed.\n\nConfirm your publisher account/contact verification, distribution visibility and countries in the developer dashboard. A private source repository does not determine Chrome Web Store listing visibility. The optional YouTube video is not included or required for this pack.\n\n## Asset details\n\nFive screenshots use real extension components with illustrative ISBN/price responses, labelled on each image. They are demonstration captures, not live-price evidence. The book-cover block is an original text-only demonstration design, not the published cover. The notification screenshot is composed around the real notification component; its position/width are adjusted for presentation. No retailer logos, Chrome logos, rankings, endorsements or review stars are used.\n\nThe 128px icon uses 96px artwork with transparent padding. Other icon sizes, editable SVG, promotional HTML and the generation script are included. Screenshot and promo exports are opaque PNGs. asset-manifest.json records their pixel dimensions.\n\nThe upload ZIP contains production code from ${version} with matching icons and the same summary as the repository manifest. It excludes screenshots, fixtures, development files and credentials. source/extension/ contains the exact upload source. The production code, store metadata generators and screenshots are updated together for automatic-by-default behavior.\n\nThe source HTML layouts reference a local capture server for the popup and are editable design references, not public web pages. Run npm run build, node scripts/store-assets.mjs and node scripts/store-metadata.mjs from the project checkout with Node and Playwright to reproduce this pack. The website/ folder is self-contained and ready to host.\n\n## Official specifications checked\n\n- [Listing fields and image dimensions](https://developer.chrome.com/docs/webstore/cws-dashboard-listing)\n- [Icon padding and image formats](https://developer.chrome.com/docs/webstore/images)\n- [Screenshot and promotional guidance](https://developer.chrome.com/docs/webstore/best-listing)\n- [Manifest description length](https://developer.chrome.com/docs/extensions/reference/manifest/description)\n- [Privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)\n- [Local processing and user-data disclosure](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)\n`
+  `# Browser store submission pack\n\nLivros Mais Baratos PT · ${version} · Prepared from the repository source\n\nSee [AUTOMATION.md](AUTOMATION.md) for Chrome, Firefox and Edge metadata, release automation and account setup. Run npm run store-listing:pack for the per-store upload ZIP.\n\n## Upload map\n\n| Dashboard field | File |\n|---|---|\n| Extension package | upload/livros-mais-baratos-pt-${version}-store.zip |\n| Store icon | icons/icon-128.png |\n| Screenshots, in order | screenshots/01... through 05... (1280×800 each) |\n| Small promotional tile | promo/small-440x280.png |\n| Marquee promotional tile | promo/marquee-1400x560.png |\n| Name and short summary | metadata/listing-pt-PT.txt |\n| Detailed description | metadata/description-pt-PT.txt |\n| Optional English listing | metadata/description-en.txt (UI remains Portuguese) |\n| Privacy and permission answers | metadata/privacy-and-permissions.md |\n| Reviewer instructions | metadata/reviewer-notes.txt |\n| Support email | rfsbraz@proton.me |\n| Category and language | Shopping; Portuguese (Portugal) |\n\n## Before submission\n\nHost the three files in website/ on a public HTTPS site. Enter the privacy.html URL in the dashboard; support.html can be the support URL and index.html the website URL. These URLs are intentionally null in listing.json because no domain has been supplied. Do not use the private repository as a public support or privacy link. No public deployment or store submission has been performed.\n\nConfirm your publisher account/contact verification, distribution visibility and countries in the developer dashboard. A private source repository does not determine Chrome Web Store listing visibility. The optional YouTube video is not included or required for this pack.\n\n## Asset details\n\nFive screenshots use real extension components with illustrative ISBN/price responses, labelled on each image. They are demonstration captures, not live-price evidence. The book-cover block is an original text-only demonstration design, not the published cover. The notification screenshot is composed around the real notification component; its position/width are adjusted for presentation. No retailer logos, Chrome logos, rankings, endorsements or review stars are used.\n\nThe 128px icon uses 96px artwork with transparent padding. Other icon sizes, editable SVG, promotional HTML and the generation script are included. Screenshot and promo exports are opaque PNGs. asset-manifest.json records their pixel dimensions.\n\nThe upload ZIP contains production code from ${version} with matching icons and the same summary as the repository manifest. It excludes screenshots, fixtures, development files and credentials. source/extension/ contains the exact upload source. The production code, store metadata generators and screenshots are updated together for automatic-by-default behavior.\n\nThe source HTML layouts reference a local capture server for the popup and are editable design references, not public web pages. Run npm run build, node scripts/store-assets.mjs and node scripts/store-metadata.mjs from the project checkout with Node and Playwright to reproduce this pack. The website/ folder is self-contained and ready to host.\n\n## Official specifications checked\n\n- [Listing fields and image dimensions](https://developer.chrome.com/docs/webstore/cws-dashboard-listing)\n- [Icon padding and image formats](https://developer.chrome.com/docs/webstore/images)\n- [Screenshot and promotional guidance](https://developer.chrome.com/docs/webstore/best-listing)\n- [Manifest description length](https://developer.chrome.com/docs/extensions/reference/manifest/description)\n- [Privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)\n- [Local processing and user-data disclosure](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)\n`
 );
 await cp('scripts/store-assets.mjs', `${out}/source/generate-assets.mjs`);
 await cp('scripts/store-metadata.mjs', `${out}/source/generate-metadata.mjs`);

@@ -30,7 +30,11 @@
     "store-listing:check": "node scripts/check-listing.mjs",
     "store-listing:amo": "node scripts/amo-listing.mjs",
     "store-listing:drift": "node scripts/store-maintenance.mjs drift",
-    "store-credentials:check": "node scripts/store-maintenance.mjs credentials"
+    "store-credentials:check": "node scripts/store-maintenance.mjs credentials",
+    "store-listing:pack": "node scripts/store-metadata.mjs && node scripts/store-pack.mjs",
+    "store-listing:assets": "npm run build:all && node scripts/store-assets.mjs && npm run store-listing:pack",
+    "store-listing:release": "node scripts/amo-release.mjs",
+    "store-listing:edge-notes": "node scripts/edge-cert-notes.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

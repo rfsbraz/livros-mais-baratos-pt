@@ -31,6 +31,7 @@ const origin = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ headless: true });
 const logo = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect x="16" y="16" width="96" height="96" rx="16" fill="#172e59"/><path d="M36 38h22v52H36z" fill="#fff"/><path d="M65 32h27v58H65z" fill="#97bbff"/><path d="M31 94h66v4H31z" fill="#fff"/></svg>`;
 await writeFile(`${out}/source/icon.svg`, logo);
+await writeFile(`${out}/icons/icon-master.svg`, logo);
 const logoData = `data:image/svg+xml;base64,${Buffer.from(logo).toString('base64')}`;
 const product = price =>
   `<html><head><title>A Criada</title><script type="application/ld+json">${JSON.stringify({ '@type': 'Book', isbn: '9789895701124', name: 'A Criada', offers: { price, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' } })}</script></head><body><h1>A Criada</h1></body></html>`;
@@ -39,7 +40,7 @@ const stage = (title, copy, caption, iframe = true) =>
   `<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><style>${baseStyle}</style></head><body><div class="copy"><div class="brand"><img src="${logoData}">Livros Mais Baratos PT</div><h1>${title}</h1><p>${copy}</p></div><div class="spines"><i></i><i></i><i></i></div>${iframe ? `<div class="frame"><iframe src="${origin}/popup.html"></iframe></div>` : ''}<div class="caption">${caption}</div><div class="footer">Demonstração com preços ilustrativos. Portes não incluídos.</div></body></html>`;
 try {
   const icon = await browser.newPage();
-  for (const size of [16, 32, 48, 64, 128, 256, 512]) {
+  for (const size of [16, 24, 32, 48, 64, 96, 128, 256, 300, 512, 1024]) {
     await icon.setViewportSize({ width: size, height: size });
     await icon.setContent(
       `<style>html,body{margin:0;background:transparent}svg{display:block;width:100vw;height:100vh}</style>${logo}`
@@ -127,8 +128,8 @@ try {
       region: 'mainland',
       rules: {
         mainland: {
-          bertrand: { source: 'manual', fee: 350, expiresAt: Date.now() + 86400000 },
-          continente: { source: 'manual', fee: 499, expiresAt: Date.now() + 86400000 }
+          bertrand: { source: 'manual', fee: 350, expiresAt: Date.UTC(2026, 10, 5, 12) },
+          continente: { source: 'manual', fee: 499, expiresAt: Date.UTC(2026, 10, 5, 12) }
         }
       }
     };
@@ -237,12 +238,14 @@ try {
       assert.equal(await f.locator('#auto-toggle').getAttribute('aria-pressed'), 'true');
       await page.addStyleTag({ content: '.frame{top:105px;height:550px}iframe{height:550px}' });
     }
+    await f.locator('body').evaluate(() => document.activeElement?.blur());
     await page.screenshot({ path: `${out}/screenshots/${name}-1280x800.png` });
     await writeFile(`${out}/source/${name}.html`, stage(title, copy, caption));
     await page.close();
   }
   // Run the shipping content-script UI with a deterministic reply; do not draw a mock notification.
-  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, timezoneId: 'UTC' });
+  await page.clock.setFixedTime(new Date('2026-11-04T12:00:00Z'));
   const scene = stage(
     'Um aviso.<br>Uma opção<br>mais barata.',
     'Continua na página do livro.<br>A extensão mostra a poupança<br>e a ligação para a outra loja.',
@@ -337,7 +340,7 @@ try {
     ...imgs.map(x => `screenshots/${x.file}`),
     'promo/small-440x280.png',
     'promo/marquee-1400x560.png',
-    ...[16, 32, 48, 64, 128, 256, 512].map(n => `icons/icon-${n}.png`)
+    ...[16, 24, 32, 48, 64, 96, 128, 256, 300, 512, 1024].map(n => `icons/icon-${n}.png`)
   ];
   const inventory = [];
   for (const file of pngs) {
@@ -351,7 +354,7 @@ try {
   }
   await writeFile(
     `${out}/asset-manifest.json`,
-    JSON.stringify({ generated: '2026-11-03', version, assets: inventory }, null, 2)
+    JSON.stringify({ demoDate: '2026-11-04', version, assets: inventory }, null, 2)
   );
   await cp('dist/chrome', `${out}/source/extension`, { recursive: true });
   for (const size of [16, 32, 48, 128]) {

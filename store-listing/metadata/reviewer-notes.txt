@@ -25,6 +25,6 @@ Automatic alerts:
 
 The screenshots use the actual popup and notification components with labelled illustrative prices. Demo responses are not included in the upload package. Network and browser regression fixtures remain outside the runtime package.
 
-Automatic comparisons are bounded, cache results in memory for ten minutes, omit session cookies and never execute downloaded scripts. Target checks for saved books run approximately daily while Chrome is open. Only observed prices enter local history.
+Automatic comparisons are bounded, cache results in memory for ten minutes, omit session cookies and never execute downloaded scripts. Target checks for saved books run approximately daily while the browser is open. Only observed prices enter local history.
 
 Support: rfsbraz@proton.me

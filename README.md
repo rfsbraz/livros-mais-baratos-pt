@@ -118,8 +118,7 @@ npm run build:all
 npm run test:e2e
 
 # Rebuild store metadata and demonstration screenshots
-npm run store-listing:build
-npm run test:e2e:screenshots
+npm run store-listing:assets
 npm run store-listing:check
 ```
 
@@ -136,6 +135,16 @@ npm run store-listing:check
 Runtime files live at the repository root, tests in `tests/unit` and `tests/e2e`, build tooling in `scripts`, and store materials in `store-listing`. There is no server or runtime dependency. Firefox's content entry point is bundled during the build. See [architecture](docs/architecture.md) and [cross-browser builds and publishing](docs/reference-alignment.md).
 
 CI runs lint, formatting, unit tests, all-browser builds and native browser tests. Separate live shop monitoring spreads the 26 shops across 24 hourly slots with jitter and tracks failures in issues. See [shop monitoring](docs/store-monitoring.md). Store publishing remains gated until this extension's listing IDs, credentials and public privacy/support URLs are configured.
+
+## Store listings
+
+The [store submission pack](store-listing/README.md) includes Portuguese and English metadata, five screenshots, browser-store icons, promotional images, privacy disclosures and reviewer instructions. [Automation and account setup](store-listing/AUTOMATION.md) follows the Geocaching extension: tagged releases for Chrome, Firefox and Edge, Firefox text/screenshot synchronization, changelog-based reviewer notes, and weekly credential and listing-drift checks.
+
+| Compare delivered prices                                                                          | Track your own observations                                                                                 |
+| ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| ![Comparison with illustrative prices](store-listing/screenshots/02-comparar-edicao-1280x800.png) | ![Local price history with demonstration data](store-listing/screenshots/04-estante-historico-1280x800.png) |
+
+Run `npm run store-listing:assets` to regenerate the images and per-store ZIP. Releases attach the pack alongside the browser packages. Chrome and Edge listing artwork/text still use the dashboards; Firefox can synchronize these through its API. Publishing remains disabled until this extension's accounts and credentials are configured.
 
 ## Contributing
 

@@ -1,0 +1,140 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { loadListing, validateListing, amoPayload } from '../../scripts/listing.mjs';
+import { syncListing } from '../../scripts/amo-listing.mjs';
+import {
+  buildPlan,
+  diffPreviews,
+  applyPlan,
+  pixelHash,
+  withRetry,
+  versionExists
+} from '../../scripts/amo-release.mjs';
+import { releaseNotes } from '../../scripts/changelog.mjs';
+import { buildNotes } from '../../scripts/edge-cert-notes.mjs';
+
+test('listing uses both locales, real images and the production summary', () => {
+  const listing = loadListing();
+  assert.deepEqual(validateListing(listing), []);
+  assert.deepEqual(Object.keys(amoPayload(listing).summary), ['pt-PT', 'en-US']);
+  const bad = structuredClone(listing);
+  bad.locales.en.screenshots = ['../../private.png'];
+  bad.locales.en.summary = 'x'.repeat(133);
+  assert.equal(validateListing(bad).length, 2);
+});
+
+test('previewing listing is offline and applying requires credentials', async () => {
+  const listing = loadListing();
+  const fetcher = () => {
+    throw new Error('Unexpected network request');
+  };
+  assert.deepEqual(await syncListing({ listing, fetcher }), amoPayload(listing));
+  await assert.rejects(syncListing({ listing, fetcher, apply: true, env: {} }), /credentials/);
+  const calls = [];
+  await syncListing({
+    listing,
+    apply: true,
+    env: { AMO_JWT_ISSUER: 'test', AMO_JWT_SECRET: 'test' },
+    fetcher: async (url, options) => {
+      calls.push({ url, options });
+      return { ok: true };
+    }
+  });
+  assert.equal(calls.length, 1);
+  assert(calls[0].url.includes('livros-mais-baratos-pt'));
+  assert.deepEqual(JSON.parse(calls[0].options.body), amoPayload(listing));
+});
+
+test('release notes select the exact tag, not unreleased or another version', () => {
+  const log = '# Changelog\n## Unreleased\n- future\n## 1.2.3\n- shipped\n## 1.2.2\n- old';
+  assert.equal(releaseNotes(log, '1.2.3'), '- shipped');
+  assert.throws(() => releaseNotes(log, '1.2.4'), /no entries/);
+  assert.equal(
+    buildNotes({ changelog: log, version: '1.2.3', template: 'Review steps' }),
+    'Review steps\n\nChanges in 1.2.3:\n- shipped'
+  );
+});
+
+test('release screenshots are ordered and reruns keep identical pixels', () => {
+  const plan = buildPlan({
+    changelog: readFileSync('CHANGELOG.md', 'utf8'),
+    version: '0.1.5',
+    assetsDir: 'store-listing/screenshots'
+  });
+  assert.equal(plan.previews.length, 5);
+  assert.deepEqual(
+    plan.previews.map(p => p.position),
+    [0, 1, 2, 3, 4]
+  );
+  const desired = plan.previews.map(p => ({ ...p, hash: pixelHash(readFileSync(p.path)) }));
+  assert.deepEqual(
+    diffPreviews(
+      desired,
+      desired.map((p, i) => ({ ...p, id: i }))
+    ),
+    { upload: [], remove: [], move: [] }
+  );
+  assert.deepEqual(
+    diffPreviews([{ hash: 'same', position: 0 }], [{ id: 9, hash: 'same', position: 3 }]).move,
+    [{ id: 9, position: 0 }]
+  );
+});
+
+test('failed screenshot upload preserves the existing live previews', async () => {
+  const plan = buildPlan({
+    changelog: readFileSync('CHANGELOG.md', 'utf8'),
+    version: '0.1.5',
+    assetsDir: 'store-listing/screenshots'
+  });
+  const methods = [];
+  const request = async method => {
+    methods.push(method);
+    if (method === 'GET') {
+      return { previews: [{ id: 1, position: 0, image_url: 'fixture' }] };
+    }
+    if (method === 'POST') {
+      throw new Error('Upload failed');
+    }
+    return {};
+  };
+  await assert.rejects(
+    applyPlan(plan, { request, fetchImage: async () => Buffer.from('unreadable'), log: () => {} }),
+    /Upload failed/
+  );
+  assert(!methods.includes('DELETE'));
+});
+
+test('rate limiting retries with Retry-After and authentication errors stop immediately', async () => {
+  let calls = 0;
+  const waits = [];
+  const request = withRetry(
+    async () => {
+      if (++calls === 1) {
+        throw Object.assign(new Error(), { status: 429, retryAfter: '2' });
+      }
+      return true;
+    },
+    { sleep: async ms => waits.push(ms), log: () => {} }
+  );
+  assert.equal(await request('GET', 'fixture'), true);
+  assert.deepEqual(waits, [2000]);
+  await assert.rejects(
+    withRetry(async () => {
+      throw Object.assign(new Error('denied'), { status: 401 });
+    })(),
+    /denied/
+  );
+  assert.equal(
+    await versionExists(async () => {
+      throw Object.assign(new Error(), { status: 404 });
+    }, '1.2.3'),
+    false
+  );
+  await assert.rejects(
+    versionExists(async () => {
+      throw Object.assign(new Error('denied'), { status: 401 });
+    }, '1.2.3'),
+    /denied/
+  );
+});

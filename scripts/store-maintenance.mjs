@@ -1,10 +1,11 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { loadListing } from './listing.mjs';
+import { writeFile, mkdir } from 'node:fs/promises';
 import { createHmac, randomUUID } from 'node:crypto';
 const mode = process.argv[2];
 if (!['credentials', 'drift'].includes(mode)) {
   throw new Error('Expected credentials or drift');
 }
-const config = JSON.parse(await readFile('store-listing/listing.json', 'utf8'));
+const { config, locales } = loadListing();
 await mkdir('work/store-maintenance', { recursive: true });
 const report = [];
 const request = async (url, options = {}) => {
@@ -88,42 +89,50 @@ for (const store of ['chrome', 'edge', 'firefox']) {
       report.push({ store, status: 'clean' });
       continue;
     }
-    let live;
-    if (store === 'chrome') {
-      const html = await (await request(cfg.url + '?hl=pt-PT')).text();
-      const summary = html.match(/<meta name="description" content="([^"]*)"/);
-      const overview = html.match(/<div jsname="ij8cu"[^>]*>([\s\S]*?)<\/div>/);
-      const paragraphs = [...(overview?.[1] || '').matchAll(/<p>([\s\S]*?)<\/p>/g)];
-      if (!summary || !paragraphs.length) {
-        throw new Error('Unrecognized store page');
+    const differences = [];
+    for (const [id, locale] of Object.entries(locales)) {
+      const language = locale.storeLocales[store];
+      let live;
+      if (store === 'chrome') {
+        const html = await (await request(cfg.url + '?hl=' + encodeURIComponent(language))).text();
+        const summary = html.match(/<meta name="description" content="([^"]*)"/);
+        const overview = html.match(/<div jsname="ij8cu"[^>]*>([\s\S]*?)<\/div>/);
+        const paragraphs = [...(overview?.[1] || '').matchAll(/<p>([\s\S]*?)<\/p>/g)];
+        if (!summary || !paragraphs.length) {
+          throw new Error('Unrecognized store page');
+        }
+        live = { summary: summary[1], description: paragraphs.at(-1)[1] };
+      } else if (store === 'edge') {
+        const data = await (
+          await request(
+            `https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/${encodeURIComponent(cfg.id)}?hl=${encodeURIComponent(language)}`
+          )
+        ).json();
+        live = { summary: data.shortDescription, description: data.description };
+      } else {
+        const data = await (
+          await request(
+            `https://addons.mozilla.org/api/v5/addons/addon/${encodeURIComponent(cfg.id)}/`
+          )
+        ).json();
+        live = { summary: data.summary?.[language], description: data.description?.[language] };
       }
-      live = { summary: summary[1], description: paragraphs.at(-1)[1] };
-    } else if (store === 'edge') {
-      const data = await (
-        await request(
-          `https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/${encodeURIComponent(cfg.id)}?hl=pt-PT`
-        )
-      ).json();
-      live = { summary: data.shortDescription, description: data.description };
-    } else {
-      const data = await (
-        await request(
-          `https://addons.mozilla.org/api/v5/addons/addon/${encodeURIComponent(cfg.id)}/`
-        )
-      ).json();
-      live = { summary: data.summary?.['pt-PT'], description: data.description?.['pt-PT'] };
+      if (!live.summary || !live.description) {
+        throw new Error('Missing listing text');
+      }
+      if (
+        plain(live.summary) !== plain(locale.summary) ||
+        plain(live.description) !== plain(locale.description.join('\n'))
+      ) {
+        differences.push(id);
+      }
     }
-    if (!live.summary || !live.description) {
-      throw new Error('Missing listing text');
-    }
-    const description = await readFile('store-listing/metadata/description-pt-PT.txt', 'utf8');
     report.push({
       store,
-      status:
-        plain(live.summary) === plain(config.summary) &&
-        plain(live.description) === plain(description)
-          ? 'clean'
-          : 'drift'
+      status: differences.length ? 'drift' : 'clean',
+      detail: differences.length
+        ? `Listing differs in ${differences.join(', ')}. Use store-listing/CHROME_UPDATE.md or EDGE_UPDATE.md, or rerun Firefox listing sync.`
+        : undefined
     });
   } catch (error) {
     report.push({

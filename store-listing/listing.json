@@ -16,5 +16,9 @@
       "id": null,
       "url": null
     }
-  }
+  },
+  "locales": ["pt-PT", "en"],
+  "privacyPolicyUrl": null,
+  "supportUrl": null,
+  "homepageUrl": null
 }

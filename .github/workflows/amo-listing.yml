@@ -1,5 +1,12 @@
 name: Firefox listing
 on:
+  push:
+    branches: [main]
+    paths:
+      - store-listing/listing.json
+      - store-listing/locales/**
+      - scripts/amo-listing.mjs
+      - scripts/listing.mjs
   workflow_dispatch:
     inputs:
       apply:
@@ -25,7 +32,7 @@ jobs:
       - name: Preview listing
         run: node scripts/amo-listing.mjs
       - name: Apply listing
-        if: ${{ inputs.apply && vars.FIREFOX_PUBLISH_ENABLED == 'true' }}
+        if: ${{ (github.event_name == 'push' || inputs.apply) && vars.FIREFOX_PUBLISH_ENABLED == 'true' }}
         run: node scripts/amo-listing.mjs --apply
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
