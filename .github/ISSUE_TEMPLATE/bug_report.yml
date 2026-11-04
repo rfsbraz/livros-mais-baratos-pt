@@ -24,6 +24,6 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: OS, Chrome version, extension version and unpacked/packaged installation (Docker/native if relevant).
+      description: OS, browser (Chrome/Firefox/Edge), browser version, extension version and unpacked/packaged installation.
     validations:
       required: true

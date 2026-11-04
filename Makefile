@@ -1,12 +1,12 @@
 .PHONY: build run clean test unit integration
 build:
-	npm run build
+	npm run build:all
 run:
-	@echo "Load the dist/chrome/ folder in Chrome using chrome://extensions and Developer mode."
+	@echo "Load dist/chrome or dist/edge through Developer mode; load dist/firefox/manifest.json through Firefox about:debugging."
 clean:
 	node -e "require('fs').rmSync('dist', { recursive: true, force: true })"
 test: unit integration
 unit:
 	npm run test:coverage
-integration:
-	npm run test:integration
+integration: build
+	npm run test:e2e
