@@ -2,10 +2,30 @@ import { DEFAULT_STORE_IDS } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { isbn13, remember } from './core.js';
 import { STORES } from './stores.js';
-import { REGIONS } from './shipping.js';
 let queue = Promise.resolve();
-export function reduceData(data, action, now = Date.now()) {
+export function migrateData(data) {
   const next = structuredClone(data);
+  delete next.shipping;
+  delete next.priceOrder;
+  let changed = false;
+  for (const book of Object.values(next.saved || {})) {
+    if (book.watch?.basis === 'delivered') {
+      book.watch.basis = 'item';
+      book.watch.revision = (book.watch.revision || 0) + 1;
+      delete book.watch.lastNotifiedPrice;
+      changed = true;
+    }
+  }
+  if (changed) {
+    next.watchJob = null;
+  }
+  if (next.watchNotices) {
+    next.watchNotices = next.watchNotices.filter(n => n.basis !== 'delivered');
+  }
+  return next;
+}
+export function reduceData(data, action, now = Date.now()) {
+  const next = migrateData(data);
   next.saved ||= {};
   next.history ||= {};
   const isbn = isbn13(action.isbn || action.book?.isbn);
@@ -36,7 +56,7 @@ export function reduceData(data, action, now = Date.now()) {
     next.saved[isbn].watch = {
       enabled: action.enabled === true,
       target: action.target,
-      basis: action.basis,
+      basis: 'item',
       revision: (next.saved[isbn].watch?.revision || 0) + 1,
       nextCheckAt: now + 60000 + Math.floor(Math.random() * 240000)
     };
@@ -45,11 +65,6 @@ export function reduceData(data, action, now = Date.now()) {
     next.priceCache = cachePrices(next.priceCache, isbn, action.offers, now, now);
   } else if (action.type === 'selection') {
     next.selectedStores = action.ids.filter(id => STORES.some(s => s.id === id));
-  } else if (action.type === 'shipping') {
-    if (!REGIONS[action.value?.region]) {
-      throw new Error('Destino inválido.');
-    }
-    next.shipping = action.value;
   } else if (action.type === 'clear') {
     next.priceCache = {};
     next.cacheEpoch = (next.cacheEpoch || 0) + 1;
@@ -69,10 +84,12 @@ export function writeData(action) {
     .then(async () => {
       const data = await chrome.storage.local.get(null);
       const next =
-        typeof action === 'function'
-          ? await action(structuredClone(data))
-          : reduceData(data, action);
+        typeof action === 'function' ? await action(migrateData(data)) : reduceData(data, action);
       if (next) {
+        const obsolete = ['shipping', 'priceOrder'].filter(key => key in data);
+        if (obsolete.length) {
+          await chrome.storage.local.remove(obsolete);
+        }
         const patch = Object.fromEntries(
           Object.entries(next).filter(
             ([key, value]) => JSON.stringify(data[key]) !== JSON.stringify(value)

@@ -26,11 +26,11 @@ Só um clique deliberado numa oferta Wook confirmada mais barata ou em «Saber m
 
 Após o clique, a Wook recebe o identificador e dados normais da navegação e pode usar cookies segundo a sua política. O responsável pode receber uma comissão. Desativar a opção impede futuras adições, mas não elimina cookies já definidos pela Wook.
 
-## Preços-alvo, portes e gráficos
+## Preços-alvo e gráficos
 
-Alvos, base de comparação (livro ou total), horários, estado de notificações, região e regras/campanhas de portes ficam guardados localmente. Não é pedida uma morada. Os alarmes agendam consultas e as notificações apresentam correspondências. Se as notificações do sistema estiverem bloqueadas, o aviso continua disponível na extensão.
+Os preços-alvo e as preferências são guardados localmente. Não é pedido um destino de entrega.
 
-As consultas são distribuídas no tempo e param quando os alvos são pausados/removidos ou a verificação agendada é desativada. Apagar dados remove observações e avisos de alvos, invalida tarefas pendentes e desativa os dois tipos de avisos; mantém preferências de portes e afiliados. As campanhas de portes são introduzidas pelo utilizador. As condições de vales Wook podem ser consultadas automaticamente, sem cookies, a partir da ligação no livro. Os gráficos só usam preços do livro observados nesta instalação, sem recalcular portes históricos.
+As consultas são distribuídas no tempo e param quando os alvos são pausados/removidos ou a verificação agendada é desativada. Apagar dados remove observações e avisos de alvos, invalida tarefas pendentes e desativa os dois tipos de avisos; mantém a preferência de afiliados. As condições de vales Wook podem ser consultadas automaticamente, sem cookies, a partir da ligação no livro. Os gráficos só usam preços do livro observados nesta instalação.
 
 Sem uma seleção guardada, só são consultadas Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Seleções guardadas, incluindo uma seleção vazia, são preservadas. Repor os dados restaura estas seis; as restantes são opcionais.
 
@@ -43,3 +43,7 @@ Contacto: **rfsbraz@proton.me**.
 As comparações podem consultar a página de condições ligada à área de compra do livro. A consulta não inclui cookies nem afiliado. As regras reconhecidas ficam junto dos preços locais; só são apresentadas durante dez minutos e dentro do prazo da campanha. O HTML das condições não é guardado. As condições não alteram o preço observado nem os alertas de preço-alvo.
 
 A preferência local `wookPromotionEnabled`, ativa por predefinição, controla a utilização da poupança combinada dos vales Wook nas comparações e avisos. Pode ser desativada em Definições, independentemente dos afiliados. O preço equivalente é calculado localmente; a cache, o histórico e os preços-alvo mantêm os preços reais.
+
+## Avaliação e comunicação de problemas
+
+As ligações do rodapé só abrem após um clique. A avaliação abre a loja do navegador. O formulário de problemas no GitHub recebe apenas o nome do navegador e a versão da extensão; não inclui o livro, a página visitada, a estante ou o histórico. O utilizador decide o conteúdo e confirma a publicação no GitHub.

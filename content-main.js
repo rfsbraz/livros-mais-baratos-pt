@@ -65,7 +65,7 @@ export function start() {
     link.rel = 'noopener noreferrer';
     bindAffiliateLink(link, () => affiliateEnabled, true);
     const note = document.createElement('small');
-    note.textContent = `${result.basis === 'delivered' ? 'Total estimado com portes. ' : 'Preço do livro; portes por confirmar. '}Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
+    note.textContent = `Preço do livro. Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
     const disclosure = document.createElement('small');
     disclosure.textContent =
       new URL(result.url || location.href).hostname === 'www.wook.pt' && affiliateEnabled
@@ -203,8 +203,7 @@ export function start() {
       (!changes.autoEnabled &&
         !changes.selectedStores &&
         !changes.affiliateEnabled &&
-        !changes.wookPromotionEnabled &&
-        !changes.shipping)
+        !changes.wookPromotionEnabled)
     ) {
       return;
     }

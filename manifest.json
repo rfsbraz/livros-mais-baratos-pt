@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Livros Mais Baratos PT",
   "version": "0.1.5",
-  "description": "Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.",
+  "description": "Compara preços de livros em Portugal, recebe alertas de preço-alvo e consulta o histórico das tuas pesquisas.",
   "minimum_chrome_version": "120",
   "permissions": ["activeTab", "scripting", "storage", "offscreen", "alarms", "notifications"],
   "action": {

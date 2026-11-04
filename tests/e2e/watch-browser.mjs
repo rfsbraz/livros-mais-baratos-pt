@@ -59,16 +59,31 @@ try {
     async isbn => (await chrome.storage.local.get('saved')).saved[isbn]?.watch?.target === 1900,
     isbn
   );
-  await page.evaluate(async () => {
-    const { changeData } = await import('./data.js');
-    await changeData({
-      type: 'shipping',
-      value: {
-        region: 'mainland',
-        rules: { mainland: { bertrand: { fee: 0, expiresAt: Date.now() + 86400000 } } }
-      }
+  // Upgrade an existing total-based target without losing the shelf or target amount.
+  await page.evaluate(async isbn => {
+    const { saved } = await chrome.storage.local.get('saved');
+    saved[isbn].watch.basis = 'delivered';
+    saved[isbn].watch.lastNotifiedPrice = 2000;
+    await chrome.storage.local.set({
+      saved,
+      shipping: { region: 'mainland' },
+      priceOrder: 'delivered'
     });
-  });
+  }, isbn);
+  await page.reload();
+  await poll(async isbn => {
+    const data = await chrome.storage.local.get(null);
+    return (
+      data.saved[isbn]?.watch?.basis === 'item' && !('shipping' in data) && !('priceOrder' in data)
+    );
+  }, isbn);
+  assert.equal(
+    await page.evaluate(
+      async isbn => (await chrome.storage.local.get('saved')).saved[isbn].watch.target,
+      isbn
+    ),
+    1900
+  );
   await poll(async () => !!(await chrome.alarms.get('saved-book-check')));
   async function trigger() {
     await page.evaluate(async isbn => {

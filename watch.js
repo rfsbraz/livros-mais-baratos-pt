@@ -2,7 +2,7 @@ import { selectedStoreIds } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { STORES } from './stores.js';
 import { remember, safeUrl } from './core.js';
-import { targetOffer } from './shipping.js';
+import { targetOffer } from './offers.js';
 import { writeData } from './data.js';
 export const WATCH_ALARM = 'saved-book-check';
 export function nextDue(data, now = Date.now()) {
@@ -50,7 +50,7 @@ export function completeWatch(data, message, now = Date.now()) {
   watch.lastStatus = offers.some(o => o.status === 'ok') ? 'ok' : 'unavailable';
   next.priceCache = cachePrices(next.priceCache, book.isbn, offers, now, now);
   next.history = remember(next.history || {}, book.isbn, offers, now, 'scheduled');
-  const best = targetOffer(offers, watch, data.shipping || {}, now);
+  const best = targetOffer(offers, watch);
   if (
     best &&
     (!Number.isFinite(watch.lastNotifiedPrice) || best.targetPrice < watch.lastNotifiedPrice)
@@ -63,8 +63,7 @@ export function completeWatch(data, message, now = Date.now()) {
       name: STORES.find(s => s.id === best.id).name,
       price: best.targetPrice,
       itemPrice: best.price,
-      basis: watch.basis,
-      region: data.shipping?.region || 'mainland',
+      basis: 'item',
       url: best.url,
       at: now
     };
@@ -189,13 +188,7 @@ export function installWatch(offscreen) {
             type: 'basic',
             iconUrl: 'icons/128.png',
             title: 'O teu preço-alvo foi atingido',
-            message:
-              (notice.title || notice.isbn) +
-              ': ' +
-              money +
-              ' na ' +
-              notice.name +
-              (notice.basis === 'delivered' ? ' (total estimado)' : ' (sem portes)')
+            message: (notice.title || notice.isbn) + ': ' + money + ' na ' + notice.name
           })
           .catch(() => {});
       }

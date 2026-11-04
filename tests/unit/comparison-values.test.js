@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { comparisonValue, comparisonAlert } from '../../comparison-values.js';
-import { targetOffer } from '../../shipping.js';
+import { targetOffer } from '../../offers.js';
 const now = Date.parse('2026-11-04T12:00:00Z');
 const promotion = {
   kind: 'future-voucher',
@@ -33,41 +33,24 @@ const current = {
   condition: 'NewCondition',
   availability: 'InStock'
 };
-const shipping = {
-  region: 'mainland',
-  rules: {
-    mainland: {
-      wook: { fee: 300, freeFrom: 2000, expiresAt: now + 86400000 },
-      continente: { fee: 0, expiresAt: now + 86400000 }
-    }
-  }
-};
 test('Wook voucher equivalent wins against a cheaper cash offer in another shop', () => {
-  const alert = comparisonAlert(current, [wook], 'continente', shipping, true, now);
+  const alert = comparisonAlert(current, [wook], 'continente', true, now);
   assert.equal(alert.price, 1334);
   assert.equal(alert.cashPrice, 2000);
   assert.equal(alert.saving, 466);
   assert.equal(alert.currentCashPrice, 1800);
   assert.equal(alert.estimated, true);
   assert.equal(alert.validUntil, now + 600000);
-  assert.equal(alert.basis, 'delivered');
+  assert.equal(alert.basis, 'item');
   assert.equal(wook.price, 2000);
-  assert.equal(comparisonAlert(current, [wook], 'continente', shipping, false, now), null);
+  assert.equal(comparisonAlert(current, [wook], 'continente', false, now), null);
 });
-test('shipping thresholds and target prices still use cash rather than voucher equivalent', () => {
-  const value = comparisonValue(wook, shipping, true, now);
-  assert.equal(value.delivery.shipping, 0);
-  assert.equal(value.total, 1334);
-  assert.equal(value.delivery.total, 2000);
-  assert.equal(targetOffer([wook], { basis: 'item', target: 1500 }, shipping, now), null);
-  const paidShipping = {
-    region: 'other',
-    rules: { other: { wook: { fee: 300, expiresAt: now + 86400000 } } }
-  };
-  assert.equal(comparisonValue(wook, paidShipping, true, now).total, 1634);
+test('targets retain cash prices rather than voucher equivalents', () => {
+  assert.equal(comparisonValue(wook, true, now).price, 1334);
+  assert.equal(targetOffer([wook], { target: 1500 }), null);
 });
 test('disabled, expired, old, missing, ineligible and foreign promotions never affect prices', () => {
-  assert.equal(comparisonValue(wook, shipping, false, now).price, 2000);
+  assert.equal(comparisonValue(wook, false, now).price, 2000);
   for (const offer of [
     { ...wook, promotion: null },
     { ...wook, promotion: { ...promotion, endsAt: now } },
@@ -78,7 +61,7 @@ test('disabled, expired, old, missing, ineligible and foreign promotions never a
     { ...wook, url: 'https://evil.example/livro/test' },
     { ...wook, promotion: { ...promotion, maximumPurchase: 1000 } }
   ]) {
-    assert.equal(comparisonValue(offer, shipping, true, now).price, 2000);
+    assert.equal(comparisonValue(offer, true, now).price, 2000);
   }
 });
 test('the current Wook page gets the same valuation only for its confirmed cash price', () => {
@@ -92,42 +75,17 @@ test('the current Wook page gets the same valuation only for its confirmed cash 
     promotion: undefined
   };
   assert.equal(
-    comparisonAlert(
-      { ...current, price: 2000, url: wook.url },
-      [wook, rival],
-      'wook',
-      shipping,
-      true,
-      now
-    ),
+    comparisonAlert({ ...current, price: 2000, url: wook.url }, [wook, rival], 'wook', true, now),
     null
   );
   assert.equal(
-    comparisonAlert(
-      { ...current, price: 2100, url: wook.url },
-      [wook, rival],
-      'wook',
-      shipping,
-      true,
-      now
-    ).saving,
+    comparisonAlert({ ...current, price: 2100, url: wook.url }, [wook, rival], 'wook', true, now)
+      .saving,
     300
   );
   assert.equal(
-    comparisonAlert(
-      { ...current, price: 2000, url: wook.url },
-      [wook, rival],
-      'wook',
-      shipping,
-      false,
-      now
-    ).saving,
+    comparisonAlert({ ...current, price: 2000, url: wook.url }, [wook, rival], 'wook', false, now)
+      .saving,
     200
   );
-});
-test('unknown shipping keeps the estimated comparison on an item basis', () => {
-  const result = comparisonAlert(current, [wook], 'continente', { region: 'other' }, true, now);
-  assert.equal(result.basis, 'item');
-  assert.equal(result.price, 1334);
-  assert.equal(result.cashPrice, 2000);
 });

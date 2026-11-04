@@ -44,8 +44,14 @@ try {
       };
       window.__permission = true;
       window.chrome = {
+        runtime: { getManifest: () => ({ version: '0.1.5' }) },
         storage: {
           local: {
+            remove: async keys => {
+              for (const key of keys) {
+                delete window.__data[key];
+              }
+            },
             get: async () => window.__data,
             set: async data => {
               window.__data = { ...window.__data, ...data };
@@ -363,34 +369,15 @@ try {
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   await mkdir('work', { recursive: true });
   await page.screenshot({ path: 'work/extension-preview.png', fullPage: true });
-  // Shipping edits, promotion windows and unknown destinations affect delivered ranking.
+  assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
+  assert.equal(await page.locator('#delivery-settings').count(), 0);
+  assert.match(await page.locator('#rate-link').getAttribute('href'), /chromewebstore.google.com/);
+  const issue = new URL(await page.locator('#report-link').getAttribute('href'));
+  assert.equal(issue.pathname, '/rfsbraz/livros-mais-baratos-pt/issues/new');
+  assert.equal(issue.searchParams.get('template'), 'bug_report.yml');
+  assert.match(issue.searchParams.get('environment'), /chrome/);
+  assert.equal(await page.evaluate(() => window.__data.shipping), undefined);
   await page.locator('#open-settings').click();
-  await page.locator('#delivery-settings > summary').click();
-  await page.locator('#shipping-store').selectOption('wook');
-  await page.locator('#shipping-fee').fill('3');
-  await page.locator('#shipping-minimum').fill('');
-  await page.getByRole('button', { name: 'Guardar regra de portes', exact: true }).click();
-  await page.locator('#shipping-store').selectOption('bertrand');
-  await page.locator('#shipping-fee').fill('6');
-  await page.locator('#shipping-minimum').fill('');
-  await page.getByRole('button', { name: 'Guardar regra de portes', exact: true }).click();
-  assert.equal(await page.locator('.best a').textContent(), 'Wook');
-  await page.locator('#shipping-promo').check();
-  await page.locator('#promo-start').fill('2020-01-01T00:00');
-  await page.locator('#promo-end').fill('2099-01-01T00:00');
-  await page.getByRole('button', { name: 'Guardar regra de portes', exact: true }).click();
-  assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
-  assert.match(await page.locator('.best').textContent(), /Campanha de portes grátis/);
-  await page.locator('#delivery-region').selectOption('other');
-  assert.equal(
-    await page.locator('.best').count(),
-    0,
-    'unknown shipping cannot win delivered ranking'
-  );
-  await page.locator('#price-order').selectOption('item');
-  assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
-  await page.locator('#delivery-region').selectOption('mainland');
-  await page.locator('#delivery-settings > summary').click();
   // Selection survives reload, requests only selected origins, and cancellation does not save partial history.
   await page.locator('#shops > summary').click();
   await page.locator('#select-none').click();

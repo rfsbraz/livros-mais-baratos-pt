@@ -65,7 +65,6 @@ async function compare(message) {
     book,
     entry.offers,
     sourceId,
-    message.shipping || {},
     message.wookPromotionEnabled !== false
   );
   if (alert) {

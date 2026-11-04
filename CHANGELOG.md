@@ -2,6 +2,9 @@
 
 ## Por publicar
 
+- Simplificar as comparações e os alvos para usar apenas o preço do livro, removendo regras de entrega e migrando preferências antigas.
+- Acrescentar avaliação na loja do navegador, formulário de problemas no GitHub e versão no rodapé. Publicar ligações às três lojas no README.
+
 - Considerar a poupança combinada dos vales Wook no preço equivalente de comparação, com opção ativa por predefinição para desativar e apresentação separada do valor a pagar.
 
 - Deteção de campanhas Wook com devolução em vale, estimativa da poupança combinada e ligação «Saber mais» com afiliado opcional, sem alterar o preço efetivamente pago.

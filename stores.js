@@ -286,7 +286,7 @@ export const CATALOGUE = [
     'OLX',
     'https://www.olx.pt',
     '/ads/q-{q}/',
-    'Classificados: edição, estado e portes precisam de confirmação com o vendedor.',
+    'Classificados: edição e estado precisam de confirmação com o vendedor.',
     { group: 'used' }
   ),
   manual(

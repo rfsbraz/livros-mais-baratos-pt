@@ -37,7 +37,7 @@ const product = price =>
   `<html><head><title>A Criada</title><script type="application/ld+json">${JSON.stringify({ '@type': 'Book', isbn: '9789895701124', name: 'A Criada', offers: { price, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' } })}</script></head><body><h1>A Criada</h1></body></html>`;
 const baseStyle = `*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font-family:'Segoe UI',Arial,sans-serif;background:#172e59;color:#fff}.brand{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:600}.brand img{width:64px;height:64px}.copy{position:absolute;left:64px;top:64px;width:590px}h1{font:normal 64px/1.08 Georgia,serif;margin:65px 0 24px;letter-spacing:-1.4px}p{font-size:23px;line-height:1.5;color:#c7d9ff;max-width:515px}.footer{position:absolute;bottom:32px;left:64px;font-size:13px;color:#becfed}.frame{position:absolute;left:750px;top:68px;width:430px;height:655px;border-radius:12px;overflow:hidden;box-shadow:0 20px 65px #07152d88;background:white;border:1px solid #526c94}iframe{border:0;width:430px;height:655px}.caption{position:absolute;right:100px;bottom:39px;color:#c7d9ff;font-size:13px}.spines{display:flex;gap:14px;position:absolute;left:64px;bottom:110px;align-items:flex-end}.spines i{display:block;width:32px;height:75px;background:#97bbff;border-radius:3px}.spines i:nth-child(2){height:100px;background:#fff}.spines i:nth-child(3){height:85px;background:#3c68b0}`;
 const stage = (title, copy, caption, iframe = true) =>
-  `<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><style>${baseStyle}</style></head><body><div class="copy"><div class="brand"><img src="${logoData}">Livros Mais Baratos PT</div><h1>${title}</h1><p>${copy}</p></div><div class="spines"><i></i><i></i><i></i></div>${iframe ? `<div class="frame"><iframe src="${origin}/popup.html"></iframe></div>` : ''}<div class="caption">${caption}</div><div class="footer">Demonstração com preços ilustrativos. Portes não incluídos.</div></body></html>`;
+  `<!doctype html><html lang="pt-PT"><head><meta charset="utf-8"><style>${baseStyle}</style></head><body><div class="copy"><div class="brand"><img src="${logoData}">Livros Mais Baratos PT</div><h1>${title}</h1><p>${copy}</p></div><div class="spines"><i></i><i></i><i></i></div>${iframe ? `<div class="frame"><iframe src="${origin}/popup.html"></iframe></div>` : ''}<div class="caption">${caption}</div><div class="footer">Demonstração com preços ilustrativos. Confirma o preço final na loja.</div></body></html>`;
 try {
   const icon = await browser.newPage();
   for (const size of [16, 24, 32, 48, 64, 96, 128, 256, 300, 512, 1024]) {
@@ -63,17 +63,17 @@ try {
   const scenes = [
     [
       '02-comparar-edicao',
-      'Compara o total.<br>Inclui os portes.',
-      'A mesma edição, com portes estimados.<br>Custos desconhecidos ficam identificados.',
+      'O mesmo livro.<br>Compara os preços.',
+      'Encontra a mesma edição por ISBN.<br>Escolhe a oferta que te interessa.',
       'Interface real · comparação manual',
       'compare'
     ],
     [
-      '03-portes-e-campanhas',
-      'Portes claros.<br>Campanhas com fim.',
-      'Define os portes e mínimos da loja.<br>As campanhas só valem<br>dentro das datas indicadas.',
-      'Interface real · regras introduzidas pelo utilizador',
-      'shipping'
+      '03-definicoes',
+      'As tuas lojas.<br>As tuas escolhas.',
+      'Escolhe as lojas e os avisos.<br>Controla os vales Wook<br>e as ligações de afiliado.',
+      'Interface real · definições da extensão',
+      'settings'
     ],
     [
       '04-estante-historico',
@@ -85,7 +85,7 @@ try {
     [
       '05-precos-alvo',
       'Define o preço.<br>Recebe um aviso.',
-      'Guarda um alvo para o livro<br>ou para o total com portes.<br>As consultas são agendadas.',
+      'Guarda um preço-alvo para o livro.<br>Recebe um aviso quando baixar.<br>As consultas são agendadas.',
       'Interface real · preços-alvo da estante',
       'targets'
     ]
@@ -124,15 +124,6 @@ try {
         ]
       }
     };
-    data.shipping = {
-      region: 'mainland',
-      rules: {
-        mainland: {
-          bertrand: { source: 'manual', fee: 350, expiresAt: Date.UTC(2026, 10, 5, 12) },
-          continente: { source: 'manual', fee: 499, expiresAt: Date.UTC(2026, 10, 5, 12) }
-        }
-      }
-    };
     data.history['9789895701124'].unshift({
       store: 'wook',
       price: 2240,
@@ -146,7 +137,7 @@ try {
         9789895701124: {
           isbn: '9789895701124',
           title: 'A Criada',
-          watch: { enabled: true, target: 1850, basis: 'delivered' }
+          watch: { enabled: true, target: 1850, basis: 'item' }
         }
       };
     }
@@ -160,6 +151,7 @@ try {
       ({ data, html }) => {
         let state = structuredClone(data);
         window.chrome = {
+          runtime: { getManifest: () => ({ version: '0.1.5' }) },
           storage: {
             local: {
               get: async () => state,
@@ -215,14 +207,8 @@ try {
         await f.locator('#history-section').evaluate(el => window.scrollTo(0, el.offsetTop - 18));
       }
     }
-    if (mode === 'shipping') {
+    if (mode === 'settings') {
       await f.locator('#open-settings').click();
-      await f.locator('#delivery-settings').evaluate(el => (el.open = true));
-      await f.locator('#shipping-store').selectOption('bertrand');
-      await f.locator('#shipping-minimum').fill('25.00');
-      await f.locator('#shipping-promo').check();
-      await f.locator('#promo-end').fill('2026-11-10T23:59');
-      await f.locator('#shipping-form').evaluate(el => window.scrollTo(0, el.offsetTop - 10));
     }
     if (mode === 'targets') {
       await page.addStyleTag({ content: '.frame{top:140px;height:480px}iframe{height:480px}' });
@@ -243,7 +229,7 @@ try {
     await writeFile(`${out}/source/${name}.html`, stage(title, copy, caption));
     await page.close();
   }
-  // Run the shipping content-script UI with a deterministic reply; do not draw a mock notification.
+  // Run the production content-script UI with a deterministic reply; do not draw a mock notification.
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, timezoneId: 'UTC' });
   await page.clock.setFixedTime(new Date('2026-11-04T12:00:00Z'));
   const scene = stage(
@@ -322,7 +308,7 @@ try {
   for (const file of [
     '01-aviso-automatico',
     '02-comparar-edicao',
-    '03-portes-e-campanhas',
+    '03-definicoes',
     '04-estante-historico',
     '05-precos-alvo'
   ]) {
@@ -362,7 +348,7 @@ try {
   }
   const manifest = JSON.parse(await readFile(`${out}/source/extension/manifest.json`, 'utf8'));
   manifest.description =
-    'Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.';
+    'Compara preços de livros em Portugal, recebe alertas de preço-alvo e consulta o histórico das tuas pesquisas.';
   assert(manifest.description.length <= 132);
   await writeFile(
     `${out}/source/extension/manifest.json`,

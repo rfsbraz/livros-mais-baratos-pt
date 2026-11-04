@@ -15,18 +15,21 @@ _Imagem de demonstração com preços ilustrativos, não ofertas em tempo real._
 - **Seis lojas por predefinição** - Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Em **Definições**, podes escolher entre 26 adaptadores automáticos. As escolhas guardadas mantêm-se nas atualizações.
 - **A mesma edição** - Valida ISBN-10 e ISBN-13. Separa livros usados, outras moedas e disponibilidade desconhecida das ofertas novas confirmadas em EUR.
 - **Preços prontos ao abrir o menu** - Reutiliza resultados recentes de consultas em segundo plano, manuais e agendadas, indicando quando foram obtidos e se podem estar desatualizados.
-- **Estimativas de portes** - Define custos de entrega, mínimos para portes grátis e campanhas com datas. Portugal continental é o destino predefinido. Portes desconhecidos nunca são considerados gratuitos.
-- **Estante e preços-alvo** - Guarda até 100 livros, define um preço-alvo para o livro ou para o total com portes e recebe notificações de verificações aproximadamente diárias enquanto o navegador estiver aberto.
+- **Estante e preços-alvo** - Guarda até 100 livros, define um preço-alvo para o livro e recebe notificações de verificações aproximadamente diárias enquanto o navegador estiver aberto.
 - **O teu próprio histórico** - Os gráficos usam apenas preços observados por esta instalação. Preferências, livros guardados, cache e histórico ficam no navegador e podem ser apagados.
-- **Definições separadas** - Pesquisa, resultados e estante ficam no ecrã principal. Lojas, portes, avisos e afiliados ficam em **Definições**.
+- **Definições separadas** - Pesquisa, resultados e estante ficam no ecrã principal. Lojas, avisos e afiliados ficam em **Definições**.
 
-Consulta a [cobertura das lojas](docs/store-coverage.md) e as [regras de preços-alvo, portes e histórico](docs/targets-shipping-history.md).
+Consulta a [cobertura das lojas](docs/store-coverage.md) e as [regras de preços-alvo e histórico](docs/targets-history.md).
+
+O rodapé inclui **Avaliar a extensão**, que abre a loja correspondente ao navegador, **Comunicar um problema**, que abre o formulário de erro no GitHub, e a versão instalada. O formulário inclui apenas o navegador e a versão da extensão; o envio é confirmado por ti no GitHub.
 
 ## Instalação
 
 ### Lojas de extensões
 
-A extensão ainda não está publicada na Chrome Web Store, no Firefox Add-ons ou no Edge Add-ons. As ligações serão adicionadas quando as páginas estiverem disponíveis. Entretanto, podes gerar os pacotes a partir do código.
+- [Chrome Web Store](https://chromewebstore.google.com/detail/ongoinfbkmfffpmnkinhnoepdclbkenc/)
+- [Firefox Add-ons](https://addons.mozilla.org/pt-PT/firefox/addon/livros-mais-baratos-pt/)
+- [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/hcielebbeilidlkedpobbclikllnmggn)
 
 ### Instalação manual
 
@@ -40,26 +43,26 @@ A extensão ainda não está publicada na Chrome Web Store, no Firefox Add-ons o
 
 #### Firefox
 
-Para testes locais, abre `about:debugging#/runtime/this-firefox`, escolhe **Carregar extra temporário** e seleciona `dist/firefox/manifest.json`. Esta instalação é temporária. Uma instalação permanente exige um pacote assinado pelo Firefox Add-ons, ainda não disponibilizado.
+Para testes locais, abre `about:debugging#/runtime/this-firefox`, escolhe **Carregar extra temporário** e seleciona `dist/firefox/manifest.json`. Esta instalação é temporária. Para uma instalação permanente, usa a ligação Firefox Add-ons acima.
 
 ## Utilização
 
 1. Visita a página de um livro numa loja selecionada. Quando o ISBN e o preço atual são verificáveis, a extensão compara em segundo plano e mostra um aviso se encontrar uma oferta elegível mais barata.
 2. Abre o ícone da extensão para consultar os preços em cache ou comparar manualmente. Confirma ou introduz o ISBN e escolhe **Comparar**. Mantém o menu aberto durante a comparação manual.
-3. Escolhe **Guardar** para adicionar um livro à estante. Define um preço-alvo, com ou sem portes, e consulta o histórico das tuas observações.
-4. Abre **Definições** para escolher lojas, configurar **Entrega e portes**, alterar avisos ou afiliados e apagar dados. **Voltar aos preços** recupera os mesmos resultados.
+3. Escolhe **Guardar** para adicionar um livro à estante. Define um preço-alvo e consulta o histórico das tuas observações.
+4. Abre **Definições** para escolher lojas, alterar avisos ou afiliados e apagar dados. **Voltar aos preços** recupera os mesmos resultados.
 
-### Preços, portes e disponibilidade
+### Preços e disponibilidade
 
 A comparação exige a mesma edição. O saldo em cartão não é um desconto imediato. Ofertas usadas, de vendedores externos ou noutras moedas mantêm essa identificação e não entram nos avisos automáticos de menor preço novo em EUR.
 
-Os totais com portes são estimativas para um livro com entrega normal, sem taxas de importação ou serviços adicionais. Existem regras iniciais publicadas para Wook e Presença; nas restantes lojas, confirma ou introduz os portes. As regras expiram. A deteção automática de campanhas ainda não está implementada. Confirma sempre o preço final na loja.
+Comparamos o preço do livro. Confirma sempre o preço final na loja.
 
 Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 26 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
 
 ## Campanhas de vales Wook
 
-Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. A opção **Considerar vales Wook na comparação**, ativa por predefinição em Definições, aplica essa percentagem ao preço Wook para ordenar ofertas e apresentar avisos, mesmo quando visitas outra loja. O preço equivalente é identificado como estimativa e o valor a pagar agora aparece em separado. Desativar a opção repõe a comparação pelo preço a pagar. Os portes, os alvos e o histórico continuam a usar preços reais. Consulta as [regras e limitações](docs/wook-promotions.md).
+Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. A opção **Considerar vales Wook na comparação**, ativa por predefinição em Definições, aplica essa percentagem ao preço Wook para ordenar ofertas e apresentar avisos, mesmo quando visitas outra loja. O preço equivalente é identificado como estimativa e o valor a pagar agora aparece em separado. Desativar a opção repõe a comparação pelo preço a pagar. Os alvos e o histórico continuam a usar preços reais. Consulta as [regras e limitações](docs/wook-promotions.md).
 
 ## Permissões e privacidade
 
@@ -124,7 +127,7 @@ A CI verifica estilo, formatação, testes, pacotes, navegadores, dependências 
 
 O [pacote de submissão](store-listing/README.md) inclui metadados em português de Portugal, cinco capturas de ecrã, ícones, imagens promocionais, informações de privacidade e instruções de revisão. A [automação e configuração](store-listing/AUTOMATION.md) segue a extensão Geocaching: publicação por versões etiquetadas, sincronização de texto e imagens no Firefox, notas baseadas no registo de alterações e verificações semanais de credenciais e divergências.
 
-| Comparar preços com portes                                                                       | Acompanhar as tuas observações                                                                            |
+| Comparar preços de livros                                                                        | Acompanhar as tuas observações                                                                            |
 | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | ![Comparação com preços ilustrativos](store-listing/screenshots/02-comparar-edicao-1280x800.png) | ![Histórico local com dados de demonstração](store-listing/screenshots/04-estante-historico-1280x800.png) |
 

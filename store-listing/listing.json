@@ -1,20 +1,20 @@
 {
   "name": "Livros Mais Baratos PT",
-  "summary": "Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.",
+  "summary": "Compara preços de livros em Portugal, recebe alertas de preço-alvo e consulta o histórico das tuas pesquisas.",
   "defaultLocale": "pt-PT",
   "supportEmail": "rfsbraz@proton.me",
   "stores": {
     "chrome": {
-      "id": null,
-      "url": null
+      "id": "ongoinfbkmfffpmnkinhnoepdclbkenc",
+      "url": "https://chromewebstore.google.com/detail/ongoinfbkmfffpmnkinhnoepdclbkenc/"
     },
     "firefox": {
       "id": "livros-mais-baratos-pt@rfsbraz.github.io",
-      "url": null
+      "url": "https://addons.mozilla.org/pt-PT/firefox/addon/livros-mais-baratos-pt/"
     },
     "edge": {
-      "id": null,
-      "url": null
+      "id": "hcielebbeilidlkedpobbclikllnmggn",
+      "url": "https://microsoftedge.microsoft.com/addons/detail/hcielebbeilidlkedpobbclikllnmggn"
     }
   },
   "locales": ["pt-PT"],

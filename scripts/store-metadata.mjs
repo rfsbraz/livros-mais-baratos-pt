@@ -43,7 +43,7 @@ await writeFile(
       screenshots: [
         '01-aviso-automatico',
         '02-comparar-edicao',
-        '03-portes-e-campanhas',
+        '03-definicoes',
         '04-estante-historico',
         '05-precos-alvo'
       ].map(s => `screenshots/${s}-1280x800.png`)
@@ -66,7 +66,7 @@ A extensão compara preços da mesma edição de um livro por ISBN, mostra aviso
 
 Na comparação manual, a extensão lê a página atual após a abrires. Os avisos estão ativos por predefinição após a instalação, identificando páginas de livro nas lojas selecionadas com o acesso autorizado pelo navegador. Não é necessário abrir a extensão para iniciar estas consultas. O URL e o conteúdo da página são processados localmente para obter o ISBN, título, preço, moeda e disponibilidade. Não recolhe o histórico geral de navegação nem envia o HTML da página para um servidor do responsável.
 
-Os ISBN, títulos guardados, preços-alvo, regras de portes, destino, notificações, preços observados, preferências de lojas e estado dos avisos são guardados no armazenamento local da extensão, não no Chrome Sync. As ações de guardar/remover livros e escolher lojas servem apenas para executar estas funções. Não há registo de cliques, movimentos do rato ou outras interações para análise de utilização.
+Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, preferências de lojas e estado dos avisos são guardados no armazenamento local da extensão, não no Chrome Sync. As ações de guardar/remover livros e escolher lojas servem apenas para executar estas funções. Não há registo de cliques, movimentos do rato ou outras interações para análise de utilização.
 
 ## Ligações às lojas
 
@@ -88,11 +88,15 @@ As consultas automáticas usam uma cache em memória com até 50 combinações d
 
 ## Controlo e eliminação
 
-O acesso às lojas é solicitado na instalação e os avisos automáticos estão inicialmente ativos. Uma preferência anterior de desativação é preservada nas atualizações. Podes selecionar lojas, desativar os avisos e revogar permissões nas definições do navegador. A opção Apagar dados elimina a estante e o histórico, repõe a seleção de lojas e desativa os avisos. Desinstalar a extensão remove o armazenamento local. Livros com alvo ativo têm verificações aproximadamente diárias enquanto o navegador está aberto. Alvos, destino e regras de portes são guardados localmente.
+O acesso às lojas é solicitado na instalação e os avisos automáticos estão inicialmente ativos. Uma preferência anterior de desativação é preservada nas atualizações. Podes selecionar lojas, desativar os avisos e revogar permissões nas definições do navegador. A opção Apagar dados elimina a estante e o histórico, repõe a seleção de lojas e desativa os avisos. Desinstalar a extensão remove o armazenamento local. Livros com alvo ativo têm verificações aproximadamente diárias enquanto o navegador está aberto. Alvos e preferências são guardados localmente.
 
 ## Contacto de suporte
 
 Se enviares uma mensagem para rfsbraz@proton.me, os dados que incluíres no email são usados para responder ao pedido de suporte. Esse contacto é separado do funcionamento da extensão. Não envies palavras-passe, dados de pagamento ou informação pessoal desnecessária. Podes usar o mesmo contacto para pedir a eliminação da correspondência de suporte.
+
+## Avaliação e comunicação de problemas
+
+As ligações do rodapé só abrem após um clique. A avaliação abre a loja do navegador. O formulário de problemas no GitHub recebe apenas o nome do navegador e a versão da extensão, sem dados do livro, da página visitada, da estante ou do histórico. O utilizador revê o conteúdo e confirma a publicação no GitHub.
 
 ## Utilização limitada
 
@@ -112,9 +116,9 @@ Depois de instalar a extensão e aceitar as permissões no Chrome, basta visitar
 
 Pode não existir uma oferta mais barata. A página pode não identificar a edição ou o preço de forma suportada, ou uma loja pode bloquear o acesso. Páginas de pesquisa, marketplaces e formatos digitais identificados não originam estes avisos. Um livro Wook abrangido por uma campanha de vale reconhecida também pode mostrar um aviso informativo com a poupança combinada e a ligação Saber mais. Confirma as lojas selecionadas e as permissões no Chrome. Podes usar a comparação manual por ISBN e abrir as ligações das lojas.
 
-## Os preços incluem portes?
+## Que preço é comparado?
 
-Quando existe uma regra válida, mostramos um total estimado com portes para o destino escolhido. Sem regra, os portes ficam por confirmar. Confirma condições, taxas, disponibilidade e preço final na loja. As consultas automáticas podem reutilizar preços observados nos últimos dez minutos; o aviso indica a hora.
+Comparamos apenas o preço do livro. Confirma condições, taxas, disponibilidade e preço final na loja. As consultas automáticas podem reutilizar preços observados nos últimos dez minutos; o aviso indica a hora.
 
 ## Como apagar os dados?
 
@@ -122,7 +126,7 @@ Usa Apagar dados na extensão para limpar a estante e o histórico e desativar o
 
 ## Histórico de preços
 
-O histórico contém só observações desta instalação: comparações manuais e verificações agendadas de alvos. O gráfico mostra o preço do livro por loja, moeda e estado, sem portes. Não contém dados de terceiros nem preços anteriores. Os avisos ao navegar não acrescentam observações ao histórico.
+O histórico contém só observações desta instalação: comparações manuais e verificações agendadas de alvos. O gráfico mostra o preço do livro por loja, moeda e estado. Não contém dados de terceiros nem preços anteriores. Os avisos ao navegar não acrescentam observações ao histórico.
 `;
 const esc = s => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 function htmlDoc(markdown, title) {
@@ -145,7 +149,7 @@ await writeFile(`${out}/website/support.html`, htmlDoc(support, 'Suporte'));
 await writeFile(
   `${out}/website/index.html`,
   htmlDoc(
-    `# Livros Mais Baratos PT\n\nO mesmo livro. Um preço melhor.\n\nCompara a mesma edição por ISBN em livrarias portuguesas, recebe automaticamente avisos de ofertas mais baratas e guarda o histórico das tuas consultas neste navegador.\n\n## Como funciona\n\nInstala, aceita as permissões de acesso às lojas e visita um livro. As comparações e os avisos começam automaticamente. Podes ajustar as lojas ou desativar os avisos a qualquer momento. Os avisos exigem um livro novo da mesma edição, em EUR, mais barato e com stock confirmado na outra loja. Os preços não incluem portes e a disponibilidade depende de cada loja.\n\n## Sem conta. Afiliados opcionais\n\nAfiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Os dados da estante e do histórico são locais. As consultas enviam o ISBN e, quando necessário, o título às lojas selecionadas. Consulta a política de privacidade para conhecer todos os detalhes.\n\n## Apoio\n\nContacto: rfsbraz@proton.me.`,
+    `# Livros Mais Baratos PT\n\nO mesmo livro. Um preço melhor.\n\nCompara a mesma edição por ISBN em livrarias portuguesas, recebe automaticamente avisos de ofertas mais baratas e guarda o histórico das tuas consultas neste navegador.\n\n## Como funciona\n\nInstala, aceita as permissões de acesso às lojas e visita um livro. As comparações e os avisos começam automaticamente. Podes ajustar as lojas ou desativar os avisos a qualquer momento. Os avisos exigem um livro novo da mesma edição, em EUR, mais barato e com stock confirmado na outra loja. Comparamos o preço do livro; a disponibilidade e o valor final dependem de cada loja.\n\n## Sem conta. Afiliados opcionais\n\nAfiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Os dados da estante e do histórico são locais. As consultas enviam o ISBN e, quando necessário, o título às lojas selecionadas. Consulta a política de privacidade para conhecer todos os detalhes.\n\n## Apoio\n\nContacto: rfsbraz@proton.me.`,
     'Comparar preços de livros'
   )
 );
@@ -162,7 +166,7 @@ await writeFile(
 await writeFile(`${out}/metadata/reviewer-notes.txt`, await template('reviewer-notes.txt'));
 await writeFile(
   `${out}/metadata/release-notes-pt-PT.txt`,
-  'Preços-alvo com verificações agendadas, totais estimados com portes, mínimos e campanhas datadas, e gráficos apenas com observações locais. Afiliados Wook opcionais, ativos por predefinição, com divulgação e opção de desativar. Deteção automática por predefinição de páginas de livros, com acesso às lojas solicitado na instalação e avisos de ofertas mais baratas da mesma edição. Seleção de lojas, comparação por ISBN, estante e histórico local de consultas. A cobertura e a disponibilidade dos preços dependem de cada loja.\n'
+  'Preços-alvo com verificações agendadas, gráficos apenas com observações locais. Afiliados Wook opcionais, ativos por predefinição, com divulgação e opção de desativar. Deteção automática por predefinição de páginas de livros, com acesso às lojas solicitado na instalação e avisos de ofertas mais baratas da mesma edição. Seleção de lojas, comparação por ISBN, estante e histórico local de consultas. A cobertura e a disponibilidade dos preços dependem de cada loja.\n'
 );
 await writeFile(`${out}/README.md`, await template('README.md'));
 await cp('scripts/store-assets.mjs', `${out}/source/generate-assets.mjs`);
