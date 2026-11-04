@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: chrome-store
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist
@@ -136,7 +136,7 @@ jobs:
           sparse-checkout: scripts
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist
@@ -219,7 +219,7 @@ jobs:
       - name: Generate certification notes
         id: notes
         run: node .release-tools/scripts/edge-cert-notes.mjs --github-output --root .
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist
