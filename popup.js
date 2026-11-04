@@ -1,8 +1,9 @@
+import { comparisonValue } from './comparison-values.js';
 import { promotionCard } from './promotion-view.js';
 import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
-import { quoteDelivery, shippingRule, REGIONS } from './shipping.js';
+import { shippingRule, REGIONS } from './shipping.js';
 import { renderHistoryChart } from './history-view.js';
 import { bindAffiliateLink } from './affiliate.js';
 import { isbn13 } from './core.js';
@@ -24,9 +25,11 @@ let current = null,
 let selected = new Set(DEFAULT_STORE_IDS);
 let autoEnabled = true,
   affiliateEnabled = false,
+  wookPromotionEnabled = true,
   shipping = { region: 'mainland' },
   priceOrder = 'delivered';
 let mainScroll = 0;
+let promotionExpiryTimer;
 function settingsView(open) {
   if (open) {
     mainScroll = window.scrollY;
@@ -182,6 +185,16 @@ function renderHistory() {
   renderHistoryChart($('history'), history[current?.isbn] || []);
 }
 function renderOffers(offers) {
+  clearTimeout(promotionExpiryTimer);
+  const expiry = Math.min(
+    ...offers.map(o => comparisonValue(o, shipping, wookPromotionEnabled).validUntil)
+  );
+  if (Number.isFinite(expiry)) {
+    promotionExpiryTimer = setTimeout(
+      () => renderOffers(offers),
+      Math.max(1, expiry - Date.now() + 1)
+    );
+  }
   $('results').replaceChildren();
   $('unconfirmed-results').replaceChildren();
   const available = offers.filter(
@@ -192,7 +205,10 @@ function renderOffers(offers) {
       o.condition === 'NewCondition' &&
       !o.marketplace
   );
-  const value = o => (priceOrder === 'delivered' ? quoteDelivery(o, shipping).total : o.price);
+  const value = o => {
+    const result = comparisonValue(o, shipping, wookPromotionEnabled);
+    return priceOrder === 'delivered' ? result.total : result.price;
+  };
   const known = available.filter(o => value(o) !== null);
   const best = known.length ? Math.min(...known.map(value)) : null;
   const ordered = [...offers].sort(
@@ -207,12 +223,13 @@ function renderOffers(offers) {
   for (const offer of ordered) {
     const row = document.createElement('div');
     row.className = 'offer';
-    const delivery = quoteDelivery(offer, shipping);
+    const comparison = comparisonValue(offer, shipping, wookPromotionEnabled);
+    const delivery = comparison.delivery;
     const price = document.createElement('strong');
     price.textContent =
       offer.status === 'ok'
         ? money(
-            priceOrder === 'delivered' && delivery.known ? delivery.total : offer.price,
+            priceOrder === 'delivered' && delivery.known ? comparison.total : comparison.price,
             offer.currency
           )
         : '…';
@@ -255,6 +272,10 @@ function renderOffers(offers) {
         detail.textContent += ' · Faltam ' + money(delivery.remaining) + ' para portes grátis';
       }
     }
+    if (comparison.estimated) {
+      price.textContent += ' estimados';
+      detail.textContent += ` · A pagar agora: ${money(priceOrder === 'delivered' && delivery.known ? delivery.total : offer.price, offer.currency)}. Equivalente com uso integral do vale em compras futuras.`;
+    }
     const cheaper =
       available.includes(offer) &&
       value(offer) !== null &&
@@ -271,7 +292,9 @@ function renderOffers(offers) {
       badge.textContent =
         priceOrder === 'delivered'
           ? 'Menor total estimado entre portes conhecidos'
-          : 'Menor preço do livro novo, com stock confirmado';
+          : comparison.estimated
+            ? 'Menor preço equivalente com vale'
+            : 'Menor preço do livro novo, com stock confirmado';
       row.append(badge);
     }
     $(offer.status === 'ok' ? 'results' : 'unconfirmed-results').append(row);
@@ -428,6 +451,17 @@ $('auto-toggle').onclick = async () => {
     status('Não foi possível alterar os avisos automáticos.');
   }
 };
+$('wook-promotion-toggle').onchange = async () => {
+  const next = $('wook-promotion-toggle').checked;
+  try {
+    await chrome.storage.local.set({ wookPromotionEnabled: next });
+    wookPromotionEnabled = next;
+    renderOffers(activeOffers);
+  } catch {
+    $('wook-promotion-toggle').checked = wookPromotionEnabled;
+    status('Não foi possível guardar a preferência da campanha Wook.');
+  }
+};
 $('affiliate-toggle').onchange = async () => {
   const next = $('affiliate-toggle').checked;
   try {
@@ -439,6 +473,11 @@ $('affiliate-toggle').onchange = async () => {
   }
 };
 chrome.storage.onChanged?.addListener((changes, area) => {
+  if (area === 'local' && changes.wookPromotionEnabled) {
+    wookPromotionEnabled = changes.wookPromotionEnabled.newValue !== false;
+    $('wook-promotion-toggle').checked = wookPromotionEnabled;
+    renderOffers(activeOffers);
+  }
   if (area === 'local' && changes.affiliateEnabled) {
     affiliateEnabled = changes.affiliateEnabled.newValue !== false;
     $('affiliate-toggle').checked = affiliateEnabled;
@@ -502,6 +541,7 @@ async function init() {
       'selectedStores',
       'autoEnabled',
       'affiliateEnabled',
+      'wookPromotionEnabled',
       'shipping',
       'watchEnabled',
       'watchNotices',
@@ -510,6 +550,8 @@ async function init() {
     ]);
     autoEnabled = data.autoEnabled !== false;
     autoLabel();
+    wookPromotionEnabled = data.wookPromotionEnabled !== false;
+    $('wook-promotion-toggle').checked = wookPromotionEnabled;
     affiliateEnabled = data.affiliateEnabled !== false;
     $('affiliate-toggle').checked = affiliateEnabled;
     saved = data.saved || {};

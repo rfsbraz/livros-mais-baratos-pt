@@ -44,7 +44,8 @@ async function settings() {
     'autoEnabled',
     'selectedStores',
     'shipping',
-    'cacheEpoch'
+    'cacheEpoch',
+    'wookPromotionEnabled'
   ]);
   const grants = await chrome.permissions.getAll();
   const stores = STORES.filter(
@@ -54,6 +55,7 @@ async function settings() {
   );
   return {
     cacheEpoch: data.cacheEpoch || 0,
+    wookPromotionEnabled: data.wookPromotionEnabled !== false,
     enabled: data.autoEnabled !== false,
     stores,
     shipping: data.shipping || {}
@@ -137,7 +139,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     ) {
       return null;
     }
-    const { enabled, stores, shipping, cacheEpoch } = await settings();
+    const { enabled, stores, shipping, cacheEpoch, wookPromotionEnabled } = await settings();
     const source = storeForUrl(sender.url);
     if (!enabled || !stores.some(s => s.id === source.id)) {
       return null;
@@ -149,12 +151,14 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       book: message.book,
       sourceId: source.id,
       storeIds: stores.map(s => s.id),
-      shipping
+      shipping,
+      wookPromotionEnabled
     });
     const latest = await settings();
     if (
       !latest.enabled ||
       latest.cacheEpoch !== cacheEpoch ||
+      latest.wookPromotionEnabled !== wookPromotionEnabled ||
       latest.stores.map(s => s.id).join() !== stores.map(s => s.id).join()
     ) {
       return null;

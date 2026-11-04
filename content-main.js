@@ -47,10 +47,15 @@ export function start() {
     const title = document.createElement('h2');
     title.textContent =
       result.saving > 0
-        ? `Poupa ${money(result.saving)} neste livro`
+        ? result.estimated
+          ? `Poupança estimada de ${money(result.saving)} com vale`
+          : `Poupa ${money(result.saving)} neste livro`
         : 'Campanha Wook: percebe a poupança';
     const detail = document.createElement('p');
     detail.textContent = `${result.name}: ${money(result.price)} · Nesta loja: ${money(result.currentPrice ?? book.price)}`;
+    if (result.estimated) {
+      detail.textContent += ` · A pagar agora na ${result.name}: ${money(result.cashPrice)}; nesta loja: ${money(result.currentCashPrice)}. O preço equivalente pressupõe utilizar todo o vale em compras futuras.`;
+    }
     const edition = document.createElement('small');
     edition.textContent = `Mesma edição · ISBN ${book.isbn} · Novo, em stock`;
     const link = document.createElement('a');
@@ -79,6 +84,17 @@ export function start() {
     }
     shadow.append(style, panel);
     document.documentElement.append(host);
+    if (result.estimated && Number.isFinite(result.validUntil)) {
+      const shown = host;
+      setTimeout(
+        () => {
+          if (host === shown) {
+            remove();
+          }
+        },
+        Math.max(0, result.validUntil - Date.now())
+      );
+    }
   }
   async function scan() {
     if (stopped) {
@@ -187,6 +203,7 @@ export function start() {
       (!changes.autoEnabled &&
         !changes.selectedStores &&
         !changes.affiliateEnabled &&
+        !changes.wookPromotionEnabled &&
         !changes.shipping)
     ) {
       return;

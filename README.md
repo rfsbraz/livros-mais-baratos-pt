@@ -59,7 +59,7 @@ Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confi
 
 ## Campanhas de vales Wook
 
-Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. O preço a pagar, a ordenação, os alvos e o histórico não descontam o vale. Consulta as [regras e limitações](docs/wook-promotions.md).
+Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. A opção **Considerar vales Wook na comparação**, ativa por predefinição em Definições, aplica essa percentagem ao preço Wook para ordenar ofertas e apresentar avisos, mesmo quando visitas outra loja. O preço equivalente é identificado como estimativa e o valor a pagar agora aparece em separado. Desativar a opção repõe a comparação pelo preço a pagar. Os portes, os alvos e o histórico continuam a usar preços reais. Consulta as [regras e limitações](docs/wook-promotions.md).
 
 ## Permissões e privacidade
 

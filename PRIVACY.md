@@ -41,3 +41,5 @@ Contacto: **rfsbraz@proton.me**.
 ## Condições de vales Wook
 
 As comparações podem consultar a página de condições ligada à área de compra do livro. A consulta não inclui cookies nem afiliado. As regras reconhecidas ficam junto dos preços locais; só são apresentadas durante dez minutos e dentro do prazo da campanha. O HTML das condições não é guardado. As condições não alteram o preço observado nem os alertas de preço-alvo.
+
+A preferência local `wookPromotionEnabled`, ativa por predefinição, controla a utilização da poupança combinada dos vales Wook nas comparações e avisos. Pode ser desativada em Definições, independentemente dos afiliados. O preço equivalente é calculado localmente; a cache, o histórico e os preços-alvo mantêm os preços reais.
