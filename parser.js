@@ -1,3 +1,4 @@
+import { discoverPromotion } from './promotions.js';
 import { isbn13, nodes, identity, offerFrom, safeUrl, euros } from './core.js';
 import { storeForUrl } from './stores.js';
 
@@ -168,6 +169,9 @@ export function parseOffer(doc, isbn, url) {
   }
   return {
     ...offer,
+    ...(verifiedPage && store?.id === 'wook' && offer.currency === 'EUR'
+      ? { promotionUrl: discoverPromotion(doc, url) }
+      : {}),
     availability: store?.uncertainStock ? '' : offer.availability || '',
     condition: offer.condition || (store?.marketplace ? 'UnknownCondition' : 'NewCondition')
   };

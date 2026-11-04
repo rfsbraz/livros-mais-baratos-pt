@@ -32,6 +32,7 @@ export function cachePrices(cache = {}, isbn, offers, at = Date.now(), now = Dat
           'availability',
           'marketplace',
           'seller',
+          'promotion',
           'url',
           'title'
         ]

@@ -1,3 +1,4 @@
+import { enrichPromotion } from './promotions.js';
 import { parseOffer, productLinks } from './parser.js';
 import { safeUrl, wooOffer, svelteProductLinks } from './core.js';
 import { searchUrl } from './stores.js';
@@ -97,6 +98,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
     if (!offer || !safeUrl(offer.url, store.origin)) {
       return { ...store, status: 'unverified', url };
     }
+    offer = await enrichPromotion(offer, loader, signal);
     return { ...store, ...offer, status: 'ok', checkedAt: Date.now() };
   } catch {
     return { ...store, status: 'unavailable', url };

@@ -485,3 +485,23 @@ select {
 #settings-title:focus {
   outline: none;
 }
+
+.voucher-promotion {
+  grid-column: 1 / -1;
+  padding: 12px;
+  border: 1px solid #c5ddce;
+  border-radius: 10px;
+  background: #f1f7f3;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.voucher-promotion strong {
+  font-size: 13px;
+}
+.voucher-promotion p {
+  margin: 7px 0;
+}
+.voucher-promotion small {
+  display: block;
+  margin-top: 6px;
+}

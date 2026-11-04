@@ -17,6 +17,8 @@ export const runtimeFiles = () => [
   'offscreen.html',
   'offscreen.js',
   'parser.js',
+  'promotions.js',
+  'promotion-view.js',
   'popup.css',
   'popup.html',
   'popup.js',

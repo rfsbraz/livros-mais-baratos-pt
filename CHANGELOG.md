@@ -2,6 +2,8 @@
 
 ## Por publicar
 
+- Deteção de campanhas Wook com devolução em vale, estimativa da poupança combinada e ligação «Saber mais» com afiliado opcional, sem alterar o preço efetivamente pago.
+
 - Preparar a colaboração em código aberto, corrigir a dependência minimatch e acrescentar análises de segurança ao histórico e às dependências.
 - Uniformizar documentação, metadados, modelos e textos de colaboração em português de Portugal.
 - Alinhar estrutura, estilo, formatação, CI, publicação e manutenção das lojas com a extensão Geocaching; acrescentar pacotes Firefox e Edge com código partilhado.

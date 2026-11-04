@@ -22,7 +22,7 @@ As lojas selecionadas e a preferência de avisos ficam guardadas localmente. **D
 
 O apoio por afiliados está ativo por predefinição, com a preferência local `affiliateEnabled`. Desativa **Apoiar através de ligações de afiliado** para deixar de o usar. A escolha mantém-se nas atualizações e ao apagar a estante/histórico.
 
-Só um clique deliberado numa oferta Wook confirmada mais barata pode acrescentar `a_aid=5d3ee4327c2fd`. Identificadores já existentes são preservados. Pedidos de comparação, URL da página, ligações copiadas e resultados guardados não são reescritos. Não há outros parceiros configurados. A ordenação não depende de comissões.
+Só um clique deliberado numa oferta Wook confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada pode acrescentar `a_aid=5d3ee4327c2fd`. Identificadores já existentes são preservados. Pedidos de comparação, URL da página, ligações copiadas e resultados guardados não são reescritos. Não há outros parceiros configurados. A ordenação não depende de comissões.
 
 Após o clique, a Wook recebe o identificador e dados normais da navegação e pode usar cookies segundo a sua política. O responsável pode receber uma comissão. Desativar a opção impede futuras adições, mas não elimina cookies já definidos pela Wook.
 
@@ -30,10 +30,14 @@ Após o clique, a Wook recebe o identificador e dados normais da navegação e p
 
 Alvos, base de comparação (livro ou total), horários, estado de notificações, região e regras/campanhas de portes ficam guardados localmente. Não é pedida uma morada. Os alarmes agendam consultas e as notificações apresentam correspondências. Se as notificações do sistema estiverem bloqueadas, o aviso continua disponível na extensão.
 
-As consultas são distribuídas no tempo e param quando os alvos são pausados/removidos ou a verificação agendada é desativada. Apagar dados remove observações e avisos de alvos, invalida tarefas pendentes e desativa os dois tipos de avisos; mantém preferências de portes e afiliados. As campanhas são introduzidas pelo utilizador, não recolhidas automaticamente. Os gráficos só usam preços do livro observados nesta instalação, sem recalcular portes históricos.
+As consultas são distribuídas no tempo e param quando os alvos são pausados/removidos ou a verificação agendada é desativada. Apagar dados remove observações e avisos de alvos, invalida tarefas pendentes e desativa os dois tipos de avisos; mantém preferências de portes e afiliados. As campanhas de portes são introduzidas pelo utilizador. As condições de vales Wook podem ser consultadas automaticamente, sem cookies, a partir da ligação no livro. Os gráficos só usam preços do livro observados nesta instalação, sem recalcular portes históricos.
 
 Sem uma seleção guardada, só são consultadas Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Seleções guardadas, incluindo uma seleção vazia, são preservadas. Repor os dados restaura estas seis; as restantes são opcionais.
 
 Firefox usa uma página de segundo plano e uma moldura local de análise em vez de `offscreen`. O manifesto declara consentimento para transmissão de conteúdo de sites e atividade de navegação porque as consultas de ISBN/título seguem diretamente para as lojas. Firefox e Edge aplicam as mesmas regras de conservação e preferências de afiliados.
 
 Contacto: **rfsbraz@proton.me**.
+
+## Condições de vales Wook
+
+As comparações podem consultar a página de condições ligada à área de compra do livro. A consulta não inclui cookies nem afiliado. As regras reconhecidas ficam junto dos preços locais; só são apresentadas durante dez minutos e dentro do prazo da campanha. O HTML das condições não é guardado. As condições não alteram o preço observado nem os alertas de preço-alvo.
