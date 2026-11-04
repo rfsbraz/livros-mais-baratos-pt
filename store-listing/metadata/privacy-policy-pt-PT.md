@@ -10,7 +10,7 @@ A extensão compara preços da mesma edição de um livro por ISBN, mostra aviso
 
 ## Dados tratados no navegador
 
-Na comparação manual, a extensão lê a página atual após a abrires. Os avisos estão ativos por predefinição após a instalação, identificando páginas de livro nas lojas selecionadas com o acesso autorizado pelo Chrome. Não é necessário abrir a extensão para iniciar estas consultas. O URL e o conteúdo da página são processados localmente para obter o ISBN, título, preço, moeda e disponibilidade. Não recolhe o histórico geral de navegação nem envia o HTML da página para um servidor do responsável.
+Na comparação manual, a extensão lê a página atual após a abrires. Os avisos estão ativos por predefinição após a instalação, identificando páginas de livro nas lojas selecionadas com o acesso autorizado pelo navegador. Não é necessário abrir a extensão para iniciar estas consultas. O URL e o conteúdo da página são processados localmente para obter o ISBN, título, preço, moeda e disponibilidade. Não recolhe o histórico geral de navegação nem envia o HTML da página para um servidor do responsável.
 
 Os ISBN, títulos guardados, preços-alvo, regras de portes, destino, notificações, preços observados, preferências de lojas e estado dos avisos são guardados no armazenamento local da extensão, não no Chrome Sync. As ações de guardar/remover livros e escolher lojas servem apenas para executar estas funções. Não há registo de cliques, movimentos do rato ou outras interações para análise de utilização.
 
@@ -32,7 +32,7 @@ As consultas automáticas usam uma cache em memória com até 50 combinações d
 
 ## Controlo e eliminação
 
-O acesso às lojas é solicitado na instalação e os avisos automáticos estão inicialmente ativos. Uma preferência anterior de desativação é preservada nas atualizações. Podes selecionar lojas, desativar os avisos e revogar permissões nas definições do Chrome. A opção Apagar dados elimina a estante e o histórico, repõe a seleção de lojas e desativa os avisos. Desinstalar a extensão remove o armazenamento local. Livros com alvo ativo têm verificações aproximadamente diárias enquanto o Chrome está aberto. Alvos, destino e regras de portes são guardados localmente.
+O acesso às lojas é solicitado na instalação e os avisos automáticos estão inicialmente ativos. Uma preferência anterior de desativação é preservada nas atualizações. Podes selecionar lojas, desativar os avisos e revogar permissões nas definições do navegador. A opção Apagar dados elimina a estante e o histórico, repõe a seleção de lojas e desativa os avisos. Desinstalar a extensão remove o armazenamento local. Livros com alvo ativo têm verificações aproximadamente diárias enquanto o navegador está aberto. Alvos, destino e regras de portes são guardados localmente.
 
 ## Contacto de suporte
 

@@ -1,6 +1,8 @@
-# Chrome Web Store submission pack
+# Browser store submission pack
 
-Livros Mais Baratos PT · 0.1.5 · Prepared 3 November 2026
+Livros Mais Baratos PT · 0.1.5 · Prepared from the repository source
+
+See [AUTOMATION.md](AUTOMATION.md) for Chrome, Firefox and Edge metadata, release automation and account setup. Run npm run store-listing:pack for the per-store upload ZIP.
 
 ## Upload map
 

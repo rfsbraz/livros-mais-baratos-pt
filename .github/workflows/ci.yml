@@ -30,6 +30,7 @@ jobs:
       - run: npm run test:coverage
       - run: npm run build:all
       - run: npm run store-listing:check
+      - run: npm run store-listing:pack
       - uses: actions/upload-artifact@v4
         with:
           name: extension-package

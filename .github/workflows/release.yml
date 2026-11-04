@@ -67,6 +67,13 @@ jobs:
         run: node --input-type=module -e "import fs from 'node:fs'; if ('v'+JSON.parse(fs.readFileSync('package.json')).version !== process.env.TAG) process.exit(1)"
       - run: npm ci
       - run: npm run check && npm test && npm run build:all
+      - name: Build submission pack when supported by the tag
+        run: |
+          if [ -f scripts/store-pack.mjs ]; then
+            npm run store-listing:check && npm run store-listing:pack
+          else
+            echo "::notice::This older tag predates the multi-store submission pack."
+          fi
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.target.outputs.tag }}
@@ -74,7 +81,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: browser-extensions
-          path: dist/*-*.zip
+          path: |
+            dist/*-chrome.zip
+            dist/*-firefox.zip
+            dist/*-edge.zip
           retention-days: 7
   publish-to-chrome:
     needs: [target, build-release]
@@ -101,24 +111,114 @@ jobs:
     if: ${{ !cancelled() && needs.build-release.result == 'success' && vars.FIREFOX_PUBLISH_ENABLED == 'true' && (needs.target.outputs.stores == 'all' || needs.target.outputs.stores == 'firefox') }}
     runs-on: ubuntu-latest
     environment: firefox-store
+    timeout-minutes: 20
+    # Store uploads use store secrets; GITHUB_TOKEN only reads the repo.
+    permissions:
+      contents: read
+
     steps:
-      - uses: actions/download-artifact@v4
+      # Checkout first: it cleans the workspace, so it must run before the download.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ needs.target.outputs.tag }}
+          persist-credentials: false
+
+      # The AMO script comes from the workflow's own commit, not the tag: a dispatch for
+      # an older tag would otherwise run that tag's script. It reads
+      # CHANGELOG.md, the screenshots and the version from the tag checkout (--root .).
+      - name: Checkout release tools
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: .release-tools
+          persist-credentials: false
+          sparse-checkout: scripts
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
           name: browser-extensions
           path: dist
-      - run: mv dist/*-firefox.zip dist/firefox.zip
-      - uses: wdzeng/firefox-addon@v1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          addon-guid: livros-mais-baratos-pt@rfsbraz.github.io
-          xpi-path: dist/firefox.zip
+          node-version: 22
+
+      # A rerun for a version AMO already has must not upload again (AMO answers 409
+      # "Version X already exists"), but must still set the notes and previews.
+      - name: Check whether AMO already has this version
+        id: amo-version
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: node .release-tools/scripts/amo-release.mjs --check-version --root .
+
+      - name: Upload to Firefox Add-ons
+        id: upload
+        if: steps.amo-version.outputs.exists != 'true'
+        continue-on-error: true
+        uses: wdzeng/firefox-addon@v1
+        with:
+          addon-guid: 'livros-mais-baratos-pt@rfsbraz.github.io'
+          xpi-path: dist/*-firefox.zip
           jwt-issuer: ${{ secrets.AMO_JWT_ISSUER }}
           jwt-secret: ${{ secrets.AMO_JWT_SECRET }}
+
+      # A failed upload is fine only if AMO has the version anyway (a 409 from a race
+      # with an earlier attempt). Otherwise the job fails here.
+      - name: Confirm AMO has this version
+        if: steps.upload.outcome == 'failure'
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: node .release-tools/scripts/amo-release.mjs --check-version --require --root .
+
+      # The action cannot send release notes or previews, so this step does it with the
+      # same AMO key: the CHANGELOG.md section for this version becomes the release
+      # notes, and the listing previews are synced to store-listing/screenshots/*.png.
+      # See store-listing/AUTOMATION.md.
+      - name: Set AMO release notes and previews
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: node .release-tools/scripts/amo-release.mjs --apply --root .
+
+      - name: Sync listing translations
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          if [ -d store-listing/locales ]; then
+            node .release-tools/scripts/amo-listing.mjs --apply --root .
+          else
+            echo "::notice::This older tag predates shared listing locales; text was left unchanged."
+          fi
+
   publish-to-edge:
     needs: [target, build-release]
     if: ${{ !cancelled() && needs.build-release.result == 'success' && vars.EDGE_PUBLISH_ENABLED == 'true' && (needs.target.outputs.stores == 'all' || needs.target.outputs.stores == 'edge') }}
     runs-on: ubuntu-latest
     environment: edge-store
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ needs.target.outputs.tag }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Checkout release tools
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: .release-tools
+          persist-credentials: false
+          sparse-checkout: scripts
+      - name: Generate certification notes
+        id: notes
+        run: node .release-tools/scripts/edge-cert-notes.mjs --github-output --root .
       - uses: actions/download-artifact@v4
         with:
           name: browser-extensions
@@ -130,4 +230,4 @@ jobs:
           client-id: ${{ secrets.EDGE_CLIENT_ID }}
           api-key: ${{ secrets.EDGE_API_KEY }}
           zip-path: dist/edge.zip
-          notes-for-certification: Compare the same ISBN on the six default shops. Open Definições for shipping and alerts. No account required. All test data is excluded from the package.
+          notes-for-certification: ${{ steps.notes.outputs.notes }}

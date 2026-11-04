@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-const listing = JSON.parse(readFileSync('store-listing/listing.json'));
+import { loadListing, validateListing } from './listing.mjs';
+const listing = loadListing();
 const manifest = JSON.parse(readFileSync('manifest.json'));
-assert.equal(listing.name, manifest.name);
-assert.equal(listing.summary, manifest.description);
+assert.equal(listing.config.name, manifest.name);
+assert.equal(listing.config.summary, manifest.description);
+assert.deepEqual(validateListing(listing), []);
 for (const id of ['chrome', 'firefox', 'edge']) {
-  assert(Object.hasOwn(listing.stores, id));
+  assert(Object.hasOwn(listing.config.stores, id));
 }
-console.log('Store listing configuration validated.');
+console.log('Store locales, copy limits and screenshot dimensions validated.');
