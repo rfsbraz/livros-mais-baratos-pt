@@ -8,6 +8,7 @@ export const runtimeFiles = () => [
   'background.html',
   'background.js',
   'compare.js',
+  'comparison-values.js',
   'content-entry.js',
   'content-main.js',
   'content.js',

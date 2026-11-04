@@ -6,7 +6,7 @@ await mkdir('work', { recursive: true });
 const root = await mkdtemp(resolve('work/voucher-'));
 await cp('dist/chrome', `${root}/extension`, { recursive: true });
 const manifest = JSON.parse(await readFile(`${root}/extension/manifest.json`, 'utf8'));
-manifest.host_permissions = ['https://www.wook.pt/*'];
+manifest.host_permissions = ['https://www.wook.pt/*', 'https://www.continente.pt/*'];
 await writeFile(`${root}/extension/manifest.json`, JSON.stringify(manifest));
 const isbn = '9780306406157',
   url = 'https://www.wook.pt/livro/exemplo/123';
@@ -76,6 +76,48 @@ try {
   await shop.getByRole('link', { name: 'Saber mais' }).click();
   assert.equal(await shop.evaluate(() => window.__clicked), termsUrl);
   await shop.screenshot({ path: 'work/wook-voucher-alert.png' });
+  await context.route('https://www.continente.pt/**', route =>
+    route.fulfill({
+      contentType: 'text/html',
+      body: html
+        .replaceAll('18.85', '18.00')
+        .replace('class="sale-container"', 'class="no-promotion"')
+    })
+  );
+  const other = await context.newPage();
+  await other.goto('https://www.continente.pt/produto/livro-exemplo-123.html');
+  await other.getByRole('link', { name: 'Ver oferta na Wook' }).waitFor({ timeout: 20000 });
+  assert(
+    (await other.locator('#lmb-price-alert section').textContent()).includes('Poupança estimada')
+  );
+  assert((await other.locator('#lmb-price-alert section').textContent()).includes('12,57'));
+  assert((await other.locator('#lmb-price-alert section').textContent()).includes('18,85'));
+  assert.equal(
+    await other.getByRole('link', { name: 'Saber mais' }).getAttribute('href'),
+    termsUrl
+  );
+  await settings.goto(`chrome-extension://${id}/popup.html?isbn=${isbn}`);
+  await settings.locator('#results .voucher-promotion').waitFor();
+  assert(
+    (
+      await settings.locator('#results .offer').filter({ hasText: 'Wook' }).first().textContent()
+    ).includes('12,57')
+  );
+  await settings.locator('#open-settings').click();
+  assert.equal(await settings.locator('#wook-promotion-toggle').isChecked(), true);
+  await settings.locator('#wook-promotion-toggle').uncheck();
+  await other.locator('#lmb-price-alert').waitFor({ state: 'detached' });
+  await settings.locator('#close-settings').click();
+  assert(!(await settings.locator('#results').textContent()).includes('12,57'));
+  await other.reload();
+  await other.waitForTimeout(2200);
+  assert.equal(await other.locator('#lmb-price-alert').count(), 0);
+  await settings.reload();
+  await settings.locator('#open-settings').click();
+  assert.equal(await settings.locator('#wook-promotion-toggle').isChecked(), false);
+  await settings.locator('#wook-promotion-toggle').check();
+  await other.getByRole('link', { name: 'Ver oferta na Wook' }).waitFor();
+
   console.log(
     'Campanha detetada automaticamente, preço preservado, cache e preferência de afiliados verificados.'
   );

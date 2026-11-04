@@ -27,4 +27,4 @@ As capturas usam componentes reais com preços ilustrativos. Respostas de demons
 
 Apoio: rfsbraz@proton.me
 
-Campanhas Wook: um livro abrangido pode mostrar um aviso informativo de devolução em vale, mesmo sem outra oferta mais barata. Saber mais abre as condições da campanha e respeita a preferência de afiliados. O vale nunca reduz o preço usado na comparação ou nos alvos.
+Campanhas Wook: um livro abrangido pode mostrar um aviso informativo de devolução em vale, mesmo sem outra oferta mais barata. Saber mais abre as condições da campanha e respeita a preferência de afiliados. A opção Considerar vales Wook na comparação, ativa por predefinição, usa um equivalente estimado nos avisos e na ordenação. O valor a pagar aparece separado; portes, histórico e alvos mantêm os valores reais. Desativar a opção recalcula as comparações em cache.

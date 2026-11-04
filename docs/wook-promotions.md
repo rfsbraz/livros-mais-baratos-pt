@@ -14,7 +14,11 @@ As [condições consultadas em 4 de novembro de 2026](https://www.wook.pt/Mensag
 
 ## Apresentação e pedidos
 
-O aviso pode aparecer numa página Wook mesmo sem outra loja mais barata. O menu mostra a informação junto da oferta Wook. Não se subtrai o vale ao preço, aos portes, à ordenação, ao histórico ou aos preços-alvo.
+A opção **Considerar vales Wook na comparação** fica ativa por predefinição em Definições. Aplica a percentagem de poupança combinada ao preço Wook, com arredondamento conservador ao cêntimo, para ordenar ofertas no menu e apresentar avisos automáticos noutras lojas. Por exemplo, Wook a 20 € com devolução de 100% e utilização até 50% corresponde a 13,34 € estimados; pode gerar um aviso numa página Continente a 18 €. O aviso e o menu distinguem este equivalente do valor a pagar agora.
+
+A opção é independente dos afiliados, mantém-se nas atualizações e recalcula os resultados guardados sem alterar os preços em cache. Quando desativada, expirada ou sem condições confirmadas, a comparação usa o preço a pagar. Numa página Wook, aplica-se o mesmo critério ao preço atual quando a consulta confirma esse preço.
+
+Os portes e mínimos de portes grátis são calculados sobre o preço real; os portes são somados sem desconto ao equivalente. Os preços-alvo e o histórico mantêm os valores reais. O aviso informativo da campanha e «Saber mais» continuam disponíveis mesmo com a opção de cálculo desativada.
 
 As condições são consultadas sem cookies, com os limites de tempo, tamanho e origem usados nas comparações. Consultas simultâneas da mesma campanha partilham um pedido. A memória temporária é limitada a 20 campanhas, reutilizadas durante dez minutos. A apresentação expira também no fim da campanha. Recomendações e faixas genéricas fora da área de compra não tornam o livro elegível.
 

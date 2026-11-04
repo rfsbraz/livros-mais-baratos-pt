@@ -1,7 +1,6 @@
-import { quoteDelivery, eligibleOffer } from './shipping.js';
+import { comparisonAlert } from './comparison-values.js';
 import { STORES } from './stores.js';
 import { compareStore, pooled } from './compare.js';
-import { cheaperOffer } from './auto-rules.js';
 const cache = new Map(),
   pending = new Map();
 let active = 0;
@@ -62,52 +61,16 @@ async function compare(message) {
     }
     entry = await pending.get(key);
   }
-  const currentDelivery = quoteDelivery({ ...book, id: sourceId }, message.shipping || {});
-  let best,
-    total,
-    saving,
-    basis = 'item';
-  if (currentDelivery.known) {
-    const candidates = entry.offers
-      .filter(o => eligibleOffer(o) && o.id !== sourceId)
-      .map(o => ({ ...o, delivery: quoteDelivery(o, message.shipping || {}) }))
-      .filter(o => o.delivery.known && o.delivery.total < currentDelivery.total)
-      .sort((a, b) => a.delivery.total - b.delivery.total);
-    best = candidates[0];
-    basis = 'delivered';
-    total = best?.delivery.total;
-    saving = currentDelivery.total - total;
-    if (!best) {
-      best = cheaperOffer(
-        book,
-        entry.offers.filter(o => !quoteDelivery(o, message.shipping || {}).known),
-        sourceId
-      );
-      basis = 'item';
-      total = best?.price;
-      saving = book.price - total;
-    }
-  } else {
-    best = cheaperOffer(book, entry.offers, sourceId);
-    total = best?.price;
-    saving = book.price - total;
+  const alert = comparisonAlert(
+    book,
+    entry.offers,
+    sourceId,
+    message.shipping || {},
+    message.wookPromotionEnabled !== false
+  );
+  if (alert) {
+    alert.checkedAt = entry.at;
   }
-  const alert = best
-    ? {
-        isbn: book.isbn,
-        name: best.name,
-        url: best.url,
-        price: total,
-        itemPrice: best.price,
-        currentPrice: basis === 'delivered' ? currentDelivery.total : book.price,
-        currency: best.currency,
-        saving,
-        basis,
-        checkedAt: entry.at,
-        promotion: best.promotion,
-        id: best.id
-      }
-    : null;
   const offers = entry.offers.map(o =>
     Object.fromEntries(
       [
