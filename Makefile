@@ -2,7 +2,7 @@
 build:
 	npm run build
 run:
-	@echo "Load the extension/ folder in Chrome using chrome://extensions and Developer mode."
+	@echo "Load the dist/chrome/ folder in Chrome using chrome://extensions and Developer mode."
 clean:
 	node -e "require('fs').rmSync('dist', { recursive: true, force: true })"
 test: unit integration

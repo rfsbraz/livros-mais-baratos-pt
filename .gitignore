@@ -4,3 +4,8 @@ work/
 coverage/
 .env
 *.log
+playwright-report/
+test-results/
+store-listing/source/
+store-listing/upload/
+store-listing/preview.png

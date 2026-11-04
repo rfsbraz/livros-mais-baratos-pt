@@ -1,0 +1,104 @@
+{
+  "generated": "2026-11-03",
+  "version": "0.1.5",
+  "assets": [
+    {
+      "file": "screenshots/01-aviso-automatico-1280x800.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 77309,
+      "colorType": 2
+    },
+    {
+      "file": "screenshots/02-comparar-edicao-1280x800.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 92863,
+      "colorType": 2
+    },
+    {
+      "file": "screenshots/03-portes-e-campanhas-1280x800.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 89619,
+      "colorType": 2
+    },
+    {
+      "file": "screenshots/04-estante-historico-1280x800.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 81493,
+      "colorType": 2
+    },
+    {
+      "file": "screenshots/05-precos-alvo-1280x800.png",
+      "width": 1280,
+      "height": 800,
+      "bytes": 70303,
+      "colorType": 2
+    },
+    {
+      "file": "promo/small-440x280.png",
+      "width": 440,
+      "height": 280,
+      "bytes": 8583,
+      "colorType": 2
+    },
+    {
+      "file": "promo/marquee-1400x560.png",
+      "width": 1400,
+      "height": 560,
+      "bytes": 43090,
+      "colorType": 2
+    },
+    {
+      "file": "icons/icon-16.png",
+      "width": 16,
+      "height": 16,
+      "bytes": 288,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-32.png",
+      "width": 32,
+      "height": 32,
+      "bytes": 410,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-48.png",
+      "width": 48,
+      "height": 48,
+      "bytes": 523,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-64.png",
+      "width": 64,
+      "height": 64,
+      "bytes": 634,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-128.png",
+      "width": 128,
+      "height": 128,
+      "bytes": 1213,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-256.png",
+      "width": 256,
+      "height": 256,
+      "bytes": 2395,
+      "colorType": 6
+    },
+    {
+      "file": "icons/icon-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 5160,
+      "colorType": 6
+    }
+  ]
+}

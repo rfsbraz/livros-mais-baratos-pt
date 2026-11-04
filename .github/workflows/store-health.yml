@@ -41,6 +41,7 @@ jobs:
             await writeFile('work/store-plan.json', JSON.stringify({ stores, failures }));
             core.info('Planned stores: ' + stores.join(', '));
       - run: npm ci
+      - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: timeout 780 npm run test:live
         env:

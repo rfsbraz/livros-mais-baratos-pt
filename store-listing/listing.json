@@ -1,0 +1,20 @@
+{
+  "name": "Livros Mais Baratos PT",
+  "summary": "Compara livros em Portugal com portes estimados, alertas de preço-alvo e histórico das tuas próprias consultas.",
+  "defaultLocale": "pt-PT",
+  "supportEmail": "rfsbraz@proton.me",
+  "stores": {
+    "chrome": {
+      "id": null,
+      "url": null
+    },
+    "firefox": {
+      "id": "livros-mais-baratos-pt@rfsbraz.github.io",
+      "url": null
+    },
+    "edge": {
+      "id": null,
+      "url": null
+    }
+  }
+}

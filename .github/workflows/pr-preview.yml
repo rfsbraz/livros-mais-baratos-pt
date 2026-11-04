@@ -16,7 +16,7 @@ jobs:
           script: |
             const marker = '<!-- comment-tag: extension-install -->';
             const number = context.payload.pull_request.number;
-            const body = `${marker}\nTo test this extension locally:\n\n\`\`\`sh\ngh pr checkout ${number} --repo ${context.repo.owner}/${context.repo.repo}\nnpm ci\nnpm run build\n\`\`\`\n\nOpen chrome://extensions, enable Developer mode, and load the extension/ folder. No Docker service or pre-built PR image is needed. Check the ISBN and displayed price against the store page. The CI run also provides a chrome-extension ZIP artifact.`;
+            const body = `${marker}\nTo test this extension locally:\n\n\`\`\`sh\ngh pr checkout ${number} --repo ${context.repo.owner}/${context.repo.repo}\nnpm ci\nnpm run build\n\`\`\`\n\nOpen chrome://extensions, enable Developer mode, and load the dist/chrome/ folder. No Docker service or pre-built PR image is needed. Check the ISBN and displayed price against the store page. The CI run also provides a extension-package ZIP artifact.`;
             const comments = await github.paginate(github.rest.issues.listComments, { ...context.repo, issue_number: number });
             const existing = comments.find(c => c.user.type === 'Bot' && c.body.includes(marker));
             if (existing) await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });

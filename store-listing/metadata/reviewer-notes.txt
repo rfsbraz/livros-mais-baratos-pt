@@ -1,0 +1,30 @@
+Livros Mais Baratos PT 0.1.5
+
+Open Definições for shop selection, shipping, alert preferences, affiliate preferences and data deletion. Voltar aos preços returns to the same results. The main view contains search, prices and saved books.
+
+No login, subscription, API key or payment is required. The interface is in Portuguese (Portugal).
+
+Affiliate links:
+Enabled by default, with the Apoiar através de ligações de afiliado opt-out. Only a deliberate click on a confirmed cheaper Wook offer adds a_aid=5d3ee4327c2fd. Background requests and ranking are unaffected. Existing affiliate attribution is preserved. Disable the setting to open clean offer links. Wook may use cookies after navigation.
+
+Targets, shipping and history:
+Save a book, set an item or delivered target, and keep Chrome open. The first scheduled check starts within a few minutes, subject to ten-minute spacing. Disable with Verificar preços-alvo da estante. Delivery rules and dated promotions are under Entrega e portes. Charts contain only local observations. Alarms and notifications permissions are declared at installation/update.
+
+Manual comparison:
+1. Open the extension and enter a valid ISBN, such as 9789895598762 or 9789899267411.
+2. Select shops and choose Comparar. Shop access was requested at installation; no additional permission prompt is requested here.
+3. Confirmed offers show a price and availability. Access failures have no invented price and retain a link to the shop.
+4. Guardar saves a book locally. Histórico neste navegador shows observations from manual comparisons.
+
+Automatic alerts:
+1. Install the extension and accept Chrome’s declared site permissions. Do not open the toolbar popup or write any preferences. Six shops are selected by default (Wook, Bertrand, Almedina, Continente, Porto Editora and Presença) and alerts are enabled by default on a fresh installation.
+2. Visit a supported product page, for example https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345 or another selected-shop book page with an ISBN and price.
+3. The toolbar popup does not need to be opened. A dismissible on-page notice appears only if another selected authorized shop returns a strictly cheaper new EUR offer for the same ISBN, with confirmed stock.
+4. No notice is expected when no qualifying cheaper offer is found. Live prices and access restrictions vary. The extension does not guarantee a discount for the example ISBN.
+5. Close a notice with ×. Disable alerts with Desativar avisos automáticos. Apagar dados removes shelf/history, resets selection and disables alerts.
+
+The screenshots use the actual popup and notification components with labelled illustrative prices. Demo responses are not included in the upload package. Network and browser regression fixtures remain outside the runtime package.
+
+Automatic comparisons are bounded, cache results in memory for ten minutes, omit session cookies and never execute downloaded scripts. Target checks for saved books run approximately daily while Chrome is open. Only observed prices enter local history.
+
+Support: rfsbraz@proton.me

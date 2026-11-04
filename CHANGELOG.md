@@ -1,11 +1,38 @@
 # Changelog
 
+## Unreleased
+
+- Align root layout, linting, formatting, CI/release jobs and store maintenance with the Geocaching extension. Add Firefox and Edge builds with shared runtime code.
+
+- Read fallback ISBN text without cloning retailer SVGs or other elements with inline event handlers.
+
+- Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
+
+- Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
+
+- Show locally cached background, scheduled and manual prices immediately in the menu, with freshness labels and explicit refresh.
+
+## 0.1.5
+
+- Add saved-book price targets, staggered scheduled checks and deduplicated notifications.
+- Compare estimated delivered totals using destination-specific shipping fees, free-shipping thresholds and dated promotions.
+- Draw history charts exclusively from locally observed manual and scheduled prices.
+- Preserve concurrent shelf/history changes and invalidate pending jobs when data is cleared.
+
 ## 0.1.4
 
 - Add optional affiliate support, enabled by default, for deliberate clicks on verified cheaper Wook offers.
 - Disclose commissions in the interface and store listing; preserve opt-outs and existing attribution.
 
 ## Unreleased
+
+- Align root layout, linting, formatting, CI/release jobs and store maintenance with the Geocaching extension. Add Firefox and Edge builds with shared runtime code.
+
+- Read fallback ISBN text without cloning retailer SVGs or other elements with inline event handlers.
+
+- Move preferences into a separate Settings view and collapse the optional title field, keeping the main menu focused on prices.
+
+- Default to six Portuguese shops while preserving saved selections and providing a reset-to-six button.
 
 - Enable automatic comparisons on fresh installation with required access to the 26 configured shops, without opening the popup or an activation step.
 - Preserve a saved disabled preference and refresh store screenshots, listing copy, privacy disclosures and install instructions.

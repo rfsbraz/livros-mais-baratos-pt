@@ -1,9 +1,9 @@
 # Security policy
 
-| Version | Supported |
-| --- | --- |
-| 0.1.x | Yes, experimental |
-| Earlier versions | No |
+| Version          | Supported         |
+| ---------------- | ----------------- |
+| 0.1.x            | Yes, experimental |
+| Earlier versions | No                |
 
 Report vulnerabilities privately through the repository's **Security > Report a vulnerability** option when enabled. While this repository is private, collaborators may open a private repository issue marked `security`, visible only to those with repository access. Do not post vulnerabilities publicly. Before making the repository public, enable GitHub private vulnerability reporting and replace this private-issue fallback.
 
