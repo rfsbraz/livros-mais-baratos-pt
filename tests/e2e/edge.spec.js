@@ -12,6 +12,15 @@ test('Edge package loads with native storage and settings', async () => {
     const id = new URL(worker.url()).host;
     const page = await context.newPage();
     await page.goto('chrome-extension://' + id + '/popup.html');
+    await expect(page.locator('#rate-link')).toHaveAttribute(
+      'href',
+      'https://microsoftedge.microsoft.com/addons/detail/hcielebbeilidlkedpobbclikllnmggn'
+    );
+    await expect(page.locator('#report-link')).toHaveAttribute(
+      'href',
+      /issues\/new\?template=bug_report.yml/
+    );
+    await expect(page.locator('#delivery-settings')).toHaveCount(0);
     await page.locator('#open-settings').click();
     await expect(page.locator('#settings-view')).toBeVisible();
     await expect(page.locator('#shop-list input:checked')).toHaveCount(6);

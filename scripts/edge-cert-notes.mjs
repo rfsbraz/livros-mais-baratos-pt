@@ -71,7 +71,7 @@ function main(argv) {
     version,
     template: fs.existsSync(path.join(root, 'store-listing/edge-certification-notes.txt'))
       ? fs.readFileSync(path.join(root, 'store-listing/edge-certification-notes.txt'), 'utf8')
-      : 'Não exige conta. Compara o mesmo ISBN nas lojas selecionadas; abre Definições para portes e avisos. O acesso às lojas pode variar. Apoio: rfsbraz@proton.me.'
+      : 'Não exige conta. Compara o mesmo ISBN nas lojas selecionadas; abre Definições para lojas e avisos. O acesso às lojas pode variar. Apoio: rfsbraz@proton.me.'
   });
   console.log(notes);
   console.log(`\n(${notes.length} characters)`);

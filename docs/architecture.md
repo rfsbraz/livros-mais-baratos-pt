@@ -12,7 +12,7 @@ O script da página usa os adaptadores de ISBN e preço existentes. Rejeita pág
 
 O documento oculto usa os mesmos adaptadores de comparação. Executa no máximo duas tarefas de edição/seleção distintas, com quatro lugares partilhados para lojas, limite de 90 segundos por tarefa e 35 segundos por loja. Pedidos iguais partilham a tarefa. A cache em memória dura dez minutos e tem limite de 50 entradas.
 
-Só uma oferta estritamente mais barata, nova, em EUR, com stock e de outra loja sem vendedores externos gera aviso. O aviso indica hora e diferença, distinguindo totais estimados de comparações sem portes. Resultados em cache não são observações históricas. Fechar o aviso suprime esse ISBN no documento atual.
+Só uma oferta estritamente mais barata, nova, em EUR, com stock e de outra loja sem vendedores externos gera aviso. O aviso indica hora e diferença, comparando preços do livro e identificando equivalentes condicionados ao uso de vales. Resultados em cache não são observações históricas. Fechar o aviso suprime esse ISBN no documento atual.
 
 ## Módulos e correspondência
 
@@ -36,13 +36,13 @@ Chrome e Edge usam o processo de serviço e a API [offscreen](https://developer.
 
 Os testes Chromium exercitam a comunicação nativa entre página, processo e documento oculto. Só a fronteira de rede é substituída na cópia temporária, pois o encaminhamento de páginas do Playwright não interceta alvos ocultos. Firefox e Edge têm testes nativos próprios. As amostras são reconstruídas a partir de campos públicos e incluem casos adversariais. `node scripts/live-smoke.mjs` verifica lojas reais, opcionalmente com identificadores de lojas como argumentos. Nenhum código privado é enviado para um serviço externo de navegação.
 
-Resultados confirmados em segundo plano, agendados e manuais ficam em cache local para até 50 ISBN. O menu recupera preços das lojas selecionadas, com a hora. Após dez minutos são sinalizados como possivelmente desatualizados; após 24 horas deixam de aparecer e são removidos na próxima escrita. **Comparar** atualiza explicitamente. Mostrar a cache não cria histórico. Apagar dados remove-a e invalida escritas pendentes. Os portes são recalculados com regras atuais.
+Resultados confirmados em segundo plano, agendados e manuais ficam em cache local para até 50 ISBN. O menu recupera preços das lojas selecionadas, com a hora. Após dez minutos são sinalizados como possivelmente desatualizados; após 24 horas deixam de aparecer e são removidos na próxima escrita. **Comparar** atualiza explicitamente. Mostrar a cache não cria histórico. Apagar dados remove-a e invalida escritas pendentes. As campanhas Wook são reavaliadas com as condições atuais.
 
 ## Materiais de publicação e evolução
 
 `npm run store-listing:assets` gera os pacotes e as capturas reais com dados de demonstração. Os materiais ficam em `store-listing/` e `dist/store-listing`; o ZIP de submissão fica em `dist/`. As páginas públicas de privacidade e apoio ainda precisam de alojamento. Consulta a [automação](../store-listing/AUTOMATION.md).
 
-Valida os adaptadores e as condições das lojas antes de uma distribuição ampla. Usa amostras mínimas com origem e data quando a utilização for permitida. Preços-alvo, portes e gráficos estão descritos [aqui](targets-shipping-history.md). Deteção automática de campanhas, detalhe de saldo em cartão e importação de listas continuam por implementar.
+Valida os adaptadores e as condições das lojas antes de uma distribuição ampla. Usa amostras mínimas com origem e data quando a utilização for permitida. Preços-alvo e gráficos estão descritos [aqui](targets-history.md). Deteção automática de campanhas, detalhe de saldo em cartão e importação de listas continuam por implementar.
 
 ## Aspeto visual
 

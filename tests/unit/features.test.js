@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { quoteDelivery, targetOffer } from '../../shipping.js';
-import { reduceData } from '../../data.js';
+import { targetOffer } from '../../offers.js';
+import { reduceData, migrateData } from '../../data.js';
 import { nextDue, completeWatch } from '../../watch.js';
 const now = Date.parse('2026-11-03T12:00:00Z');
 const offer = {
@@ -13,69 +13,16 @@ const offer = {
   availability: 'InStock',
   url: 'https://www.wook.pt/livro/test'
 };
-const settings = {
-  region: 'mainland',
-  rules: { mainland: { wook: { fee: 300, freeFrom: 2000, expiresAt: now + 86400000 } } }
-};
-test('shipping handles unknown, thresholds, regions, expiry and bounded promotions', () => {
-  assert.deepEqual(
-    [
-      quoteDelivery(offer, settings, now).shipping,
-      quoteDelivery(offer, settings, now).total,
-      quoteDelivery(offer, settings, now).remaining
-    ],
-    [300, 1800, 500]
-  );
-  assert.equal(quoteDelivery({ ...offer, price: 2000 }, settings, now).shipping, 0);
-  assert.equal(quoteDelivery({ ...offer, id: 'bertrand' }, {}, now).total, null);
-  assert.equal(quoteDelivery(offer, settings, now + 86400000).total, null);
-  assert.equal(quoteDelivery(offer, { ...settings, region: 'other' }, now).total, null);
-  assert.equal(quoteDelivery({ ...offer, currency: 'GBP' }, settings, now).total, null);
-  assert.equal(quoteDelivery({ ...offer, marketplace: true }, settings, now).total, null);
-  const promo = structuredClone(settings);
-  promo.rules.mainland.wook.promotion = {
-    verified: true,
-    region: 'mainland',
-    minimum: 1000,
-    startsAt: now - 1,
-    endsAt: now + 1000
-  };
-  assert.equal(quoteDelivery(offer, promo, now).shipping, 0);
-  assert.equal(quoteDelivery(offer, promo, now + 1000).shipping, 300);
-  promo.rules.mainland.wook.promotion.region = 'madeira';
-  assert.equal(quoteDelivery(offer, promo, now).shipping, 300);
-  assert.equal(
-    quoteDelivery({ ...offer, id: 'presenca', price: 2000 }, {}, now).total,
-    null,
-    'ambiguous exact published threshold is not assumed free'
-  );
-  assert.equal(quoteDelivery({ ...offer, id: 'presenca', price: 2001 }, {}, now).shipping, 0);
-});
-test('targets compare delivered totals only when known, and require new stock', () => {
-  assert.equal(targetOffer([offer], { basis: 'delivered', target: 1700 }, settings, now), null);
-  assert.equal(targetOffer([offer], { basis: 'item', target: 1500 }, settings, now).price, 1500);
-  assert.equal(
-    targetOffer([offer], { basis: 'delivered', target: 1800 }, settings, now).targetPrice,
-    1800
-  );
-  assert.equal(
-    targetOffer(
-      [{ ...offer, id: 'bertrand' }],
-      { basis: 'delivered', target: 5000 },
-      settings,
-      now
-    ),
-    null
-  );
+test('targets use book prices and require eligible stock', () => {
+  assert.equal(targetOffer([offer], { target: 1499 }), null);
+  assert.equal(targetOffer([offer], { target: 1500 }).targetPrice, 1500);
   for (const change of [
     { availability: 'OutOfStock' },
     { condition: 'UsedCondition' },
-    { marketplace: true }
+    { marketplace: true },
+    { currency: 'GBP' }
   ]) {
-    assert.equal(
-      targetOffer([{ ...offer, ...change }], { basis: 'item', target: 5000 }, settings, now),
-      null
-    );
+    assert.equal(targetOffer([{ ...offer, ...change }], { target: 5000 }), null);
   }
 });
 const isbn = '9780306406157';
@@ -84,24 +31,23 @@ const watched = () => ({
     [isbn]: {
       isbn,
       title: 'Teste',
-      watch: { enabled: true, revision: 1, target: 1800, basis: 'delivered', nextCheckAt: 0 }
+      watch: { enabled: true, revision: 1, target: 1800, basis: 'item', nextCheckAt: 0 }
     }
   },
   history: {},
-  shipping: settings,
   watchJob: { token: 'job', isbn, revision: 1, at: now, storeIds: ['wook'] }
 });
 test('scheduled observations are local, alerts deduplicate and stale/removed targets are ignored', () => {
   const message = { token: 'job', isbn, offers: [offer] };
   const first = completeWatch(watched(), message, now);
-  assert.equal(first.notice.price, 1800);
+  assert.equal(first.notice.price, 1500);
   assert.equal(first.data.history[isbn][0].source, 'scheduled');
   assert.equal(first.data.saved[isbn].watch.nextCheckAt >= now + 86400000, true);
   const again = { ...first.data, watchJob: watched().watchJob };
   assert.equal(completeWatch(again, message, now + 1).notice, undefined);
   assert.equal(
     completeWatch(again, { ...message, offers: [{ ...offer, price: 1400 }] }, now + 2).notice.price,
-    1700
+    1400
   );
   assert.equal(completeWatch({ ...watched(), watchEnabled: false }, message, now), null);
   assert.equal(completeWatch({ ...watched(), saved: {} }, message, now), null);
@@ -191,4 +137,28 @@ test('default selection contains six automatic stores and preserves explicit pre
   assert.deepEqual(selectedStoreIds([]), []);
   assert.deepEqual(selectedStoreIds(['bookcover', 'wook']), ['bookcover', 'wook']);
   assert.deepEqual(reduceData({}, { type: 'clear' }).selectedStores, [...DEFAULT_STORE_IDS]);
+});
+
+test('migration removes old delivery rules and resets only delivered targets', () => {
+  const old = watched();
+  old.saved[isbn].watch.basis = 'delivered';
+  old.saved[isbn].watch.lastNotifiedPrice = 1800;
+  old.shipping = { region: 'mainland' };
+  old.priceOrder = 'delivered';
+  old.watchNotices = [
+    { isbn, basis: 'delivered' },
+    { isbn: 'other', basis: 'item' }
+  ];
+  const result = migrateData(old);
+  assert.equal(result.saved[isbn].watch.target, 1800);
+  assert.equal(result.saved[isbn].watch.basis, 'item');
+  assert.equal(result.saved[isbn].watch.revision, 2);
+  assert.equal(result.saved[isbn].watch.lastNotifiedPrice, undefined);
+  assert.equal(result.watchJob, null);
+  assert.equal(result.shipping, undefined);
+  assert.equal(result.priceOrder, undefined);
+  assert.equal(result.watchNotices.length, 1);
+  assert.deepEqual(result.history, old.history);
+  assert.deepEqual(migrateData(result), result);
+  assert.equal(old.saved[isbn].watch.basis, 'delivered');
 });

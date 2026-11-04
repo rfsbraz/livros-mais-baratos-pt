@@ -1,14 +1,14 @@
 Livros Mais Baratos PT 0.1.5
 
-Abre Definições para escolher lojas, portes, avisos, afiliados e eliminação de dados. Voltar aos preços regressa aos resultados. O ecrã principal contém pesquisa, preços e estante.
+Abre Definições para escolher lojas, avisos, afiliados e eliminação de dados. Voltar aos preços regressa aos resultados. O ecrã principal contém pesquisa, preços e estante.
 
 Não exige início de sessão, subscrição, chave de API ou pagamento. A interface está em português de Portugal.
 
 Afiliados:
 Ativos por predefinição, com opção Apoiar através de ligações de afiliado. Só um clique deliberado numa oferta Wook confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada acrescenta a_aid=5d3ee4327c2fd. Pedidos de segundo plano e ordenação não mudam. Atribuição existente é preservada. Desativar impede novas adições. A Wook pode usar cookies depois da navegação.
 
-Alvos, portes e histórico:
-Guarda um livro, define um alvo para o livro ou total e mantém o navegador aberto. A primeira consulta começa após alguns minutos, respeitando o intervalo de dez minutos. Desativa em Verificar preços-alvo da estante. Regras e campanhas ficam em Entrega e portes. Os gráficos só usam observações locais. As permissões alarms e notifications são declaradas na instalação/atualização.
+Alvos e histórico:
+Guarda um livro, define um alvo para o livro e mantém o navegador aberto. A primeira consulta começa após alguns minutos, respeitando o intervalo de dez minutos. Desativa em Verificar preços-alvo da estante. Os gráficos só usam observações locais. As permissões alarms e notifications são declaradas na instalação/atualização.
 
 Comparação manual:
 1. Abre a extensão e introduz um ISBN válido, como 9789895598762 ou 9789899267411.
@@ -27,4 +27,6 @@ As capturas usam componentes reais com preços ilustrativos. Respostas de demons
 
 Apoio: rfsbraz@proton.me
 
-Campanhas Wook: um livro abrangido pode mostrar um aviso informativo de devolução em vale, mesmo sem outra oferta mais barata. Saber mais abre as condições da campanha e respeita a preferência de afiliados. A opção Considerar vales Wook na comparação, ativa por predefinição, usa um equivalente estimado nos avisos e na ordenação. O valor a pagar aparece separado; portes, histórico e alvos mantêm os valores reais. Desativar a opção recalcula as comparações em cache.
+Campanhas Wook: um livro abrangido pode mostrar um aviso informativo de devolução em vale, mesmo sem outra oferta mais barata. Saber mais abre as condições da campanha e respeita a preferência de afiliados. A opção Considerar vales Wook na comparação, ativa por predefinição, usa um equivalente estimado nos avisos e na ordenação. O valor a pagar aparece separado; histórico e alvos mantêm os valores reais. Desativar a opção recalcula as comparações em cache.
+
+Rodapé: Avaliar a extensão abre a página pública da loja correspondente ao navegador. Comunicar um problema abre o formulário de erro no GitHub com navegador e versão da extensão preenchidos. O utilizador revê e submete o problema; a extensão não envia automaticamente relatos nem dados dos livros.

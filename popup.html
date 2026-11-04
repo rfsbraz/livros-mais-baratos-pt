@@ -65,9 +65,8 @@
             <div id="unconfirmed-results"></div>
           </details>
           <p class="note">
-            Totais estimados quando os portes são conhecidos; caso contrário mostramos o preço do
-            livro. Saldo em cartão não é desconto imediato. Moedas e estados de conservação
-            diferentes não entram no mesmo mínimo. Confirma a oferta na loja.
+            Comparamos o preço do livro. Saldo em cartão não é desconto imediato. Moedas e estados
+            de conservação diferentes não entram no mesmo mínimo. Confirma a oferta na loja.
           </p>
           <details id="manual-section">
             <summary>Consulta manual e outros formatos</summary>
@@ -77,8 +76,7 @@
             <summary>Histórico neste navegador</summary>
             <p class="muted">
               Só preços observados nesta instalação, em comparações manuais e verificações
-              agendadas. Sem dados externos nem histórico anterior. Gráfico do preço do livro, sem
-              portes.
+              agendadas. Sem dados externos nem histórico anterior. Gráfico do preço do livro.
             </p>
             <div id="history"></div>
           </details>
@@ -91,7 +89,7 @@
       </div>
       <div id="settings-view" hidden aria-labelledby="settings-title">
         <h2 id="settings-title" tabindex="-1">Definições</h2>
-        <p class="muted">Personaliza as lojas, a entrega e os avisos.</p>
+        <p class="muted">Personaliza as lojas, os avisos e as preferências.</p>
         <details id="shops">
           <summary id="coverage"></summary>
           <p class="muted">
@@ -115,8 +113,7 @@
           </button>
           <p class="muted">
             Os avisos estão ativos por predefinição. Ao visitar um livro, procuramos a mesma edição
-            nova mais barata, em stock. Com portes conhecidos comparamos totais; caso contrário
-            indicamos o preço do livro.
+            nova mais barata, em stock, comparando o preço do livro.
           </p>
         </div>
         <div class="promotion-settings">
@@ -141,62 +138,6 @@
             Não altera a ordem dos preços nem as consultas às lojas.
           </p>
         </div>
-        <details id="delivery-settings">
-          <summary>Entrega e portes</summary>
-          <label for="delivery-region">Destino</label
-          ><select id="delivery-region"></select>
-          <label for="price-order">Ordenar preços</label
-          ><select id="price-order">
-            <option value="delivered">Total estimado com portes</option>
-            <option value="item">Preço do livro</option>
-          </select>
-          <p class="muted">
-            Estimativa para um livro, entrega normal. Portes desconhecidos não contam como grátis.
-            Confirma condições e total na loja.
-          </p>
-          <form id="shipping-form">
-            <label for="shipping-store">Regra da loja para este destino</label
-            ><select id="shipping-store"></select>
-            <p id="shipping-source" class="muted"></p>
-            <div class="field-pair">
-              <label
-                >Portes (€)<input
-                  id="shipping-fee"
-                  inputmode="decimal"
-                  placeholder="Desconhecidos" /></label
-              ><label
-                >Grátis a partir de (€)<input
-                  id="shipping-minimum"
-                  inputmode="decimal"
-                  placeholder="Sem mínimo conhecido"
-              /></label>
-            </div>
-            <label>Rever esta regra em<input id="shipping-expires" type="date" required /></label>
-            <label class="check-label"
-              ><input id="shipping-promo" type="checkbox" /> Campanha de portes grátis</label
-            >
-            <div id="promotion-fields" hidden>
-              <label
-                >Valor mínimo da campanha (€)<input
-                  id="promo-minimum"
-                  inputmode="decimal"
-                  value="0"
-              /></label>
-              <div class="field-pair">
-                <label>Início<input id="promo-start" type="datetime-local" /></label
-                ><label>Fim<input id="promo-end" type="datetime-local" /></label>
-              </div>
-              <p class="muted">
-                Introduz apenas condições confirmadas para este destino. A deteção automática de
-                campanhas ainda não está ativa.
-              </p>
-            </div>
-            <button class="secondary" type="submit">Guardar regra de portes</button>
-            <button id="shipping-reset" class="secondary" type="button">
-              Repor regra publicada
-            </button>
-          </form>
-        </details>
         <div class="watch-settings">
           <label class="check-label"
             ><input id="watch-toggle" type="checkbox" checked /> Verificar preços-alvo da
@@ -217,7 +158,30 @@
         </section>
       </div>
     </main>
-    <footer><span>Sem conta. Afiliados opcionais.</span></footer>
+    <footer class="footer">
+      <div class="footer-links">
+        <a
+          id="rate-link"
+          class="footer-link"
+          href="https://chromewebstore.google.com/detail/ongoinfbkmfffpmnkinhnoepdclbkenc/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span aria-hidden="true">☆</span> Avaliar a extensão
+        </a>
+        <a
+          id="report-link"
+          class="footer-link"
+          href="https://github.com/rfsbraz/livros-mais-baratos-pt/issues/new?template=bug_report.yml"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span aria-hidden="true">ⓘ</span> Comunicar um problema
+        </a>
+      </div>
+      <span class="footer-version" id="version"></span>
+      <span>Sem conta. Afiliados opcionais.</span>
+    </footer>
     <script type="module" src="popup.js"></script>
   </body>
 </html>

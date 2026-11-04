@@ -43,7 +43,6 @@ async function settings() {
   const data = await chrome.storage.local.get([
     'autoEnabled',
     'selectedStores',
-    'shipping',
     'cacheEpoch',
     'wookPromotionEnabled'
   ]);
@@ -57,8 +56,7 @@ async function settings() {
     cacheEpoch: data.cacheEpoch || 0,
     wookPromotionEnabled: data.wookPromotionEnabled !== false,
     enabled: data.autoEnabled !== false,
-    stores,
-    shipping: data.shipping || {}
+    stores
   };
 }
 async function sync() {
@@ -139,7 +137,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     ) {
       return null;
     }
-    const { enabled, stores, shipping, cacheEpoch, wookPromotionEnabled } = await settings();
+    const { enabled, stores, cacheEpoch, wookPromotionEnabled } = await settings();
     const source = storeForUrl(sender.url);
     if (!enabled || !stores.some(s => s.id === source.id)) {
       return null;
@@ -151,7 +149,6 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       book: message.book,
       sourceId: source.id,
       storeIds: stores.map(s => s.id),
-      shipping,
       wookPromotionEnabled
     });
     const latest = await settings();
@@ -202,4 +199,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     .catch(error => reply({ ok: false, error: error.message }));
   return true;
 });
+writeData({ type: 'migrate' }).catch(error =>
+  console.error('Falha ao atualizar preferências:', error)
+);
 installWatch(offscreen);
