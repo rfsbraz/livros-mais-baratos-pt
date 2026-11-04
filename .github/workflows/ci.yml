@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -42,6 +44,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version: 22
@@ -67,12 +71,20 @@ jobs:
           retention-days: 30
   # Preserve existing branch-protection check names during the migration.
   unit:
+    if: ${{ always() && !cancelled() && !startsWith(github.head_ref || '', 'release-please--') }}
     needs: lint-and-test
     runs-on: ubuntu-latest
     steps:
-      - run: echo 'Lint, format, unit tests and all browser builds passed.'
+      - name: Exigir sucesso das verificações unitárias
+        env:
+          RESULT: ${{ needs.lint-and-test.result }}
+        run: test "$RESULT" = success
   browser:
+    if: ${{ always() && !cancelled() && !startsWith(github.head_ref || '', 'release-please--') }}
     needs: e2e-tests
     runs-on: ubuntu-latest
     steps:
-      - run: echo 'Browser tests passed.'
+      - name: Exigir sucesso das verificações nos navegadores
+        env:
+          RESULT: ${{ needs.e2e-tests.result }}
+        run: test "$RESULT" = success

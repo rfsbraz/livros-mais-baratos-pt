@@ -1,12 +1,14 @@
-# Security policy
+# Política de segurança
 
-| Version          | Supported         |
-| ---------------- | ----------------- |
-| 0.1.x            | Yes, experimental |
-| Earlier versions | No                |
+| Versão             | Suporte           |
+| ------------------ | ----------------- |
+| 0.1.x              | Sim, experimental |
+| Versões anteriores | Não               |
 
-Report vulnerabilities privately through the repository's **Security > Report a vulnerability** option when enabled. While this repository is private, collaborators may open a private repository issue marked `security`, visible only to those with repository access. Do not post vulnerabilities publicly. Before making the repository public, enable GitHub private vulnerability reporting and replace this private-issue fallback.
+Comunica vulnerabilidades para **rfsbraz@proton.me**, ou usa **Security > Report a vulnerability** no GitHub quando essa opção estiver disponível. Não publiques vulnerabilidades por corrigir em issues ou discussões públicas. O contacto por email permanece disponível independentemente da visibilidade do repositório.
 
-Include reproduction steps, affected version and impact. Avoid real credentials and personal data. Target initial response: seven days; remediation timing depends on severity and maintainer availability.
+Inclui passos de reprodução, versão afetada e impacto. Não envies credenciais reais ou dados pessoais. O objetivo é responder inicialmente em sete dias; o prazo de correção depende da gravidade e da disponibilidade do responsável.
 
-The extension does not execute merchant HTML/scripts, send session cookies, or request unrestricted host access. Normal search redirects are followed without credentials; responses with a final origin outside the requested shop are rejected. Remote content is untrusted. Prices and links must remain bound to a validated ISBN and allowed HTTPS store origin.
+A extensão não executa HTML ou scripts das lojas, não envia cookies de sessão nos pedidos de comparação e não pede acesso irrestrito a sites. Segue redirecionamentos normais sem credenciais e rejeita respostas cuja origem final não pertença à loja pedida. O conteúdo remoto é não fiável: preços e ligações têm de corresponder a um ISBN validado e a uma origem HTTPS permitida.
+
+A CI procura segredos no histórico Git obtido e audita dependências de desenvolvimento em PRs, alterações ao ramo principal e verificações semanais. Não são distribuídas dependências npm em execução. Uma análise sem resultados não garante a ausência de todas as vulnerabilidades. Consulta o [relatório de preparação para código aberto](docs/oss-readiness.md).

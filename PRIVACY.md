@@ -1,23 +1,39 @@
-# Privacy
+# Privacidade
 
-Automatic alerts are enabled by default after installation. The extension detects book pages while browsing selected, authorized shops without opening the toolbar popup. An explicitly saved off preference is preserved on update. Manual comparison also reads the current page when the user opens the extension. Page HTML is processed locally to find an ISBN, title and current price; HTML is not uploaded. On manual or automatic comparison, the ISBN and, when needed, the book title are sent directly to the selected, authorized bookshops. They receive normal connection information, including IP address, and apply their own privacy policies. Requests omit session cookies. Access to the 26 configured shop origins is declared as required host permissions at installation. Requests only use the selected shops; manual links open ordinary store pages using normal browser privacy settings.
+Os avisos automáticos estão ativos por predefinição após a instalação. A extensão identifica páginas de livros nas lojas selecionadas e autorizadas sem exigir a abertura do menu. Uma preferência guardada para os desativar é respeitada nas atualizações. A comparação manual também lê a página atual quando abres a extensão.
 
-Saved titles, ISBNs and observed prices remain in `chrome.storage.local`, not Chrome sync. At most 100 saved books, 200 ISBN histories and 360 observations per ISBN are retained. On updating a book's history, observations older than 90 days for that book are removed. Old histories for unqueried books can remain until replaced by the 200-book bound or deleted.
+O HTML é processado localmente para encontrar ISBN, título e preço; não é enviado para um servidor. Ao comparar, o ISBN e, quando necessário, o título são enviados diretamente às lojas selecionadas. Estas recebem os dados normais de ligação, incluindo o endereço IP, e aplicam as próprias políticas de privacidade. Os pedidos não enviam cookies de sessão. As 26 origens configuradas são declaradas como permissões obrigatórias na instalação, mas só as lojas selecionadas são consultadas. Abrir uma ligação manual usa as definições normais de privacidade do navegador.
 
-Automatic comparisons reuse results in the hidden extension document's memory, with at most 50 ISBN/store-selection entries and a ten-minute reuse window. They are not written to price history. Disabling alerts or changing authorized shops closes that document, cancels its requests and clears its in-memory cache. Confirmed automatic, scheduled and manual prices are also cached locally for the menu, up to 50 ISBNs. The menu excludes entries older than 24 hours and labels entries older than ten minutes as potentially outdated. Expired entries are pruned on the next cache write; clear data deletes all cached prices. Opening cached results does not add history or contact shops. Dismissals last for the current page document. There is no browsing-history collection, analytics, remote code or account system. Saved books with enabled targets are checked approximately daily while Chrome is open. Only manual and scheduled observations enter local price history; no third-party or pre-installation history is imported.
+## Dados locais e conservação
 
-Selected store IDs and the automatic-alert preference are saved locally. **Desativar avisos automáticos** stops automatic checks and removes notices from open pages. Use **Apagar dados** to delete the shelf and history, reset store selection and disable automatic alerts. Uninstalling removes extension storage. Site access can be restricted in Chrome's extension settings. Updates that add site permissions may require Chrome approval.
+Títulos guardados, ISBN e preços observados ficam em `chrome.storage.local`, não na sincronização do Chrome. Os limites são 100 livros guardados, 200 históricos por ISBN e 360 observações por ISBN. Quando o histórico de um livro é atualizado, as observações desse livro com mais de 90 dias são removidas. Históricos não atualizados podem permanecer até serem substituídos pelo limite de 200 livros ou apagados.
 
-## Optional affiliate links
+As comparações automáticas reutilizam resultados na memória do documento oculto, até 50 combinações de ISBN/lojas e durante dez minutos. Estes resultados não entram no histórico. Desativar avisos ou alterar as lojas autorizadas fecha esse documento, cancela pedidos e apaga a cache em memória.
 
-Affiliate support is enabled by default and saved locally as `affiliateEnabled`. Turn off **Apoiar através de ligações de afiliado** to disable it. The preference is preserved across updates and clearing the shelf/history. Only deliberate clicks on a verified cheaper Wook offer may add `a_aid=5d3ee4327c2fd` to its destination. Existing attribution is preserved. Comparison requests, page URLs, copied links and stored results are not rewritten. Other stores have no affiliate partner configured. Rankings do not depend on commissions.
+Os preços confirmados automáticos, agendados e manuais também ficam em cache local para o menu, até 50 ISBN. O menu oculta entradas com mais de 24 horas e assinala as que têm mais de dez minutos. As entradas expiradas são removidas na próxima escrita; apagar dados elimina toda esta cache. Abrir resultados em cache não contacta lojas nem cria histórico. Fechar um aviso só o suprime no documento atual.
 
-After an affiliate click, Wook receives the affiliate identifier and normal browser navigation data and may use cookies under its own privacy policy. This can earn the developer a commission. Disabling this setting stops future affiliate additions; it does not remove cookies already set by Wook.
+Não existe recolha do histórico geral de navegação, análise de utilização, código remoto ou sistema de contas. Livros com preços-alvo ativos são verificados aproximadamente todos os dias enquanto o navegador estiver aberto. Só observações manuais e agendadas entram no histórico; não são importados históricos externos ou anteriores à instalação.
 
-## Targets, shipping and local charts
+## Controlo
 
-Target prices, item/delivered basis, schedules, notification deduplication state, destination region and shipping rules/promotions are saved locally. No street address is requested. Alarms schedule checks and notifications show target matches. Notices remain in the extension if system notifications are blocked. Checks are spread over time and stop when targets are paused/removed or scheduled checking is disabled. Clear data removes shelf, observations and target notices, invalidates pending jobs and disables both alert types; shipping preferences and affiliate preference remain. Shipping promotions are entered by the user, not automatically scraped. Charts use the book prices observed by this installation only, without recalculating historical shipping costs.
+As lojas selecionadas e a preferência de avisos ficam guardadas localmente. **Desativar avisos automáticos** interrompe as consultas automáticas e remove avisos das páginas abertas. **Apagar dados** remove estante e histórico, repõe as seis lojas predefinidas e desativa os avisos. Desinstalar remove o armazenamento da extensão. Podes restringir o acesso a sites nas definições do navegador. Uma atualização que acrescente permissões pode exigir nova autorização.
 
-Without a saved selection, only Wook, Bertrand, Almedina, Continente, Porto Editora and Presença are checked. Saved selections, including an empty selection, are preserved. Resetting data restores these six; all other adapters remain optional.
+## Ligações de afiliado opcionais
 
-Firefox uses a bundled background page and parser iframe instead of the Chromium offscreen API. Its manifest declares website-content and browsing-activity transmission consent because ISBN/title queries go directly to shops. The same local data retention and affiliate preferences apply in Firefox and Edge.
+O apoio por afiliados está ativo por predefinição, com a preferência local `affiliateEnabled`. Desativa **Apoiar através de ligações de afiliado** para deixar de o usar. A escolha mantém-se nas atualizações e ao apagar a estante/histórico.
+
+Só um clique deliberado numa oferta Wook confirmada mais barata pode acrescentar `a_aid=5d3ee4327c2fd`. Identificadores já existentes são preservados. Pedidos de comparação, URL da página, ligações copiadas e resultados guardados não são reescritos. Não há outros parceiros configurados. A ordenação não depende de comissões.
+
+Após o clique, a Wook recebe o identificador e dados normais da navegação e pode usar cookies segundo a sua política. O responsável pode receber uma comissão. Desativar a opção impede futuras adições, mas não elimina cookies já definidos pela Wook.
+
+## Preços-alvo, portes e gráficos
+
+Alvos, base de comparação (livro ou total), horários, estado de notificações, região e regras/campanhas de portes ficam guardados localmente. Não é pedida uma morada. Os alarmes agendam consultas e as notificações apresentam correspondências. Se as notificações do sistema estiverem bloqueadas, o aviso continua disponível na extensão.
+
+As consultas são distribuídas no tempo e param quando os alvos são pausados/removidos ou a verificação agendada é desativada. Apagar dados remove observações e avisos de alvos, invalida tarefas pendentes e desativa os dois tipos de avisos; mantém preferências de portes e afiliados. As campanhas são introduzidas pelo utilizador, não recolhidas automaticamente. Os gráficos só usam preços do livro observados nesta instalação, sem recalcular portes históricos.
+
+Sem uma seleção guardada, só são consultadas Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Seleções guardadas, incluindo uma seleção vazia, são preservadas. Repor os dados restaura estas seis; as restantes são opcionais.
+
+Firefox usa uma página de segundo plano e uma moldura local de análise em vez de `offscreen`. O manifesto declara consentimento para transmissão de conteúdo de sites e atividade de navegação porque as consultas de ISBN/título seguem diretamente para as lojas. Firefox e Edge aplicam as mesmas regras de conservação e preferências de afiliados.
+
+Contacto: **rfsbraz@proton.me**.

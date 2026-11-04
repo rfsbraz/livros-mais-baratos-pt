@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, mkdirSync, cpSync, readdirSync } from 'node:fs';
-import { resolve, relative } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, cpSync, readdirSync, rmSync } from 'node:fs';
+import { resolve, relative, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { loadListing, validateListing } from './listing.mjs';
 import { releaseNotes } from './changelog.mjs';
@@ -14,6 +14,10 @@ const { config, locales } = listing;
 const version = JSON.parse(readFileSync('package.json')).version;
 const notes = releaseNotes(readFileSync('CHANGELOG.md', 'utf8'), version);
 const out = resolve('dist/store-listing');
+if (dirname(out) !== resolve('dist')) {
+  throw new Error('Destino do pacote inválido');
+}
+rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 const documents = [];
 for (const store of ['chrome', 'firefox', 'edge']) {
@@ -49,15 +53,15 @@ for (const store of ['chrome', 'firefox', 'edge']) {
     writeFileSync(`${target}/description.txt`, metadata.description + '\n');
     writeFileSync(`${target}/summary.txt`, metadata.summary + '\n');
     documents.push(
-      `## ${store} / ${id}\n\nName: ${config.name}\n\nSummary: ${locale.summary}\n\n${metadata.description}\n`
+      `## ${store} / ${id}\n\nNome: ${config.name}\n\nResumo: ${locale.summary}\n\n${metadata.description}\n`
     );
   }
 }
 writeFileSync(
   `${out}/README.md`,
-  '# Store upload pack\n\nVersion ' +
+  '# Pacote de submissão\n\nVersão ' +
     version +
-    '\n\nEach store folder contains its icon, ordered screenshots, Portuguese and English listing text, reviewer disclosures and release notes. The interface and screenshots are Portuguese. Prices in screenshots are illustrative.\n\nChrome and Edge listing text/images are dashboard uploads; their official publishing APIs update packages. Firefox text, previews and release notes are synchronized by the repository workflows. First submissions and publisher verification still require each store dashboard.\n\nSet public HTTPS privacy/support URLs in store-listing/listing.json before submission. Null means not configured, not a usable link. Host website/ on your chosen public domain. The source repository is private.\n'
+    '\n\nCada pasta de loja contém ícone, capturas ordenadas, metadados em português de Portugal, informações de revisão e notas de versão. Os preços das imagens são ilustrativos.\n\nChrome e Edge exigem os painéis para texto e imagens; as APIs atualizam os pacotes. Firefox sincroniza texto, capturas e notas através da automação do repositório. A primeira submissão e a verificação da conta exigem os painéis.\n\nPreenche os URLs públicos HTTPS de privacidade e apoio em store-listing/listing.json antes da submissão. null significa configuração em falta. Aloja website/ num domínio público. Consulta AUTOMATION.md.\n'
 );
 cpSync('store-listing/website', `${out}/website`, { recursive: true });
 cpSync('store-listing/icons', `${out}/icons`, { recursive: true });
@@ -86,4 +90,4 @@ const hashes = Object.fromEntries(
 writeFileSync(`${out}/checksums.json`, JSON.stringify(hashes, null, 2) + '\n');
 entries.push({ name: 'checksums.json', data: readFileSync(`${out}/checksums.json`) });
 zipFiles(entries, `dist/livros-mais-baratos-pt-${version}-store-assets.zip`);
-console.log(`Prepared ${entries.length} files for Chrome, Firefox and Edge.`);
+console.log(`Gerados ${entries.length} ficheiros para Chrome, Firefox e Edge.`);

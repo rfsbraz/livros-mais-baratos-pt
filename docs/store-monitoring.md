@@ -1,55 +1,57 @@
-# Live store monitoring
+# Monitorização real das lojas
 
-The **Live store page checks** workflow wakes hourly at minute 17 UTC. Each of the 26 automatic stores has one stable slot per day, giving one or two stores per hour. A run checks only that slot, sequentially. There is no live batch on every push; deterministic PR/main CI still checks the saved parser fixtures.
+O processo **Verificação das páginas das lojas** arranca de hora a hora, ao minuto 17 UTC. Cada um dos 26 adaptadores tem um período diário estável, ficando uma ou duas lojas por hora. Uma execução só consulta esse período, sequencialmente. Não há uma consulta completa a cada alteração: a CI de PRs e do ramo principal usa amostras guardadas.
 
-Each store starts after a fresh random delay of 0-120 seconds. Network requests have another random delay of 1-3 seconds. These delays reduce bursts; they do not bypass access controls or guarantee that a shop will accept GitHub-hosted traffic.
+Cada loja começa após um atraso aleatório de 0 a 120 segundos. Cada pedido tem mais um atraso de 1 a 3 segundos. Isto reduz rajadas; não contorna controlos de acesso nem garante que uma loja aceite tráfego do GitHub.
 
-The slot uses the GitHub run's creation timestamp, so queue/setup delays do not change the selected hour. GitHub schedules are best effort and can be delayed or skipped; a missed slot is not replayed as a batch. Manual Actions runs check their current slot. Re-running a workflow intentionally repeats its slot.
+A escolha do período usa a hora de criação da execução, não a hora em que sai da fila. Os agendamentos do GitHub podem atrasar ou falhar; um período perdido não é repetido em lote. Execuções manuais usam o período atual e repetir uma execução repete o respetivo período.
 
-## What is checked
+## O que é verificado
 
-The shipped compareStore adapter searches using the configured sample ISBN and optional sampleTitle. A passing check requires a positive integer price in an allowed currency, a same-store product URL matching the adapter pattern, and the expected ISBN and a parseable price on that product page. Price changes and out-of-stock items are allowed. Manual-only shops and reference entries have no automatic parser and are excluded.
+O adaptador `compareStore` procura o ISBN de exemplo e o `sampleTitle` opcional. Para passar, tem de devolver um preço inteiro positivo numa moeda permitida, URL da mesma loja que corresponda ao padrão de produto, e uma página com o ISBN esperado e preço legível. Alterações de preço e falta de stock são permitidas. Fontes exclusivamente manuais e entradas de referência ficam de fora.
 
-Comparisons have a 60-second limit; product verification has a 15-second limit. An hourly command is bounded to 13 minutes in Actions, with a 15-minute job limit. The network checker runs with read-only repository, Actions and issue access. Only the separate reporting job receives issues:write. No extra secret is required.
+A comparação tem limite de 60 segundos e a verificação do produto de 15 segundos. O comando horário tem limite de 13 minutos e a tarefa de 15 minutos. O verificador só tem leitura do repositório, Actions e issues; apenas a tarefa separada de relatório recebe `issues: write`. Não exige segredos adicionais.
 
-## Access errors and backoff
+## Erros e pausas
 
-- rate-limited: HTTP 429. No immediate retry.
-- authentication-required: HTTP 401. No immediate retry.
-- access-forbidden: HTTP 403. No immediate retry.
-- method-not-allowed: HTTP 405. No immediate retry.
-- shop-server-error: HTTP 5xx.
-- network-error: failed or timed-out request.
-- page-missing: HTTP 404 or 410.
-- pattern-unverified: the adapter could not verify an offer.
-- invalid-offer: missing/invalid price or unexpected currency.
-- product-pattern: result URL does not match the store product route.
-- page-detection: product page does not identify the expected ISBN.
-- request-failed: failure without more specific evidence.
+| Identificador             | Significado                                |
+| ------------------------- | ------------------------------------------ |
+| `rate-limited`            | HTTP 429; sem repetição imediata           |
+| `authentication-required` | HTTP 401; sem repetição imediata           |
+| `access-forbidden`        | HTTP 403; sem repetição imediata           |
+| `method-not-allowed`      | HTTP 405; sem repetição imediata           |
+| `shop-server-error`       | HTTP 5xx                                   |
+| `network-error`           | Pedido falhado ou tempo excedido           |
+| `page-missing`            | HTTP 404 ou 410                            |
+| `pattern-unverified`      | Não foi possível confirmar uma oferta      |
+| `invalid-offer`           | Preço ausente/inválido ou moeda inesperada |
+| `product-pattern`         | URL fora do padrão de produto da loja      |
+| `page-detection`          | Página sem o ISBN esperado                 |
+| `request-failed`          | Falha sem prova mais específica            |
 
-HTTP 403 alone does not establish rate limiting. HTTP 202 can be a successful HTTP response without enough content to verify an offer, which is reported as pattern-unverified.
+Um HTTP 403, por si só, não demonstra limitação de frequência. Um HTTP 202 pode não ter conteúdo suficiente para verificar a oferta e resultar em `pattern-unverified`.
 
-After 401/403/405/429, no further request to that origin is made during the run, including adapter fallback candidates. Retry-After, when present, also stops further requests and is recorded as a cooldown. Both delay-seconds and HTTP-date formats are supported. A 429 without Retry-After gets a 24-hour cooldown. Cooldowns persist in the bot-owned issue and are read before subsequent CI checks. A skipped cooldown is not treated as recovery.
+Após 401/403/405/429, não há mais pedidos à mesma origem nessa execução, incluindo alternativas do adaptador. `Retry-After` também interrompe pedidos e define uma pausa, aceitando segundos ou uma data HTTP. Um 429 sem esse cabeçalho impõe 24 horas de pausa. O estado fica na issue gerida pelo bot e é lido nas consultas seguintes. Uma loja ignorada por estar em pausa não é considerada recuperada.
 
-Other failures get at most one retry after a random 20-40 seconds, provided the shop did not request a cooldown. There are no CAPTCHA workarounds or affiliate requests.
+Outras falhas permitem no máximo uma repetição após 20 a 40 segundos aleatórios, desde que não exista pausa pedida pela loja. Não há contorno de captchas nem pedidos de afiliado.
 
-## Failure tracking across hourly batches
+## Acompanhamento de falhas
 
-One bot-owned issue tracks outstanding failures. Each run updates only stores actually checked. Passing one hourly batch cannot close failures from other slots. The issue closes when all previously failing stores have passed; a later failure reopens it. Missing or incomplete reports open/update a checker failure and cannot clear existing store failures.
+Uma única issue do bot acompanha as falhas pendentes. Cada execução só altera lojas efetivamente verificadas. Um período bem-sucedido não elimina falhas de outros períodos. A issue fecha quando todas as lojas anteriormente em falha passam; uma nova falha volta a abri-la. Relatórios ausentes ou incompletos mantêm as falhas existentes e assinalam o problema do verificador.
 
-A compact encoded JSON comment in the issue stores failure state and cooldowns. This is plain encoded data, not encrypted or executable content. The reporter migrates failure rows from the original whole-catalogue issue, so existing failures remain until checked again. No new issue or comment is created on every hourly run.
+Um comentário JSON codificado guarda o estado e as pausas. São dados codificados, não encriptados nem executáveis. O relatório migra as linhas da issue antiga que verificava o catálogo completo. Não cria uma issue ou comentário novo a cada hora.
 
-The store-health JSON artifact is retained for 14 days. It contains sample ISBNs, URLs, HTTP status codes, error types, cooldown timestamps and retry results. It excludes page HTML, cookies and other response headers.
+O artefacto `store-health` é conservado durante 14 dias. Contém ISBN de exemplo, URLs, códigos HTTP, tipos de erro, datas de pausa e resultados das repetições. Exclui HTML, cookies e outros cabeçalhos de resposta.
 
-## Local reproduction
+## Reprodução local
 
-Run npm ci and npx playwright install chromium once.
+Executa primeiro `npm ci` e `npx playwright install chromium`.
 
-- npm run test:live: current hourly slot, with jitter.
-- npm run test:live -- wook: one named store.
-- npm run test:live -- wook bookcover: selected stores, sequentially.
-- npm run test:live -- --all: explicit local full check, never used by scheduled CI.
+- `npm run test:live`: período horário atual, com atrasos aleatórios.
+- `npm run test:live -- wook`: uma loja.
+- `npm run test:live -- wook bookcover`: lojas escolhidas, sequencialmente.
+- `npm run test:live -- --all`: consulta completa explícita, nunca usada pela CI agendada.
 
-Local runs do not load GitHub's persisted cooldown state automatically. Avoid manual repeats while a shop has requested a cooldown. Inspect work/store-health.json before diagnosing a parser failure. For parser changes, add a minimal sanitized fixture and run npm run test:coverage and npm run test:integration.
+As execuções locais não importam automaticamente as pausas guardadas no GitHub. Evita repetições durante uma pausa pedida pela loja. Inspeciona `work/store-health.json` antes de atribuir a falha ao analisador. Ao alterar a análise, acrescenta uma amostra mínima e executa `npm run test:coverage` e `npm run test:integration`.
 
-HTTP semantics: [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429), [Retry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After).
+Referências HTTP: [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/429) e [Retry-After](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After).

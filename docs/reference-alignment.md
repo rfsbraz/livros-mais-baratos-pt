@@ -1,32 +1,32 @@
-# Extension architecture alignment
+# Organização e alinhamento da extensão
 
-Reference: [Geocaching.com-Friends-Logs](https://github.com/rfsbraz/Geocaching.com-Friends-Logs), inspected at 9f46486230605c580abac1635d0c0297076cb271.
+Referência: [Geocaching.com-Friends-Logs](https://github.com/rfsbraz/Geocaching.com-Friends-Logs), inspecionada na revisão `9f46486230605c580abac1635d0c0297076cb271`.
 
-## Layout and commands
+## Estrutura e comandos
 
-Runtime modules, manifest, popup and icons live at the repository root. `tests/unit` holds pure logic tests; `tests/e2e` holds browser tests with a Playwright report. Build tooling lives in `scripts`, and listing metadata and screenshots live in `store-listing`.
+Módulos, manifesto, menu e ícones ficam na raiz. `tests/unit` contém testes de lógica; `tests/e2e`, testes de navegador e o relatório Playwright; `scripts`, ferramentas; e `store-listing`, materiais de publicação.
 
-Run `npm ci`, `npm run lint`, `npm run format:check`, `npm run test:coverage`, `npm run build:all`, and `npm run test:e2e`. Install Edge for its native smoke test using `npx playwright install msedge`. Install test browsers with `npx playwright install chromium firefox`. Chrome and Edge packages use a service worker with an offscreen parser. Firefox uses a nonpersistent background page and a local parser iframe, retaining the same validated message boundary. Dynamic content registration preserves the saved automatic-alert and store selection settings. Runtime modules are shared. Firefox also bundles the content entry point into one script with esbuild, avoiding dynamic content-module loading. The browser package is built from an explicit runtime file list, excluding tooling and tests.
+Executa `npm ci`, `npm run lint`, `npm run format:check`, `npm run test:coverage`, `npm run build:all` e `npm run test:e2e`. Instala os navegadores com `npx playwright install chromium firefox msedge`. Chrome e Edge usam um processo de serviço e um analisador oculto; Firefox usa uma página de segundo plano não persistente e uma moldura local, com as mesmas validações de mensagens. O registo dinâmico respeita as preferências de avisos e lojas. O código é partilhado e Firefox empacota o ponto de entrada de conteúdo com esbuild. Os ZIPs usam uma lista explícita de ficheiros, excluindo testes e ferramentas.
 
-Load `dist/chrome` or `dist/edge` unpacked. Firefox development loading uses `about:debugging`, Load Temporary Add-on and `dist/firefox/manifest.json`. Release Firefox installation requires signing through AMO. Minimum Firefox is 140; host access and data-transmission consent remain browser-controlled. Chrome/Edge keep their existing declared permissions.
+Carrega `dist/chrome` ou `dist/edge` em modo de programador. Em Firefox, usa `about:debugging` e `dist/firefox/manifest.json`. Instalações permanentes Firefox exigem assinatura AMO. A versão mínima Firefox é 140; permissões e consentimento continuam sob controlo do navegador.
 
-## Workflows
+## Automação
 
-CI matches the reference's lint-and-test then e2e-tests pipeline, including formatting, all-browser packages, reports and screenshots. Compatibility gate jobs retain the previous `unit` and `browser` required-check names. Node 22 is retained because runtime-independent test code uses modern built-ins. Unit tests retain Node's built-in runner; migrating assertions to Jest adds no browser coverage.
+A CI segue as tarefas `lint-and-test` e `e2e-tests` da referência. Os nomes de verificações obrigatórias `unit` e `browser` são preservados. Node 22 é mantido pelos recursos usados nos testes; os testes unitários usam o executor nativo Node, sem migração desnecessária para Jest.
 
-Release uses separate release-please, target, build-release and publish-to-browser jobs. Release Please follows the reference's node release type and synchronizes the manifest. Dispatch supports rebuilding an existing tag and choosing the destination. Credentials have job-scoped access. Store publishing requires per-store enable variables and environments. No other extension's identifiers are reused.
+A publicação separa Release Please, escolha da etiqueta, geração dos pacotes e envio para cada navegador. O versionamento Node sincroniza o manifesto. A execução manual permite escolher uma etiqueta existente e o destino. As credenciais só estão disponíveis nas tarefas que precisam delas. A publicação exige variáveis de ativação por loja e pode usar ambientes protegidos. Não são reutilizados identificadores de outra extensão.
 
-PR titles follow conventional commits. Daily Dependabot patch auto-merge and weekly CI are retained. The hourly bookshop health workflow retains its 24-hour jitter plan and failure issue handling. Weekly credentials and listing drift jobs use separate check/report jobs and keepalive. Missing store URLs/disabled publishing are skipped; unreadable listings never close an existing drift issue.
+Os títulos dos PRs seguem Conventional Commits, com o texto descritivo em português. Dependabot verifica dependências diariamente; apenas correções de versão elegíveis podem ter integração automática, com proteção verificada. A CI corre semanalmente. A monitorização das livrarias mantém os 24 períodos horários e atrasos aleatórios. As verificações semanais de credenciais e divergências separam consulta e atualização de issues e mantêm o agendamento ativo. URLs ausentes e publicação desativada são ignorados; uma página ilegível nunca fecha uma divergência existente.
 
-## Publishing configuration
+## Configuração de publicação
 
-Before enabling publishing, create this extension's listings, set the public support/privacy URLs, update `store-listing/listing.json`, and configure `chrome-store`, `firefox-store`, `edge-store` environments with any desired reviewer rules.
+Cria as páginas desta extensão nas lojas, define URLs públicos de apoio/privacidade e preenche `store-listing/listing.json`. Configura os ambientes `chrome-store`, `firefox-store` e `edge-store` com as regras de revisão pretendidas.
 
-- Release: `RELEASE_PLEASE_TOKEN` secret.
-- Chrome: variables `CHROME_PUBLISH_ENABLED=true`, `CHROME_EXTENSION_ID`, `CHROME_PUBLISHER_ID`; secrets `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`.
-- Edge: variables `EDGE_PUBLISH_ENABLED=true`, `EDGE_API_KEY_EXPIRES` (YYYY-MM-DD); secrets `EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY`.
-- Firefox: variable `FIREFOX_PUBLISH_ENABLED=true`; secrets `AMO_JWT_ISSUER`, `AMO_JWT_SECRET`. GUID: `livros-mais-baratos-pt@rfsbraz.github.io`.
+- Versões: segredo `RELEASE_PLEASE_TOKEN`.
+- Chrome: variáveis `CHROME_PUBLISH_ENABLED=true`, `CHROME_EXTENSION_ID`, `CHROME_PUBLISHER_ID`; segredos `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET`, `CHROME_REFRESH_TOKEN`.
+- Edge: variáveis `EDGE_PUBLISH_ENABLED=true`, `EDGE_API_KEY_EXPIRES` (AAAA-MM-DD); segredos `EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY`.
+- Firefox: variável `FIREFOX_PUBLISH_ENABLED=true`; segredos `AMO_JWT_ISSUER`, `AMO_JWT_SECRET`. GUID: `livros-mais-baratos-pt@rfsbraz.github.io`.
 
-Keep publishing credentials as repository secrets if the scheduled credential check should use them, or give the check the same environment access. No listing IDs, credentials or publication are configured by this refactor. Store metadata synchronization is supplied as checked-in material and drift detection; Firefox listing edits use the preview-first Firefox listing workflow or the dashboard. Release submission uses the packaged version, so reruns after an already accepted submission must exclude that store using the dispatch selector.
+Usa segredos do repositório para permitir a verificação semanal, que não seleciona um ambiente de loja. Consulta a [automação das lojas](../store-listing/AUTOMATION.md). O Firefox deteta versões já existentes e atualiza notas e imagens nas repetições. Chrome e Edge usam os painéis para texto/imagens e as APIs para pacotes.
 
-Firefox native tests cover automatic comparisons, caching and scheduled targets through a test-only content bridge, because Playwright cannot drive privileged Firefox popup pages. Chromium covers full popup interactions; the Edge test uses Microsoft Edge. All fixtures and bridges are excluded from production packages.
+Os testes Firefox verificam comparações automáticas, cache e alvos através de uma ponte temporária de teste, pois Playwright não controla páginas privilegiadas do menu Firefox. Chromium cobre a interação completa do menu e Edge usa o navegador Microsoft Edge. As amostras e pontes ficam fora dos pacotes de produção.

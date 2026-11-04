@@ -1,47 +1,45 @@
-# Browser store submission pack
+# Pacote de submissão nas lojas de extensões
 
-Livros Mais Baratos PT · 0.1.5 · Prepared from the repository source
+Livros Mais Baratos PT · 0.1.5 · Gerado a partir do código do repositório.
 
-See [AUTOMATION.md](AUTOMATION.md) for Chrome, Firefox and Edge metadata, release automation and account setup. Run npm run store-listing:pack for the per-store upload ZIP.
+Consulta [AUTOMATION.md](AUTOMATION.md) para configuração e publicação em Chrome, Firefox e Edge. `npm run store-listing:pack` gera o ZIP com uma pasta por loja.
 
-## Upload map
+## Ficheiros a utilizar
 
-| Dashboard field | File |
-|---|---|
-| Extension package | upload/livros-mais-baratos-pt-0.1.5-store.zip |
-| Store icon | icons/icon-128.png |
-| Screenshots, in order | screenshots/01... through 05... (1280×800 each) |
-| Small promotional tile | promo/small-440x280.png |
-| Marquee promotional tile | promo/marquee-1400x560.png |
-| Name and short summary | metadata/listing-pt-PT.txt |
-| Detailed description | metadata/description-pt-PT.txt |
-| Optional English listing | metadata/description-en.txt (UI remains Portuguese) |
-| Privacy and permission answers | metadata/privacy-and-permissions.md |
-| Reviewer instructions | metadata/reviewer-notes.txt |
-| Support email | rfsbraz@proton.me |
-| Category and language | Shopping; Portuguese (Portugal) |
+| Campo                      | Ficheiro                             |
+| -------------------------- | ------------------------------------ |
+| Pacote de instalação       | ZIP do navegador em dist/            |
+| Ícone Chrome/Firefox       | icons/icon-128.png                   |
+| Ícone Edge                 | icons/icon-300.png                   |
+| Capturas, por ordem        | screenshots/01... a 05... (1280x800) |
+| Imagem promocional pequena | promo/small-440x280.png              |
+| Imagem promocional larga   | promo/marquee-1400x560.png           |
+| Nome e resumo              | metadata/listing-pt-PT.txt           |
+| Descrição                  | metadata/description-pt-PT.txt       |
+| Privacidade e permissões   | metadata/privacy-and-permissions.md  |
+| Instruções de revisão      | metadata/reviewer-notes.txt          |
+| Apoio                      | rfsbraz@proton.me                    |
+| Categoria e idioma         | Compras; português de Portugal       |
 
-## Before submission
+## Antes da submissão
 
-Host the three files in website/ on a public HTTPS site. Enter the privacy.html URL in the dashboard; support.html can be the support URL and index.html the website URL. These URLs are intentionally null in listing.json because no domain has been supplied. Do not use the private repository as a public support or privacy link. No public deployment or store submission has been performed.
+Aloja os três ficheiros de website/ num site HTTPS público e preenche os URLs em listing.json. Valores null significam que falta configuração. Não uses o repositório privado como página pública. Não foi efetuada publicação nas lojas ou alojamento de páginas.
 
-Confirm your publisher account/contact verification, distribution visibility and countries in the developer dashboard. A private source repository does not determine Chrome Web Store listing visibility. The optional YouTube video is not included or required for this pack.
+Confirma a verificação da conta/contacto, visibilidade e países nos painéis. A visibilidade do repositório não determina a visibilidade da extensão nas lojas. Não é incluído vídeo YouTube, que é opcional.
 
-## Asset details
+## Imagens e reprodução
 
-Five screenshots use real extension components with illustrative ISBN/price responses, labelled on each image. They are demonstration captures, not live-price evidence. The book-cover block is an original text-only demonstration design, not the published cover. The notification screenshot is composed around the real notification component; its position/width are adjusted for presentation. No retailer logos, Chrome logos, rankings, endorsements or review stars are used.
+As cinco capturas usam componentes reais, com ISBN e preços ilustrativos identificados. Não são prova de preços atuais. A capa de demonstração é uma composição de texto original. A posição/largura do aviso foram ajustadas para apresentação. Não são usados logótipos de lojas ou navegadores, classificações ou recomendações inventadas.
 
-The 128px icon uses 96px artwork with transparent padding. Other icon sizes, editable SVG, promotional HTML and the generation script are included. Screenshot and promo exports are opaque PNGs. asset-manifest.json records their pixel dimensions.
+O ícone de 128 px contém desenho de 96 px com margem transparente. Incluem-se outros tamanhos, SVG editável, composições HTML e ferramentas de geração. Capturas e imagens promocionais são PNG opacos. asset-manifest.json regista dimensões.
 
-The upload ZIP contains production code from 0.1.5 with matching icons and the same summary as the repository manifest. It excludes screenshots, fixtures, development files and credentials. source/extension/ contains the exact upload source. The production code, store metadata generators and screenshots are updated together for automatic-by-default behavior.
+Os ZIPs de instalação excluem capturas, amostras, ferramentas e credenciais. source/extension/ contém a cópia de código usada nas capturas. As composições HTML usam um servidor local de captura e não são páginas públicas. Executa `npm run store-listing:assets` para reproduzir os materiais. website/ é autónomo e pode ser alojado.
 
-The source HTML layouts reference a local capture server for the popup and are editable design references, not public web pages. Run npm run build, node scripts/store-assets.mjs and node scripts/store-metadata.mjs from the project checkout with Node and Playwright to reproduce this pack. The website/ folder is self-contained and ready to host.
+## Especificações oficiais
 
-## Official specifications checked
-
-- [Listing fields and image dimensions](https://developer.chrome.com/docs/webstore/cws-dashboard-listing)
-- [Icon padding and image formats](https://developer.chrome.com/docs/webstore/images)
-- [Screenshot and promotional guidance](https://developer.chrome.com/docs/webstore/best-listing)
-- [Manifest description length](https://developer.chrome.com/docs/extensions/reference/manifest/description)
-- [Privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)
-- [Local processing and user-data disclosure](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)
+- [Campos e dimensões](https://developer.chrome.com/docs/webstore/cws-dashboard-listing)
+- [Ícones e formatos](https://developer.chrome.com/docs/webstore/images)
+- [Orientações para imagens](https://developer.chrome.com/docs/webstore/best-listing)
+- [Limite da descrição no manifesto](https://developer.chrome.com/docs/extensions/reference/manifest/description)
+- [Campos de privacidade](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)
+- [Divulgação de dados e processamento local](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)

@@ -1,4 +1,4 @@
-name: Firefox listing
+name: Ficha do Firefox
 on:
   push:
     branches: [main]
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       apply:
-        description: Apply the reviewed listing text to AMO
+        description: Aplicar o texto revisto da ficha no AMO
         type: boolean
         default: false
 permissions:
@@ -29,9 +29,9 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - name: Preview listing
+      - name: Pré-visualizar a ficha
         run: node scripts/amo-listing.mjs
-      - name: Apply listing
+      - name: Aplicar a ficha
         if: ${{ (github.event_name == 'push' || inputs.apply) && vars.FIREFOX_PUBLISH_ENABLED == 'true' }}
         run: node scripts/amo-listing.mjs --apply
         env:

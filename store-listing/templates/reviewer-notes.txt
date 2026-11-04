@@ -1,0 +1,28 @@
+Livros Mais Baratos PT {{version}}
+
+Abre Definições para escolher lojas, portes, avisos, afiliados e eliminação de dados. Voltar aos preços regressa aos resultados. O ecrã principal contém pesquisa, preços e estante.
+
+Não exige início de sessão, subscrição, chave de API ou pagamento. A interface está em português de Portugal.
+
+Afiliados:
+Ativos por predefinição, com opção Apoiar através de ligações de afiliado. Só um clique deliberado numa oferta Wook confirmada mais barata acrescenta a_aid=5d3ee4327c2fd. Pedidos de segundo plano e ordenação não mudam. Atribuição existente é preservada. Desativar impede novas adições. A Wook pode usar cookies depois da navegação.
+
+Alvos, portes e histórico:
+Guarda um livro, define um alvo para o livro ou total e mantém o navegador aberto. A primeira consulta começa após alguns minutos, respeitando o intervalo de dez minutos. Desativa em Verificar preços-alvo da estante. Regras e campanhas ficam em Entrega e portes. Os gráficos só usam observações locais. As permissões alarms e notifications são declaradas na instalação/atualização.
+
+Comparação manual:
+1. Abre a extensão e introduz um ISBN válido, como 9789895598762 ou 9789899267411.
+2. Seleciona lojas e escolhe Comparar. O acesso foi pedido na instalação; não existe novo pedido de permissão aqui.
+3. Ofertas confirmadas mostram preço e disponibilidade. Falhas não recebem preços inventados e mantêm ligação à loja.
+4. Guardar adiciona o livro localmente. Histórico neste navegador mostra as observações.
+
+Avisos automáticos:
+1. Instala e autoriza o acesso aos sites. Não abras o menu nem alteres preferências. Wook, Bertrand, Almedina, Continente, Porto Editora e Presença estão selecionadas e os avisos ativos por predefinição.
+2. Visita uma página suportada, por exemplo https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345, com ISBN e preço.
+3. Sem abrir o menu, só aparece aviso se outra loja selecionada/autorizada devolver uma oferta nova, em EUR, estritamente mais barata, com o mesmo ISBN e stock confirmado.
+4. Não é esperado aviso sem uma oferta elegível. Preços e acesso variam; não se garante desconto para o ISBN de exemplo.
+5. Fecha com × ou desativa em Desativar avisos automáticos. Apagar dados remove estante/histórico, repõe lojas e desativa avisos.
+
+As capturas usam componentes reais com preços ilustrativos. Respostas de demonstração e amostras de teste não entram no pacote. As comparações têm limites, reutilizam resultados em memória durante dez minutos, omitem cookies de sessão e não executam scripts descarregados. Alvos são verificados aproximadamente todos os dias enquanto o navegador estiver aberto. Só preços observados entram no histórico.
+
+Apoio: rfsbraz@proton.me

@@ -1,4 +1,4 @@
-name: Live store page checks
+name: Verificação das páginas das lojas
 on:
   schedule:
     - cron: '17 * * * *'

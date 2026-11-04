@@ -81,43 +81,46 @@ export function issueBody(report, runUrl, previousBody = '') {
     complete && Object.keys(failures).length === 0 && report.results.every(r => r.status === 'ok');
   const lines = [
     marker,
-    'Live checks use the shipped store adapters and book-page detector.',
+    'As verificações utilizam os adaptadores das lojas e o detetor de páginas de livros distribuídos com a extensão.',
     '',
-    '[Latest workflow run and diagnostic artifact](' + runUrl + ')',
+    '[Última execução e ficheiro de diagnóstico](' + runUrl + ')',
     '',
-    'This run: ' +
+    'Nesta execução: ' +
       (report?.results?.length || 0) +
       '/' +
       expected.length +
-      ' planned stores. Complete: ' +
-      (complete ? 'yes' : 'no') +
+      ' lojas previstas. Relatório completo: ' +
+      (complete ? 'sim' : 'não') +
       '.',
-    'Checks are spread across 24 hourly slots, one or two stores per slot, with randomized delays.',
-    'Unchecked failures remain here until that store passes. A successful hourly batch cannot clear another store.',
-    'HTTP 429 means rate limited. HTTP 401, 403 and 405 are reported separately; they do not prove rate limiting.',
+    'As verificações distribuem-se por 24 intervalos horários, com uma ou duas lojas por intervalo e atrasos aleatórios.',
+    'As falhas mantêm-se até a respetiva loja passar numa nova verificação. O sucesso de um grupo não elimina as falhas de outras lojas.',
+    'HTTP 429 indica um limite de pedidos. Os códigos HTTP 401, 403 e 405 são apresentados separadamente e não comprovam esse limite.',
     ''
   ];
   if (!complete) {
     lines.push(
-      'The checker did not produce a complete report for its planned stores. Inspect the workflow logs.',
+      'A verificação não produziu um relatório completo para as lojas previstas. Consulta os registos da execução.',
       ''
     );
   }
   const rows = Object.values(failures).sort((a, b) => a.store.localeCompare(b.store));
   if (rows.length) {
-    lines.push('| Store | Sample ISBN | Failure | Last checked (UTC) |', '|---|---|---|---|');
+    lines.push(
+      '| Loja | ISBN de exemplo | Falha | Última verificação (UTC) |',
+      '|---|---|---|---|'
+    );
     for (const r of rows) {
       const s = STORES.find(s => s.id === r.store);
       const checked = Number.isFinite(Date.parse(r.checkedAt))
         ? new Date(r.checkedAt).toISOString()
-        : 'Previous monitor';
+        : 'Verificação anterior';
       lines.push('| ' + s.name + ' | ' + s.sample + ' | ' + r.status + ' | ' + checked + ' |');
     }
   }
   lines.push(
     '',
-    'Use npm run test:live -- STORE_ID to reproduce one store; --all is an explicit local full check.',
-    'See docs/store-monitoring.md. Access failures and unavailable samples do not by themselves prove a broken parser.',
+    'Usa npm run test:live -- STORE_ID para verificar uma loja; --all executa explicitamente uma verificação local completa.',
+    'Consulta docs/store-monitoring.md. As falhas de acesso e os exemplos indisponíveis não comprovam, por si só, uma falha de extração.',
     '<!-- store-health-state:' + Buffer.from(JSON.stringify(rows)).toString('base64') + ' -->'
   );
   return { healthy, body: lines.join('\n') };
@@ -140,12 +143,17 @@ export async function syncIssue({ github, repo, report, runUrl }) {
         state_reason: 'completed',
         body:
           body +
-          '\n\nAll previously failing stores have now passed. The monitor closed this issue automatically.'
+          '\n\nTodas as lojas anteriormente em falha passaram na verificação. Esta issue foi fechada automaticamente.'
       });
     }
     return;
   }
-  const params = { ...repo, title: 'Live store page checks are failing', body, state: 'open' };
+  const params = {
+    ...repo,
+    title: 'Falhas na verificação das páginas das lojas',
+    body,
+    state: 'open'
+  };
   if (existing) {
     await github.rest.issues.update({ ...params, issue_number: existing.number });
   } else {

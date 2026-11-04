@@ -1,72 +1,50 @@
-# Chrome Web Store privacy fields
+# Privacidade e permissões nas lojas
 
-Prepared for version 0.1.5 on 2026-11-03. These statements describe the packaged code. The account owner must confirm the dashboard certifications when submitting.
+Versão 0.1.5. Estas declarações descrevem o código empacotado. O titular da conta deve rever as certificações no painel ao submeter.
 
-## Single purpose
+## Finalidade única
 
-Help users compare the price of the same book edition across selected bookshops, including automatic-by-default on-page cheaper-offer alerts and a local record of manual price checks.
+Comparar a mesma edição de um livro em lojas selecionadas, com avisos automáticos de ofertas mais baratas e registo local de observações.
 
-## Permission justifications
+## Justificação das permissões
 
-### alarms
+- `activeTab`: lê o separador atual quando o utilizador abre a extensão, para identificar ISBN e título na comparação manual.
+- `scripting`: lê a página ativa e regista o script incluído de deteção apenas em lojas selecionadas/autorizadas. Ativo por predefinição salvo desativação guardada; também inicializa separadores já abertos.
+- `storage`: guarda ISBN, títulos, histórico próprio, alvos, estado de notificações, portes, destino, lojas e preferências em chrome.storage.local. Sem sincronização ou análise de utilização.
+- `alarms`: agenda consultas espaçadas apenas para alvos ativos e restaura o agendamento após reinício.
+- `notifications`: avisa quando um alvo é atingido ou surge preço elegível inferior; o aviso também fica na extensão.
+- `offscreen`: em Chrome/Edge, fornece DOM oculto incluído no pacote para analisar HTML enquanto a comparação decorre sem o menu aberto. Firefox usa página/moldura local equivalente. Scripts descarregados não são executados.
+- `host_permissions`: consulta páginas de pesquisa/produto por HTTPS e deteta livros nas mesmas origens autorizadas. As 26 origens específicas são declaradas na instalação; os pedidos só usam lojas selecionadas. Não há acesso irrestrito.
 
-Schedule staggered checks only for saved books with enabled price targets, and restore the schedule after browser restarts.
+## Código remoto
 
-### notifications
+Selecionar a opção que declara não usar código remoto. Todo o JavaScript executável acompanha a extensão. HTML e JSON das lojas são dados. Importações dinâmicas apontam para módulos incluídos, não código de terceiros.
 
-Show a system notification when a saved target is reached or a lower qualifying price is observed. The notice also remains in the extension.
+## Divulgação de tipos de dados
 
-### activeTab
+O processamento local também deve ser divulgado. A extensão não deve ser descrita como tratando zero dados.
 
-Reads the current tab only after the user opens the extension, to identify the book ISBN and title for manual comparison.
+| Tipo no painel                      | Seleção          | Âmbito                                                                                                |
+| ----------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
+| Conteúdo de sites                   | Sim              | Página do livro, ISBN, título, preço e disponibilidade; HTML permanece local.                         |
+| Histórico/atividade de navegação    | Sim              | URL atual de lojas suportadas para deteção e encaminhamento; sem registo geral de navegação.          |
+| Atividade do utilizador             | Sim              | Seleção de lojas, ações da estante e preferências locais; sem telemetria de cliques, rato ou teclado. |
+| Informação de identificação pessoal | Não, na extensão | Sem recolha de conta, nome ou email; contactos voluntários de apoio são tratados separadamente.       |
+| Informação de saúde                 | Não              | Sem recolha para fins de saúde.                                                                       |
+| Informação financeira/pagamento     | Não              | Só preços públicos de produtos; sem acesso a pagamentos.                                              |
+| Autenticação                        | Não              | Sem palavras-passe ou cookies de autenticação; os pedidos omitem cookies de sessão.                   |
+| Comunicações pessoais               | Não, na extensão | Não lê emails ou mensagens; correspondência de apoio é externa.                                       |
+| Localização                         | Não              | Sem geolocalização ou perfis; as lojas recebem o IP normal da ligação.                                |
 
-### scripting
+## Utilização de dados
 
-Reads the active page for manual comparison and registers the packaged book-detection script only on selected, authorized shop domains by default after installation, unless the user has disabled alerts. Also initializes detection in already-open authorized shop tabs.
+A extensão não vende nem transfere dados para finalidades alheias, não os usa para crédito/empréstimos nem recolhe navegação para perfis publicitários. Cliques de afiliado divulgados enviam o identificador à Wook, que pode usar cookies segundo a sua política. ISBN/título só seguem para lojas selecionadas para a comparação descrita. Nenhum servidor do responsável recebe páginas ou dados de navegação. Revê a política de privacidade antes de confirmar as certificações de utilização limitada.
 
-### storage
+## URL de privacidade
 
-Stores saved ISBNs and titles, locally observed manual/scheduled history, target prices, notification state, shipping rules/region, selected shop IDs and alert preferences in chrome.storage.local. No Chrome Sync or analytics.
+Pendente: alojar website/privacy.html num URL HTTPS público e introduzi-lo no painel. Uma ligação local ou um repositório privado não são uma política pública.
 
-### offscreen
-
-Provides a bundled hidden DOM environment for parsing retrieved bookshop HTML with DOMParser while automatic comparisons run independently of the toolbar popup. Downloaded scripts are never executed.
-
-### host_permissions
-
-Fetches ISBN search and product pages directly from the selected shops over HTTPS and enables page detection on those same authorized domains. Access to the 26 specific shop origins is declared in host_permissions and requested at installation, enabling background comparisons without a separate setup step. No unrestricted host permission is requested.
-
-## Remote code
-
-Select: No, I am not using remote code.
-
-All executable JavaScript is included in the extension. Bookshop HTML and JSON are parsed as data. Dynamic imports reference packaged extension modules, not third-party JavaScript.
-
-## Data-type disclosures
-
-Use these conservative disclosures rather than declaring that the extension handles no user data. Local processing must also be disclosed.
-
-| Dashboard data type | Selection | Scope |
-|---|---|---|
-| Website content | Yes | Book-page content, ISBN, title, prices and availability are processed to match offers. HTML stays local. |
-| Web history / browsing activity | Yes | Current supported shop URLs are processed for detection and routing. No general browsing-history log is collected or stored. |
-| User activity | Yes | Selected shops, saved-book actions and comparison preferences are processed locally to provide the features. No clickstream, cursor or keystroke telemetry. |
-| Personally identifiable information | No, within extension | No account, name or email collection in extension code. Emails voluntarily sent to support are handled separately as explained in the policy. |
-| Health information | No | No collection for health purposes. |
-| Financial/payment information | No | Public product prices are processed; payment details are not accessed. |
-| Authentication information | No | No passwords or authentication cookies collected; extension requests omit session cookies. |
-| Personal communications | No, within extension | The extension does not read email or messages. Support correspondence is external to the extension. |
-| Location | No | No geolocation request or location profiling; shops receive the normal network IP address. |
-
-## Data-use certifications
-
-The extension does not sell or transfer user data for unrelated purposes, use it for creditworthiness/lending, or collect browsing data for advertising profiles. Disclosed affiliate offer clicks send the partner identifier to Wook, which may set cookies under its own policy. The ISBN/title are transmitted only to selected shops to perform the disclosed comparison feature. No developer backend receives page content or browsing data. Use the dashboard's corresponding limited-use certifications after reviewing the supplied privacy policy.
-
-## Privacy URL
-
-PENDING: host website/privacy.html at a public HTTPS URL and enter it in the dashboard. A file link or the private GitHub repository is not a public privacy-policy URL.
-
-## Host access requested at installation
+## Origens declaradas na instalação
 
 - Wook: https://www.wook.pt/*
 - Bertrand: https://www.bertrand.pt/*
@@ -95,4 +73,4 @@ PENDING: host website/privacy.html at a public HTTPS URL and enter it in the das
 - Mundo Fantasma: https://mundofantasma.com/*
 - Devir: https://editoradevir.pt/*
 
-Sources: [Privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy), [local data and website-content disclosure](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq).
+Fontes: [campos de privacidade](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy) e [divulgação de dados locais e conteúdo de sites](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq).

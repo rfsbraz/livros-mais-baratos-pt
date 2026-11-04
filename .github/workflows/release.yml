@@ -1,15 +1,15 @@
-name: Release
+name: Publicação
 on:
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag (v0.1.5)
+        description: Etiqueta de uma versão existente (v0.1.5)
         required: true
         type: string
       stores:
-        description: Stores to publish
+        description: Lojas onde publicar
         type: choice
         options: [none, all, chrome, firefox, edge]
         default: none
@@ -61,18 +61,18 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Verify release version
+      - name: Verificar a versão a publicar
         env:
           TAG: ${{ needs.target.outputs.tag }}
         run: node --input-type=module -e "import fs from 'node:fs'; if ('v'+JSON.parse(fs.readFileSync('package.json')).version !== process.env.TAG) process.exit(1)"
       - run: npm ci
       - run: npm run check && npm test && npm run build:all
-      - name: Build submission pack when supported by the tag
+      - name: Gerar o pacote de submissão quando a versão o permitir
         run: |
           if [ -f scripts/store-pack.mjs ]; then
             npm run store-listing:check && npm run store-listing:pack
           else
-            echo "::notice::This older tag predates the multi-store submission pack."
+            echo "::notice::Esta versão é anterior ao pacote de submissão para várias lojas."
           fi
       - uses: softprops/action-gh-release@v2
         with:
@@ -118,7 +118,7 @@ jobs:
 
     steps:
       # Checkout first: it cleans the workspace, so it must run before the download.
-      - name: Checkout
+      - name: Obter o código
         uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.target.outputs.tag }}
@@ -127,7 +127,7 @@ jobs:
       # The AMO script comes from the workflow's own commit, not the tag: a dispatch for
       # an older tag would otherwise run that tag's script. It reads
       # CHANGELOG.md, the screenshots and the version from the tag checkout (--root .).
-      - name: Checkout release tools
+      - name: Obter as ferramentas de publicação
         uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
@@ -135,27 +135,27 @@ jobs:
           persist-credentials: false
           sparse-checkout: scripts
 
-      - name: Download artifacts
+      - name: Descarregar os artefactos
         uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist
 
-      - name: Setup Node.js
+      - name: Preparar o Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 22
 
       # A rerun for a version AMO already has must not upload again (AMO answers 409
       # "Version X already exists"), but must still set the notes and previews.
-      - name: Check whether AMO already has this version
+      - name: Verificar se esta versão já existe no AMO
         id: amo-version
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: node .release-tools/scripts/amo-release.mjs --check-version --root .
 
-      - name: Upload to Firefox Add-ons
+      - name: Enviar para o Firefox Add-ons
         id: upload
         if: steps.amo-version.outputs.exists != 'true'
         continue-on-error: true
@@ -168,7 +168,7 @@ jobs:
 
       # A failed upload is fine only if AMO has the version anyway (a 409 from a race
       # with an earlier attempt). Otherwise the job fails here.
-      - name: Confirm AMO has this version
+      - name: Confirmar a versão no AMO
         if: steps.upload.outcome == 'failure'
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
@@ -179,13 +179,13 @@ jobs:
       # same AMO key: the CHANGELOG.md section for this version becomes the release
       # notes, and the listing previews are synced to store-listing/screenshots/*.png.
       # See store-listing/AUTOMATION.md.
-      - name: Set AMO release notes and previews
+      - name: Atualizar notas e imagens no AMO
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: node .release-tools/scripts/amo-release.mjs --apply --root .
 
-      - name: Sync listing translations
+      - name: Sincronizar os textos da ficha
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
@@ -193,7 +193,7 @@ jobs:
           if [ -d store-listing/locales ]; then
             node .release-tools/scripts/amo-listing.mjs --apply --root .
           else
-            echo "::notice::This older tag predates shared listing locales; text was left unchanged."
+            echo "::notice::Esta versão é anterior aos textos partilhados das fichas; o texto foi mantido."
           fi
 
   publish-to-edge:
@@ -209,14 +209,14 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
-      - name: Checkout release tools
+      - name: Obter as ferramentas de publicação
         uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           path: .release-tools
           persist-credentials: false
           sparse-checkout: scripts
-      - name: Generate certification notes
+      - name: Gerar as notas de certificação
         id: notes
         run: node .release-tools/scripts/edge-cert-notes.mjs --github-output --root .
       - uses: actions/download-artifact@v8

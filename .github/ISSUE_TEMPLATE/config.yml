@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Comunicar uma vulnerabilidade em privado
+    url: mailto:rfsbraz@proton.me
+    about: Não publiques credenciais, dados pessoais ou vulnerabilidades por corrigir nas issues públicas.

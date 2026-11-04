@@ -18,19 +18,19 @@
       "changelog-sections": [
         {
           "type": "feat",
-          "section": "Features"
+          "section": "Funcionalidades"
         },
         {
           "type": "fix",
-          "section": "Bug Fixes"
+          "section": "Correções"
         },
         {
           "type": "perf",
-          "section": "Performance"
+          "section": "Desempenho"
         },
         {
           "type": "deps",
-          "section": "Dependencies"
+          "section": "Dependências"
         },
         {
           "type": "chore",
@@ -48,7 +48,10 @@
           "type": "refactor",
           "hidden": true
         }
-      ]
+      ],
+      "pull-request-title-pattern": "chore${scope}: publicar${component} ${version}",
+      "pull-request-header": "- Preparação de uma nova versão. Revê e traduz para português de Portugal as notas extraídas de commits em inglês antes de integrar.",
+      "pull-request-footer": ""
     }
   }
 }

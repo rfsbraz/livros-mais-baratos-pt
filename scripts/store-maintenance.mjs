@@ -66,7 +66,7 @@ for (const store of ['chrome', 'edge', 'firefox']) {
         }
         const expiry = Date.parse(process.env.EDGE_API_KEY_EXPIRES);
         if (!Number.isFinite(expiry) || expiry - Date.now() < 30 * 86400000) {
-          throw new Error('API key expiry needs review');
+          throw new Error('É necessário rever a validade da chave da API');
         }
       } else {
         const now = Math.floor(Date.now() / 1000),
@@ -99,7 +99,7 @@ for (const store of ['chrome', 'edge', 'firefox']) {
         const overview = html.match(/<div jsname="ij8cu"[^>]*>([\s\S]*?)<\/div>/);
         const paragraphs = [...(overview?.[1] || '').matchAll(/<p>([\s\S]*?)<\/p>/g)];
         if (!summary || !paragraphs.length) {
-          throw new Error('Unrecognized store page');
+          throw new Error('Página da loja não reconhecida');
         }
         live = { summary: summary[1], description: paragraphs.at(-1)[1] };
       } else if (store === 'edge') {
@@ -108,7 +108,7 @@ for (const store of ['chrome', 'edge', 'firefox']) {
             `https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/${encodeURIComponent(cfg.id)}?hl=${encodeURIComponent(language)}`
           )
         ).json();
-        live = { summary: data.shortDescription, description: data.description };
+        live = { summary: data.shortDescrição, description: data.description };
       } else {
         const data = await (
           await request(
@@ -118,7 +118,7 @@ for (const store of ['chrome', 'edge', 'firefox']) {
         live = { summary: data.summary?.[language], description: data.description?.[language] };
       }
       if (!live.summary || !live.description) {
-        throw new Error('Missing listing text');
+        throw new Error('Texto da ficha em falta');
       }
       if (
         plain(live.summary) !== plain(locale.summary) ||
@@ -131,7 +131,7 @@ for (const store of ['chrome', 'edge', 'firefox']) {
       store,
       status: differences.length ? 'drift' : 'clean',
       detail: differences.length
-        ? `Listing differs in ${differences.join(', ')}. Use store-listing/CHROME_UPDATE.md or EDGE_UPDATE.md, or rerun Firefox listing sync.`
+        ? `A ficha difere em ${differences.join(', ')}. Consulta store-listing/CHROME_UPDATE.md ou EDGE_UPDATE.md, ou volta a sincronizar a ficha do Firefox.`
         : undefined
     });
   } catch (error) {
@@ -140,7 +140,7 @@ for (const store of ['chrome', 'edge', 'firefox']) {
       status: 'error',
       detail: error.message.startsWith('HTTP ')
         ? error.message
-        : 'Check failed; review store configuration.'
+        : 'A verificação falhou; revê a configuração da loja.'
     });
   }
 }

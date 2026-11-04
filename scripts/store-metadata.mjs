@@ -8,18 +8,14 @@ for (const dir of ['metadata', 'website', 'source']) {
 }
 const config = JSON.parse(await readFile('store-listing/listing.json', 'utf8'));
 const pt = JSON.parse(await readFile('store-listing/locales/pt-PT.json', 'utf8'));
-const en = JSON.parse(await readFile('store-listing/locales/en.json', 'utf8'));
 const summary = pt.summary;
 const description = pt.description.join('\n');
-const english = en.description.join('\n');
 await writeFile(
   `${out}/metadata/listing-pt-PT.txt`,
   `Nome\nLivros Mais Baratos PT\n\nResumo (${summary.length}/132 caracteres)\n${summary}\n\nDescrição detalhada\n${description}\n`
 );
 await writeFile(`${out}/metadata/description-pt-PT.txt`, description + '\n');
-await writeFile(`${out}/metadata/description-en.txt`, english + '\n');
 await writeFile(`${out}/metadata/summary-pt-PT.txt`, summary + '\n');
-await writeFile(`${out}/metadata/summary-en.txt`, en.summary + '\n');
 await writeFile(
   `${out}/metadata/listing.json`,
   JSON.stringify(
@@ -38,13 +34,12 @@ await writeFile(
       summary,
       description,
       interfaceLanguages: ['pt-PT'],
-      optionalEnglishListing: english,
       privacyPolicyUrl: config.privacyPolicyUrl,
       supportUrl: config.supportUrl,
       homepageUrl: config.homepageUrl,
       youtubeVideoUrl: null,
       websiteVerified: false,
-      distribution: 'Not submitted; choose visibility and regions in the developer dashboard',
+      distribution: 'Ainda não submetida; escolher visibilidade e países no painel de publicação',
       screenshots: [
         '01-aviso-automatico',
         '02-comparar-edicao',
@@ -153,44 +148,21 @@ await writeFile(
   )
 );
 await writeFile(`${out}/metadata/privacy-policy-pt-PT.md`, privacy);
-const permissions = {
-  alarms:
-    'Schedule staggered checks only for saved books with enabled price targets, and restore the schedule after browser restarts.',
-  notifications:
-    'Show a system notification when a saved target is reached or a lower qualifying price is observed. The notice also remains in the extension.',
-  activeTab:
-    'Reads the current tab only after the user opens the extension, to identify the book ISBN and title for manual comparison.',
-  scripting:
-    'Reads the active page for manual comparison and registers the packaged book-detection script only on selected, authorized shop domains by default after installation, unless the user has disabled alerts. Also initializes detection in already-open authorized shop tabs.',
-  storage:
-    'Stores saved ISBNs and titles, locally observed manual/scheduled history, target prices, notification state, shipping rules/region, selected shop IDs and alert preferences in chrome.storage.local. No Chrome Sync or analytics.',
-  offscreen:
-    'Provides a bundled hidden DOM environment for parsing retrieved bookshop HTML with DOMParser while automatic comparisons run independently of the toolbar popup. Downloaded scripts are never executed.',
-  host_permissions:
-    'Fetches ISBN search and product pages directly from the selected shops over HTTPS and enables page detection on those same authorized domains. Access to the 26 specific shop origins is declared in host_permissions and requested at installation, enabling background comparisons without a separate setup step. No unrestricted host permission is requested.'
-};
+async function template(name) {
+  return (await readFile(`store-listing/templates/${name}`, 'utf8'))
+    .replaceAll('{{version}}', version)
+    .replaceAll('{{hosts}}', STORES.map(s => `- ${s.name}: ${s.origin}/*`).join('\n'));
+}
 await writeFile(
   `${out}/metadata/privacy-and-permissions.md`,
-  `# Chrome Web Store privacy fields\n\nPrepared for version ${version} on 2026-11-03. These statements describe the packaged code. The account owner must confirm the dashboard certifications when submitting.\n\n## Single purpose\n\nHelp users compare the price of the same book edition across selected bookshops, including automatic-by-default on-page cheaper-offer alerts and a local record of manual price checks.\n\n## Permission justifications\n\n${Object.entries(
-    permissions
-  )
-    .map(([k, v]) => `### ${k}\n\n${v}`)
-    .join(
-      '\n\n'
-    )}\n\n## Remote code\n\nSelect: No, I am not using remote code.\n\nAll executable JavaScript is included in the extension. Bookshop HTML and JSON are parsed as data. Dynamic imports reference packaged extension modules, not third-party JavaScript.\n\n## Data-type disclosures\n\nUse these conservative disclosures rather than declaring that the extension handles no user data. Local processing must also be disclosed.\n\n| Dashboard data type | Selection | Scope |\n|---|---|---|\n| Website content | Yes | Book-page content, ISBN, title, prices and availability are processed to match offers. HTML stays local. |\n| Web history / browsing activity | Yes | Current supported shop URLs are processed for detection and routing. No general browsing-history log is collected or stored. |\n| User activity | Yes | Selected shops, saved-book actions and comparison preferences are processed locally to provide the features. No clickstream, cursor or keystroke telemetry. |\n| Personally identifiable information | No, within extension | No account, name or email collection in extension code. Emails voluntarily sent to support are handled separately as explained in the policy. |\n| Health information | No | No collection for health purposes. |\n| Financial/payment information | No | Public product prices are processed; payment details are not accessed. |\n| Authentication information | No | No passwords or authentication cookies collected; extension requests omit session cookies. |\n| Personal communications | No, within extension | The extension does not read email or messages. Support correspondence is external to the extension. |\n| Location | No | No geolocation request or location profiling; shops receive the normal network IP address. |\n\n## Data-use certifications\n\nThe extension does not sell or transfer user data for unrelated purposes, use it for creditworthiness/lending, or collect browsing data for advertising profiles. Disclosed affiliate offer clicks send the partner identifier to Wook, which may set cookies under its own policy. The ISBN/title are transmitted only to selected shops to perform the disclosed comparison feature. No developer backend receives page content or browsing data. Use the dashboard's corresponding limited-use certifications after reviewing the supplied privacy policy.\n\n## Privacy URL\n\nPENDING: host website/privacy.html at a public HTTPS URL and enter it in the dashboard. A file link or the private GitHub repository is not a public privacy-policy URL.\n\n## Host access requested at installation\n\n${STORES.map(s => `- ${s.name}: ${s.origin}/*`).join('\n')}\n\nSources: [Privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy), [local data and website-content disclosure](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq).\n`
+  await template('privacy-and-permissions.md')
 );
-await writeFile(
-  `${out}/metadata/reviewer-notes.txt`,
-  `Livros Mais Baratos PT ${version}\n\nOpen Definições for shop selection, shipping, alert preferences, affiliate preferences and data deletion. Voltar aos preços returns to the same results. The main view contains search, prices and saved books.\n\nNo login, subscription, API key or payment is required. The interface is in Portuguese (Portugal).\n\nAffiliate links:\nEnabled by default, with the Apoiar através de ligações de afiliado opt-out. Only a deliberate click on a confirmed cheaper Wook offer adds a_aid=5d3ee4327c2fd. Background requests and ranking are unaffected. Existing affiliate attribution is preserved. Disable the setting to open clean offer links. Wook may use cookies after navigation.\n\nTargets, shipping and history:\nSave a book, set an item or delivered target, and keep Chrome open. The first scheduled check starts within a few minutes, subject to ten-minute spacing. Disable with Verificar preços-alvo da estante. Delivery rules and dated promotions are under Entrega e portes. Charts contain only local observations. Alarms and notifications permissions are declared at installation/update.\n\nManual comparison:\n1. Open the extension and enter a valid ISBN, such as 9789895598762 or 9789899267411.\n2. Select shops and choose Comparar. Shop access was requested at installation; no additional permission prompt is requested here.\n3. Confirmed offers show a price and availability. Access failures have no invented price and retain a link to the shop.\n4. Guardar saves a book locally. Histórico neste navegador shows observations from manual comparisons.\n\nAutomatic alerts:\n1. Install the extension and accept Chrome’s declared site permissions. Do not open the toolbar popup or write any preferences. Six shops are selected by default (Wook, Bertrand, Almedina, Continente, Porto Editora and Presença) and alerts are enabled by default on a fresh installation.\n2. Visit a supported product page, for example https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345 or another selected-shop book page with an ISBN and price.\n3. The toolbar popup does not need to be opened. A dismissible on-page notice appears only if another selected authorized shop returns a strictly cheaper new EUR offer for the same ISBN, with confirmed stock.\n4. No notice is expected when no qualifying cheaper offer is found. Live prices and access restrictions vary. The extension does not guarantee a discount for the example ISBN.\n5. Close a notice with ×. Disable alerts with Desativar avisos automáticos. Apagar dados removes shelf/history, resets selection and disables alerts.\n\nThe screenshots use the actual popup and notification components with labelled illustrative prices. Demo responses are not included in the upload package. Network and browser regression fixtures remain outside the runtime package.\n\nAutomatic comparisons are bounded, cache results in memory for ten minutes, omit session cookies and never execute downloaded scripts. Target checks for saved books run approximately daily while the browser is open. Only observed prices enter local history.\n\nSupport: rfsbraz@proton.me\n`
-);
+await writeFile(`${out}/metadata/reviewer-notes.txt`, await template('reviewer-notes.txt'));
 await writeFile(
   `${out}/metadata/release-notes-pt-PT.txt`,
   'Preços-alvo com verificações agendadas, totais estimados com portes, mínimos e campanhas datadas, e gráficos apenas com observações locais. Afiliados Wook opcionais, ativos por predefinição, com divulgação e opção de desativar. Deteção automática por predefinição de páginas de livros, com acesso às lojas solicitado na instalação e avisos de ofertas mais baratas da mesma edição. Seleção de lojas, comparação por ISBN, estante e histórico local de consultas. A cobertura e a disponibilidade dos preços dependem de cada loja.\n'
 );
-await writeFile(
-  `${out}/README.md`,
-  `# Browser store submission pack\n\nLivros Mais Baratos PT · ${version} · Prepared from the repository source\n\nSee [AUTOMATION.md](AUTOMATION.md) for Chrome, Firefox and Edge metadata, release automation and account setup. Run npm run store-listing:pack for the per-store upload ZIP.\n\n## Upload map\n\n| Dashboard field | File |\n|---|---|\n| Extension package | upload/livros-mais-baratos-pt-${version}-store.zip |\n| Store icon | icons/icon-128.png |\n| Screenshots, in order | screenshots/01... through 05... (1280×800 each) |\n| Small promotional tile | promo/small-440x280.png |\n| Marquee promotional tile | promo/marquee-1400x560.png |\n| Name and short summary | metadata/listing-pt-PT.txt |\n| Detailed description | metadata/description-pt-PT.txt |\n| Optional English listing | metadata/description-en.txt (UI remains Portuguese) |\n| Privacy and permission answers | metadata/privacy-and-permissions.md |\n| Reviewer instructions | metadata/reviewer-notes.txt |\n| Support email | rfsbraz@proton.me |\n| Category and language | Shopping; Portuguese (Portugal) |\n\n## Before submission\n\nHost the three files in website/ on a public HTTPS site. Enter the privacy.html URL in the dashboard; support.html can be the support URL and index.html the website URL. These URLs are intentionally null in listing.json because no domain has been supplied. Do not use the private repository as a public support or privacy link. No public deployment or store submission has been performed.\n\nConfirm your publisher account/contact verification, distribution visibility and countries in the developer dashboard. A private source repository does not determine Chrome Web Store listing visibility. The optional YouTube video is not included or required for this pack.\n\n## Asset details\n\nFive screenshots use real extension components with illustrative ISBN/price responses, labelled on each image. They are demonstration captures, not live-price evidence. The book-cover block is an original text-only demonstration design, not the published cover. The notification screenshot is composed around the real notification component; its position/width are adjusted for presentation. No retailer logos, Chrome logos, rankings, endorsements or review stars are used.\n\nThe 128px icon uses 96px artwork with transparent padding. Other icon sizes, editable SVG, promotional HTML and the generation script are included. Screenshot and promo exports are opaque PNGs. asset-manifest.json records their pixel dimensions.\n\nThe upload ZIP contains production code from ${version} with matching icons and the same summary as the repository manifest. It excludes screenshots, fixtures, development files and credentials. source/extension/ contains the exact upload source. The production code, store metadata generators and screenshots are updated together for automatic-by-default behavior.\n\nThe source HTML layouts reference a local capture server for the popup and are editable design references, not public web pages. Run npm run build, node scripts/store-assets.mjs and node scripts/store-metadata.mjs from the project checkout with Node and Playwright to reproduce this pack. The website/ folder is self-contained and ready to host.\n\n## Official specifications checked\n\n- [Listing fields and image dimensions](https://developer.chrome.com/docs/webstore/cws-dashboard-listing)\n- [Icon padding and image formats](https://developer.chrome.com/docs/webstore/images)\n- [Screenshot and promotional guidance](https://developer.chrome.com/docs/webstore/best-listing)\n- [Manifest description length](https://developer.chrome.com/docs/extensions/reference/manifest/description)\n- [Privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy)\n- [Local processing and user-data disclosure](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq)\n`
-);
+await writeFile(`${out}/README.md`, await template('README.md'));
 await cp('scripts/store-assets.mjs', `${out}/source/generate-assets.mjs`);
 await cp('scripts/store-metadata.mjs', `${out}/source/generate-metadata.mjs`);
-console.log('Listing copy, disclosures, reviewer notes and public-page files written.');
+console.log('Metadados, divulgações, instruções de revisão e páginas públicas gerados.');

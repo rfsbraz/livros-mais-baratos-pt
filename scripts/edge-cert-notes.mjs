@@ -21,10 +21,10 @@ import { releaseNotes } from './changelog.mjs';
 const ROOT_DIR = path.resolve(import.meta.dirname, '..');
 // Microsoft documents no limit for this field. Keep it short enough for a reviewer to read.
 const MAX_LENGTH = 2000;
-const MORE = '\n(The full list is in CHANGELOG.md in the GitHub repository.)';
+const MORE = '\n(A lista completa está em CHANGELOG.md no repositório GitHub.)';
 
 function buildNotes({ changelog, version, template }) {
-  const head = `${template.trim()}\n\nChanges in ${version}:\n`;
+  const head = `${template.trim()}\n\nAlterações na versão ${version}:\n`;
   const changes = releaseNotes(changelog, version);
   if (head.length + changes.length <= MAX_LENGTH) {
     return head + changes;
@@ -71,7 +71,7 @@ function main(argv) {
     version,
     template: fs.existsSync(path.join(root, 'store-listing/edge-certification-notes.txt'))
       ? fs.readFileSync(path.join(root, 'store-listing/edge-certification-notes.txt'), 'utf8')
-      : 'No account required. Compare the same ISBN across selected shops; open Definições for shipping and alerts. Shop access can vary. Support: rfsbraz@proton.me.'
+      : 'Não exige conta. Compara o mesmo ISBN nas lojas selecionadas; abre Definições para portes e avisos. O acesso às lojas pode variar. Apoio: rfsbraz@proton.me.'
   });
   console.log(notes);
   console.log(`\n(${notes.length} characters)`);
