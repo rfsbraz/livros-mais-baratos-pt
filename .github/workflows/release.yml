@@ -53,11 +53,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.target.outputs.tag }}
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: chrome-store
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist
@@ -119,7 +119,7 @@ jobs:
     steps:
       # Checkout first: it cleans the workspace, so it must run before the download.
       - name: Obter o código
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.target.outputs.tag }}
           persist-credentials: false
@@ -128,7 +128,7 @@ jobs:
       # an older tag would otherwise run that tag's script. It reads
       # CHANGELOG.md, the screenshots and the version from the tag checkout (--root .).
       - name: Obter as ferramentas de publicação
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           path: .release-tools
@@ -136,13 +136,13 @@ jobs:
           sparse-checkout: scripts
 
       - name: Descarregar os artefactos
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist
 
       - name: Preparar o Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -202,15 +202,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: edge-store
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: refs/tags/${{ needs.target.outputs.tag }}
           persist-credentials: false
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Obter as ferramentas de publicação
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           path: .release-tools
@@ -219,7 +219,7 @@ jobs:
       - name: Gerar as notas de certificação
         id: notes
         run: node .release-tools/scripts/edge-cert-notes.mjs --github-output --root .
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: browser-extensions
           path: dist

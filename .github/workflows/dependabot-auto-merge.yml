@@ -20,7 +20,7 @@ jobs:
           REPO: ${{ github.repository }}
           BASE: ${{ github.event.pull_request.base.ref }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: dependabot/fetch-metadata@v2
+      - uses: dependabot/fetch-metadata@v3
         if: steps.protection.outputs.enabled == 'true'
         id: meta
       - if: steps.protection.outputs.enabled == 'true' && steps.meta.outputs.update-type == 'version-update:semver-patch'
