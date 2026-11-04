@@ -268,6 +268,36 @@ try {
           '9789895701124',
           'https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345'
         )?.price,
+        // Wook's real shape: no availability in JSON-LD, the label in #disp-information.
+        wookStock: (() => {
+          const isbn = '9789895701124';
+          const page = (label, offers = '{"price":"19.46"}', extra = '') =>
+            parse(
+              `<script type="application/ld+json">{"@type":"Book","isbn":"${isbn}","name":"A Criada","offers":${offers}}</script><div id="product-price"><span class="price">19,46€</span></div><span id="disp-information"><span class="text-align-right"><span class="text-green font-bold"> ${label} </span><span>-</span></span><button>i</button></span>${extra}`
+            );
+          const wook = 'https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345';
+          const modal = '<div id="info-availability-toggle-modal"><p>EM STOCK</p></div>';
+          return {
+            label: parseOffer(page('EM STOCK'), isbn, wook).availability,
+            empty: parseOffer(page('', undefined, modal), isbn, wook).availability,
+            prelaunch: parseOffer(page('PRÉ-LANÇAMENTO', undefined, modal), isbn, wook)
+              .availability,
+            structuredWins: parseOffer(
+              page(
+                'EM STOCK',
+                '{"price":"19.46","priceCurrency":"EUR","availability":"https://schema.org/OutOfStock"}'
+              ),
+              isbn,
+              wook
+            ).availability,
+            otherStore: parseOffer(
+              page('EM STOCK', '{"price":"19.46","priceCurrency":"EUR"}'),
+              isbn,
+              'https://www.bertrand.pt/livro/a-criada/28535345'
+            ).availability,
+            otherEdition: parseOffer(page('EM STOCK'), '9780306406157', wook)
+          };
+        })(),
         wrong: parseOffer(parse(wrong), '9780306406157', 'https://www.wook.pt/livro/example'),
         malformed: detectBook(parse('<script type="application/ld+json">broken</script>')).isbn,
         links: productLinks(
@@ -281,6 +311,14 @@ try {
   );
   assert.equal(parsed.good, 1800);
   assert.equal(parsed.wook, 1946);
+  assert.deepEqual(parsed.wookStock, {
+    label: 'InStock',
+    empty: '',
+    prelaunch: '',
+    structuredWins: 'OutOfStock',
+    otherStore: '',
+    otherEdition: null
+  });
   assert.equal(parsed.wrong, null);
   assert.equal(parsed.malformed, null);
   assert.deepEqual(parsed.links, ['https://www.wook.pt/livro/good']);
