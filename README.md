@@ -26,7 +26,7 @@ See [shop coverage](docs/store-coverage.md) for all automatic adapters, manual s
 
 ### Browser Extension Stores
 
-The extension is not yet published on the Chrome Web Store, Firefox Add-ons or Edge Add-ons. Store links will be added when listings are available. The source repository remains private; access to its packages requires repository access.
+The extension is not yet published on the Chrome Web Store, Firefox Add-ons or Edge Add-ons. Store links will be added when listings are available. You can build from source using the instructions below.
 
 ### Manual Installation
 
@@ -134,7 +134,7 @@ npm run store-listing:check
 
 Runtime files live at the repository root, tests in `tests/unit` and `tests/e2e`, build tooling in `scripts`, and store materials in `store-listing`. There is no server or runtime dependency. Firefox's content entry point is bundled during the build. See [architecture](docs/architecture.md) and [cross-browser builds and publishing](docs/reference-alignment.md).
 
-CI runs lint, formatting, unit tests, all-browser builds and native browser tests. Separate live shop monitoring spreads the 26 shops across 24 hourly slots with jitter and tracks failures in issues. See [shop monitoring](docs/store-monitoring.md). Store publishing remains gated until this extension's listing IDs, credentials and public privacy/support URLs are configured.
+CI runs lint, formatting, unit tests, all-browser builds, native browser tests, dependency audits and full fetched-history secret scans. Separate live shop monitoring spreads the 26 shops across 24 hourly slots with jitter and tracks failures in issues. See [shop monitoring](docs/store-monitoring.md). Store publishing remains gated until this extension's listing IDs, credentials and public privacy/support URLs are configured.
 
 ## Store listings
 
@@ -148,7 +148,7 @@ Run `npm run store-listing:assets` to regenerate the images and per-store ZIP. R
 
 ## Contributing
 
-Contributions are welcome from collaborators with repository access. Read the [Contributing Guide](CONTRIBUTING.md) for setup, checks and pull request conventions. The repository remains private while following open-source collaboration practices.
+Contributions are welcome: bug reports, accessibility improvements, documentation and well-tested shop adapters. Read the [Contributing Guide](CONTRIBUTING.md) for setup, checks and pull request conventions. Code is available under the MIT license; retailer names and third-party content remain their owners' property.
 
 ## Security
 

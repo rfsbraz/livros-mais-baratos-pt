@@ -3,6 +3,16 @@ dist/
 work/
 coverage/
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.har
+cookies*.json
+.DS_Store
+Thumbs.db
 *.log
 playwright-report/
 test-results/

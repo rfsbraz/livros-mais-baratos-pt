@@ -34,7 +34,9 @@
     "store-listing:pack": "node scripts/store-metadata.mjs && node scripts/store-pack.mjs",
     "store-listing:assets": "npm run build:all && node scripts/store-assets.mjs && npm run store-listing:pack",
     "store-listing:release": "node scripts/amo-release.mjs",
-    "store-listing:edge-notes": "node scripts/edge-cert-notes.mjs"
+    "store-listing:edge-notes": "node scripts/edge-cert-notes.mjs",
+    "audit:dependencies": "npm audit --audit-level=moderate",
+    "repo:configure": "node scripts/configure-repository.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -49,5 +51,17 @@
   },
   "engines": {
     "node": ">=22.13.0"
+  },
+  "overrides": {
+    "minimatch": "11.0.1"
+  },
+  "description": "Compare book prices by ISBN across Portuguese bookshops in Chrome, Firefox and Edge.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rfsbraz/livros-mais-baratos-pt.git"
+  },
+  "homepage": "https://github.com/rfsbraz/livros-mais-baratos-pt#readme",
+  "bugs": {
+    "url": "https://github.com/rfsbraz/livros-mais-baratos-pt/issues"
   }
 }
