@@ -39,7 +39,10 @@ try {
   assert(
     (await shop.locator('#lmb-price-alert .voucher-promotion').textContent()).includes('33,3%')
   );
-  assert.equal(await shop.getByRole('link', { name: 'Saber mais' }).getAttribute('href'), termsUrl);
+  assert.equal(
+    await shop.getByRole('link', { name: 'Saber mais' }).getAttribute('href'),
+    `${termsUrl}&a_aid=5d3ee4327c2fd`
+  );
   assert.equal(await shop.getByRole('link', { name: /Ver oferta/ }).count(), 0);
   await shop.getByRole('link', { name: 'Saber mais' }).evaluate(a =>
     a.addEventListener('click', e => {

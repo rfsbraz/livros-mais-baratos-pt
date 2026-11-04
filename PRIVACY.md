@@ -22,7 +22,7 @@ As lojas selecionadas e a preferência de avisos ficam guardadas localmente. **D
 
 O apoio por afiliados está ativo por predefinição, com a preferência local `affiliateEnabled`. Desativa **Apoiar através de ligações de afiliado** para deixar de o usar. A escolha mantém-se nas atualizações e ao apagar a estante/histórico.
 
-Só um clique deliberado numa oferta Wook confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada pode acrescentar `a_aid=5d3ee4327c2fd`. Identificadores já existentes são preservados. Pedidos de comparação, URL da página, ligações copiadas e resultados guardados não são reescritos. Não há outros parceiros configurados. A ordenação não depende de comissões.
+Enquanto a opção estiver ativa, todas as ligações para a Wook mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» e ligações copiadas, incluem `a_aid=5d3ee4327c2fd`. Identificadores já existentes são preservados. Pedidos de comparação, URL da página e resultados guardados não são reescritos. Não há outros parceiros configurados. A ordenação não depende de comissões.
 
 Após o clique, a Wook recebe o identificador e dados normais da navegação e pode usar cookies segundo a sua política. O responsável pode receber uma comissão. Desativar a opção impede futuras adições, mas não elimina cookies já definidos pela Wook.
 

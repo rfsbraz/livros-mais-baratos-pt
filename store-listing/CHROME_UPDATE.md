@@ -9,7 +9,7 @@ O mesmo livro. Um preço melhor.
 Livros Mais Baratos PT ajuda-te a comparar preços da mesma edição em livrarias portuguesas e em catálogos internacionais selecionados. O ISBN identifica a edição, para não confundires livros com o mesmo título.
 
 AFILIADOS OPCIONAIS
-Afiliados Wook ativos por predefinição. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Podes desativar na extensão.
+Afiliados Wook ativos por predefinição. Ao abrires uma ligação para a Wook a partir da extensão, mesmo que não seja a oferta mais barata, podemos receber uma comissão. Podes desativar na extensão.
 
 AVISOS NA PÁGINA DO LIVRO
 Instala a extensão e aceita as permissões de acesso às lojas no navegador. Os avisos ficam ativos por predefinição, sem configuração adicional. Ao visitar uma página de livro suportada, a extensão procura ofertas noutras lojas selecionadas. Se confirmar uma edição nova mais barata, em EUR e com stock, mostra um aviso discreto com a poupança e a ligação para a oferta. Podes fechar o aviso ou desativar a função.
@@ -27,7 +27,7 @@ PREÇOS COM CONTEXTO
 Comparamos o preço do livro. Saldo em cartão não é tratado como desconto imediato. A opção Considerar vales Wook na comparação aplica a poupança combinada das campanhas confirmadas ao preço equivalente, identificado como estimativa, e mostra o valor a pagar agora. Está ativa por predefinição e pode ser desativada em Definições. Histórico e preços-alvo mantêm preços reais. Livros usados, marketplaces e moedas diferentes mantêm a sua identificação na comparação manual e não entram nos avisos de menor preço novo em EUR. Consultas automáticas recentes podem ser reutilizadas durante dez minutos; o aviso indica a hora da consulta. Confirma sempre a oferta na loja.
 
 CONTROLO E PRIVACIDADE
-Sem conta ou telemetria. Afiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Não altera a ordenação nem os pedidos de comparação. Após o clique, a Wook pode usar cookies segundo a sua política. A estante, as preferências e o histórico ficam no armazenamento local do navegador. Ao comparar, o ISBN e, quando necessário, o título são enviados diretamente às lojas selecionadas, que também recebem os dados normais de ligação, como o endereço IP. O HTML da página é processado localmente. Os pedidos da extensão não enviam cookies de sessão.
+Sem conta ou telemetria. Afiliados Wook ativos por predefinição, com opção de desativar. Ao abrires uma ligação para a Wook a partir da extensão, mesmo que não seja a oferta mais barata, podemos receber uma comissão. Não altera a ordenação nem os pedidos de comparação. Após o clique, a Wook pode usar cookies segundo a sua política. A estante, as preferências e o histórico ficam no armazenamento local do navegador. Ao comparar, o ISBN e, quando necessário, o título são enviados diretamente às lojas selecionadas, que também recebem os dados normais de ligação, como o endereço IP. O HTML da página é processado localmente. Os pedidos da extensão não enviam cookies de sessão.
 
 O acesso às lojas é pedido na instalação. Os avisos começam ativos, mas podes desativá-los. Podes desativá-los, revogar permissões ou apagar os dados locais a qualquer momento.
 

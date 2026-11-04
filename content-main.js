@@ -63,7 +63,7 @@ export function start() {
     link.href = result.url;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    bindAffiliateLink(link, () => affiliateEnabled, true);
+    bindAffiliateLink(link, () => affiliateEnabled);
     const note = document.createElement('small');
     note.textContent = `Preço do livro. Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
     const disclosure = document.createElement('small');
