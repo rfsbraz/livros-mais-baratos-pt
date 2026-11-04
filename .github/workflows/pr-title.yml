@@ -1,4 +1,4 @@
-name: PR title
+name: Título do PR
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]

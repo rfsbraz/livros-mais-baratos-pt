@@ -14,14 +14,14 @@ import {
 import { releaseNotes } from '../../scripts/changelog.mjs';
 import { buildNotes } from '../../scripts/edge-cert-notes.mjs';
 
-test('listing uses both locales, real images and the production summary', () => {
+test('listing uses the Portuguese locale, real images and the production summary', () => {
   const listing = loadListing();
   assert.deepEqual(validateListing(listing), []);
-  assert.deepEqual(Object.keys(amoPayload(listing).summary), ['pt-PT', 'en-US']);
+  assert.deepEqual(Object.keys(amoPayload(listing).summary), ['pt-PT']);
   const bad = structuredClone(listing);
-  bad.locales.en.screenshots = ['../../private.png'];
-  bad.locales.en.summary = 'x'.repeat(133);
-  assert.equal(validateListing(bad).length, 2);
+  bad.locales['pt-PT'].screenshots = ['../../private.png'];
+  bad.locales['pt-PT'].summary = 'x'.repeat(133);
+  assert.equal(validateListing(bad).length, 3);
 });
 
 test('previewing listing is offline and applying requires credentials', async () => {
@@ -52,7 +52,7 @@ test('release notes select the exact tag, not unreleased or another version', ()
   assert.throws(() => releaseNotes(log, '1.2.4'), /no entries/);
   assert.equal(
     buildNotes({ changelog: log, version: '1.2.3', template: 'Review steps' }),
-    'Review steps\n\nChanges in 1.2.3:\n- shipped'
+    'Review steps\n\nAlterações na versão 1.2.3:\n- shipped'
   );
 });
 
@@ -62,6 +62,7 @@ test('release screenshots are ordered and reruns keep identical pixels', () => {
     version: '0.1.5',
     assetsDir: 'store-listing/screenshots'
   });
+  assert.deepEqual(Object.keys(plan.notesPayload.release_notes), ['pt-PT']);
   assert.equal(plan.previews.length, 5);
   assert.deepEqual(
     plan.previews.map(p => p.position),

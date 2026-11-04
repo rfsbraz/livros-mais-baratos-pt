@@ -57,7 +57,7 @@ function buildPlan({ changelog, version, assetsDir }) {
   return {
     addon: ADDON_GUID,
     version,
-    notesPayload: { release_notes: { 'en-US': notes } },
+    notesPayload: { release_notes: { 'pt-PT': notes } },
     previews
   };
 }

@@ -1,29 +1,29 @@
-name: Bug report
-description: Report an incorrect price, ISBN match or extension problem
+name: Comunicar um erro
+description: Comunicar um preço incorreto, uma correspondência de ISBN errada ou um problema na extensão
 body:
   - type: textarea
     id: description
     attributes:
-      label: Description
+      label: Descrição
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction steps
-      description: Include store URL and ISBN, without personal information.
+      label: Passos para reproduzir
+      description: Inclui o endereço da loja e o ISBN, sem dados pessoais.
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Expected behavior
+      label: Comportamento esperado
     validations:
       required: true
   - type: input
     id: environment
     attributes:
-      label: Environment
-      description: OS, browser (Chrome/Firefox/Edge), browser version, extension version and unpacked/packaged installation.
+      label: Ambiente
+      description: Sistema operativo, navegador (Chrome/Firefox/Edge), versões do navegador e da extensão e tipo de instalação (pasta ou pacote).
     validations:
       required: true

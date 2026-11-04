@@ -75,7 +75,7 @@ jobs:
     needs: lint-and-test
     runs-on: ubuntu-latest
     steps:
-      - name: Require successful unit pipeline
+      - name: Exigir sucesso das verificações unitárias
         env:
           RESULT: ${{ needs.lint-and-test.result }}
         run: test "$RESULT" = success
@@ -84,7 +84,7 @@ jobs:
     needs: e2e-tests
     runs-on: ubuntu-latest
     steps:
-      - name: Require successful browser pipeline
+      - name: Exigir sucesso das verificações nos navegadores
         env:
           RESULT: ${{ needs.e2e-tests.result }}
         run: test "$RESULT" = success

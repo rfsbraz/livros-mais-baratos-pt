@@ -1,4 +1,4 @@
-name: Dependabot patch auto-merge
+name: Integração automática de correções do Dependabot
 on: pull_request
 permissions:
   contents: write
@@ -8,13 +8,13 @@ jobs:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Require enforced checks before enabling auto-merge
+      - name: Exigir verificações obrigatórias antes de ativar a integração automática
         id: protection
         run: |
           if gh api "repos/$REPO/branches/$BASE/protection" --jq '.required_status_checks.contexts | (index("unit") != null and index("browser") != null)' 2>/dev/null | grep -qx true; then
             echo 'enabled=true' >> "$GITHUB_OUTPUT"
           else
-            echo 'Auto-merge skipped: required branch checks are unavailable or cannot be verified.' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Integração automática ignorada: as verificações obrigatórias do ramo estão indisponíveis ou não podem ser confirmadas.' >> "$GITHUB_STEP_SUMMARY"
           fi
         env:
           REPO: ${{ github.repository }}

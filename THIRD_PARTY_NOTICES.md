@@ -1,23 +1,23 @@
-# Third-party notices and content
+# Avisos sobre terceiros e conteúdos
 
-## Project code and artwork
+## Código e imagens do projeto
 
-Project source, original icons and promotional layouts are distributed under the [MIT license](LICENSE). The store release helpers were adapted from [Geocaching.com Friends Logs](https://github.com/rfsbraz/Geocaching.com-Friends-Logs), another MIT-licensed project by the same maintainer.
+O código, os ícones originais e as composições promocionais são distribuídos sob a [licença MIT](LICENSE). As ferramentas de publicação foram adaptadas de [Geocaching.com Friends Logs](https://github.com/rfsbraz/Geocaching.com-Friends-Logs), outro projeto MIT do mesmo responsável.
 
-Screenshots use actual extension components with synthetic responses and labelled illustrative prices. The demonstration book-cover block is a text-only design, not a reproduction of a published cover. The repository does not include retailer logos, full book texts or complete authenticated retailer pages.
+As capturas usam componentes reais da extensão, respostas sintéticas e preços identificados como ilustrativos. O bloco de capa de demonstração é uma composição de texto original, não uma reprodução da capa publicada. O repositório não inclui logótipos de lojas, textos integrais de livros ou páginas autenticadas completas.
 
-Retailer names, book titles, ISBNs and public URLs identify supported sources and examples. They do not imply endorsement. Retailer content and trademarks remain subject to their owners' rights; the project's MIT license does not grant rights to third-party content obtained while using the extension.
+Nomes de lojas, títulos de livros, ISBN e endereços públicos identificam fontes suportadas e exemplos. Não implicam recomendação ou aprovação pelos titulares. Conteúdos e marcas de terceiros continuam sujeitos aos respetivos direitos; a licença MIT deste projeto não concede direitos sobre conteúdos obtidos durante a utilização da extensão.
 
-## Development tools
+## Ferramentas de desenvolvimento
 
-The extension runtime ships no npm dependencies. Builds use an explicit file list; testing tools, downloaded browser binaries, node_modules and development credentials are excluded from browser ZIPs.
+A extensão não distribui dependências npm em execução. Os pacotes são gerados a partir de uma lista explícita de ficheiros que exclui ferramentas de teste, navegadores descarregados, node_modules e credenciais.
 
-The locked development dependency graph records these license identifiers: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0 and 0BSD. These are package metadata, not a replacement for each package's license text. The lockfile identifies exact versions and registry integrity hashes; installed packages retain their own license/notice files.
+As dependências de desenvolvimento fixadas no ficheiro de versões declaram os identificadores MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, BlueOak-1.0.0 e 0BSD. Estes metadados não substituem os textos das licenças. `package-lock.json` identifica as versões e os valores de integridade; cada pacote instalado mantém os seus próprios avisos e licenças.
 
-Direct tools include ESLint and its configuration, Playwright, playwright-webextext, esbuild, Prettier, globals and tslib. Gitleaks is downloaded for CI and history audits only and is not part of the extension. Browser executables installed for tests have their own licenses and are not redistributed in this repository's packages.
+As ferramentas diretas incluem ESLint, Playwright, playwright-webextext, esbuild, Prettier, globals e tslib. Gitleaks é descarregado apenas para a CI e para auditorias ao histórico. Os navegadores usados nos testes têm licenças próprias e não são redistribuídos nos pacotes da extensão.
 
-When adding a dependency or vendoring source, record its license, preserve required notices and verify whether it is shipped to users. Do not assume a development-tool license covers downloaded retailer content.
+Ao adicionar dependências ou código de terceiros, regista a licença, preserva os avisos exigidos e verifica se o conteúdo é distribuído aos utilizadores. A licença de uma ferramenta não cobre automaticamente conteúdos das lojas.
 
-## Affiliate disclosure
+## Afiliados
 
-The public Wook affiliate identifier in `affiliate.js` is an attribution identifier, not a credential. Optional affiliate links are enabled by default and can be disabled in settings. They do not change comparison requests or ranking. Fork maintainers should review both the identifier and the matching user-facing disclosures before distributing their own build.
+O identificador público Wook em `affiliate.js` é um identificador de atribuição, não uma credencial. As ligações opcionais estão ativas por predefinição e podem ser desativadas nas definições. Não alteram pedidos ou ordenação. Quem distribuir uma versão derivada deve rever o identificador e as divulgações correspondentes.

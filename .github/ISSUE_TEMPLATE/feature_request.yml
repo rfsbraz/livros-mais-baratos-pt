@@ -1,19 +1,19 @@
-name: Feature request
-description: Suggest an improvement
+name: Propor uma funcionalidade
+description: Sugerir uma melhoria
 body:
   - type: textarea
     id: description
     attributes:
-      label: Description
+      label: Descrição
     validations:
       required: true
   - type: textarea
     id: use-case
     attributes:
-      label: Use case
+      label: Caso de utilização
     validations:
       required: true
   - type: textarea
     id: solution
     attributes:
-      label: Proposed solution
+      label: Solução proposta

@@ -1,5 +1,5 @@
-# Community conduct
+# Código de conduta
 
-Be respectful, constructive and welcoming. Discuss ideas and code without personal attacks. Harassment, discrimination, threats, publishing private information, and repeated disruptive behavior are not accepted.
+Participa com respeito, de forma construtiva e acolhedora. Discute ideias e código sem ataques pessoais. Não são aceites assédio, discriminação, ameaças, divulgação de informação privada ou comportamentos perturbadores repetidos.
 
-Maintainers may remove harmful content and restrict participation. Report concerns privately to **rfsbraz@proton.me**. Do not publish private details in public issues. Reports will be handled with care and confidentiality where possible. The maintainer aims to acknowledge reports within seven days and will explain any participation restrictions to the affected person when appropriate.
+Os responsáveis pelo projeto podem remover conteúdos prejudiciais e limitar a participação. Comunica preocupações em privado para **rfsbraz@proton.me**. Não publiques detalhes privados em issues. Os relatos serão tratados com cuidado e confidencialidade, sempre que possível. O responsável procura acusar a receção no prazo de sete dias e explicar à pessoa afetada eventuais restrições, quando adequado.

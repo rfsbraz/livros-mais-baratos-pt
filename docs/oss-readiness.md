@@ -1,53 +1,53 @@
-# Open-source preparation
+# Preparação para código aberto
 
-Prepared on 4 November 2026. This work prepares the extension for a public MIT-licensed repository. It does not change repository visibility, merge pull requests, publish browser-store listings or deploy a website.
+Preparado em 4 de novembro de 2026. Este trabalho prepara a extensão para um repositório público com licença MIT. Não altera a visibilidade, não integra PRs, não publica nas lojas de extensões e não aloja um site.
 
-## History decision
+## Decisão sobre o histórico
 
-**No history rewrite is warranted by the audit findings.** The audit fetched branches, tags and available pull-request heads, including closed PRs. At the start of the audit, 34 commits were reachable and 384 unique file blobs totalled approximately 2.61 MB. The largest blob was a 93 KB demonstration screenshot. There were no tracked upload archives, browser profiles, credential files or complete private page captures in that inventory.
+**A auditoria não identificou motivos para reescrever o histórico.** Foram obtidos ramos, etiquetas e referências disponíveis de PRs, incluindo encerrados. No início, existiam 34 commits alcançáveis e 384 conteúdos de ficheiros únicos, com cerca de 2,61 MB. O maior era uma captura de demonstração com 93 KB. O inventário não continha arquivos de submissão, perfis de navegador, ficheiros de credenciais ou capturas completas de páginas privadas.
 
-Gitleaks 8.30.1, downloaded from its official release and verified against the release checksum, scanned all fetched history with redaction enabled and found no secrets. The scanner reported 33 scanned commits (Git counts 34 reachable commits, including the merge). An additional historical text-blob pass found no local user-directory paths or private-key/token patterns. Normal Git author attribution and the intentionally disclosed Wook affiliate ID are retained.
+Gitleaks 8.30.1, obtido da distribuição oficial e verificado pelo respetivo valor de integridade, analisou o histórico com ocultação de segredos nos resultados e não encontrou segredos. Indicou 33 commits analisados; Git conta 34 alcançáveis, incluindo o commit de integração. Uma verificação adicional dos textos históricos não encontrou caminhos locais de pastas de utilizador nem padrões de chaves privadas ou tokens. Mantiveram-se a autoria normal dos commits e o identificador de afiliado Wook divulgado intencionalmente.
 
-This is an audit of fetchable repository content, not proof that no sensitive data exists anywhere. It does not inspect inaccessible server objects, personal browser profiles, GitHub secret values or private accounts. Rewriting clean history would invalidate commit references and complicate existing PRs without addressing an identified exposure. If a real credential is found later, revoke it first, then remove it from every relevant ref and address cached PR references as needed.
+A auditoria cobre o conteúdo que pode ser obtido do repositório. Não verifica objetos inacessíveis do servidor, perfis pessoais, valores dos segredos GitHub ou contas privadas. Não prova ausência absoluta de dados sensíveis. Reescrever um histórico sem exposição identificada invalidaria referências e complicaria PRs. Se surgir uma credencial real, deve ser revogada primeiro e depois removida das referências relevantes, incluindo tratamento de referências em cache quando necessário.
 
-## Findings addressed
+## Correções
 
-| Finding                                                                  | Change                                                                                                                                                                                           |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Vulnerable minimatch 10.2.6 in the lint dependency graph                 | Override to patched 11.0.1 and regenerate the lockfile. Initial npm audit reported five affected dependency nodes for one underlying advisory; the corrected graph reports zero vulnerabilities. |
-| Security reports relied on a private-repository issue                    | Provide a stable private email channel and an issue-form link; never direct reporters to public issues.                                                                                          |
-| Contributor setup described obsolete releases and Chrome-only testing    | Document forks, credential-free setup, all three browsers, shop fixtures, licensing and actual release automation.                                                                               |
-| No recurring secret/dependency security jobs                             | Add pull-request, main and weekly checks using a checksum-pinned scanner and npm audit, including development dependencies.                                                                      |
-| Required compatibility checks could be skipped after an upstream failure | Make unit/browser gate jobs explicitly fail when their upstream pipeline fails.                                                                                                                  |
-| Public-maintainer conventions incomplete                                 | Add code ownership, editor/line-ending settings, stronger secret/capture ignore patterns, repository metadata and third-party notices.                                                           |
+| Problema                                                             | Correção                                                                                                                                                               |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| minimatch 10.2.6 vulnerável nas ferramentas de estilo                | Substituição por 11.0.1 e atualização das versões fixadas. A auditoria inicial assinalava cinco nós afetados por um único aviso; após correção, zero vulnerabilidades. |
+| Comunicação de segurança dependente de uma issue privada             | Contacto privado por email e ligação no formulário de issues.                                                                                                          |
+| Instruções antigas de publicação e testes apenas Chrome              | Guia para contribuições, preparação sem credenciais e testes nos três navegadores.                                                                                     |
+| Falta de verificações recorrentes de segredos/dependências           | Análises em PRs, alterações ao ramo principal e semanalmente, incluindo ferramentas de desenvolvimento.                                                                |
+| Verificações obrigatórias podiam ficar ignoradas após falha anterior | As tarefas unit/browser falham explicitamente quando a tarefa de que dependem falha.                                                                                   |
+| Convenções incompletas para colaboração pública                      | Responsável pelo código, configurações do editor, exclusões de dados sensíveis, metadados e avisos sobre terceiros.                                                    |
 
-The dependency override is temporary because the current lint packages still request minimatch 10.x. Remove it when upstream resolves a patched release and lint/audit checks remain green. Advisory: [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249).
+A substituição de minimatch é temporária porque os pacotes originais ainda pedem 10.x. Só deve ser removida quando resolverem uma versão corrigida e as verificações passarem. Aviso: [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249).
 
-## Security and licensing scope
+## Âmbito de segurança e licenciamento
 
-Reviewed the extension's remote-page parsing and rendering, credential-free shop requests, sender validation for background messages, origin checks, bounded request scheduling, build allowlist and GitHub workflow permissions. Pull-request tests run without publishing credentials. The privileged PR-comment workflow does not check out or execute PR code. Browser fixtures and development tools are excluded from install ZIPs.
+Foram revistos análise/apresentação de páginas remotas, pedidos sem credenciais, validação do remetente das mensagens, origens permitidas, limites de pedidos, lista de ficheiros dos pacotes e permissões das tarefas GitHub. Os testes de PR não recebem credenciais de publicação. A tarefa privilegiada de comentários não obtém nem executa código do PR. Amostras e ferramentas ficam fora dos ZIPs.
 
-The MIT license remains unchanged. There are no npm runtime dependencies. Locked development packages declare permissive license identifiers, documented in [third-party notices](../THIRD_PARTY_NOTICES.md). Original artwork and synthetic test/demo responses are distinguished from third-party retailer content.
+A licença MIT não mudou. Não existem dependências npm em execução na extensão. As ferramentas declaram licenças permissivas, registadas nos [avisos sobre terceiros](../THIRD_PARTY_NOTICES.md). Imagens originais e dados sintéticos são distinguidos de conteúdos das lojas.
 
-These checks reduce risk but are not a penetration test, a legal opinion or a guarantee of security. Shop adapters remain experimental; live access and price correctness require continued maintenance.
+Estas verificações reduzem riscos, mas não são um teste de intrusão, parecer jurídico ou garantia de segurança. Os adaptadores continuam experimentais e precisam de manutenção.
 
-## Public-launch settings
+## Configuração ao tornar público
 
-The repository is still private. GitHub returned HTTP 403 when reading main-branch protection, explaining that the current private-repository plan does not support it. Private vulnerability reporting was also unavailable for this private repository. Dependency vulnerability alerts are enabled.
+O repositório permanece privado. GitHub respondeu HTTP 403 ao consultar a proteção do ramo principal, indicando que o plano atual não suporta essa função para este repositório privado. A comunicação privada de vulnerabilidades também não estava disponível. Os alertas de vulnerabilidades nas dependências estão ativos.
 
-After the owner chooses to make the repository public and the new checks have run on main:
+Depois de o proprietário decidir tornar o repositório público e de as novas verificações correrem no ramo principal:
 
 ```sh
 npm run repo:configure
 npm run repo:configure -- --apply
 ```
 
-The first command is an offline preview. The second requires an authenticated repository administrator and a public repository. It applies the checked-in branch-protection policy, enables vulnerability alerts and enables private vulnerability reporting. It never changes visibility, secrets, branch contents or store publication.
+O primeiro comando mostra uma previsão sem acesso à rede. O segundo exige um administrador autenticado e repositório público. Aplica a proteção versionada e ativa alertas de vulnerabilidades e comunicação privada. Nunca muda visibilidade, segredos, conteúdo dos ramos ou publicação nas lojas.
 
-The policy requires up-to-date `unit`, `browser`, `secret-scan` and `dependency-audit` checks; applies to administrators; disallows force pushes and deletion; and requires conversation resolution. Pull requests are required, but zero external approvals allows the solo maintainer to merge after checks pass. Review branch protection after any workflow/job rename. GitHub secret scanning and push protection should also be enabled in the public repository's security settings when available.
+A política exige `unit`, `browser`, `secret-scan` e `dependency-audit` atualizados; aplica-se aos administradores; proíbe envios forçados e eliminação; e exige resolução das conversas. Exige PRs, mas permite zero aprovações externas para o responsável individual integrar depois de as verificações passarem. Revê a proteção após mudar nomes de tarefas. Ativa também a deteção de segredos e proteção de envios nas definições públicas, quando disponíveis.
 
-Merge the store automation PR before this preparation PR, then rerun the release checks. Store listing IDs, publisher credentials and public privacy/support URLs remain separate requirements for browser-store submission; see [store setup](../store-listing/AUTOMATION.md). They are not required for OSS contributors to build and test locally.
+Integra primeiro o PR de automação das lojas e depois este PR de preparação. Identificadores das lojas, credenciais de editor e URLs públicos de apoio/privacidade são requisitos separados da distribuição nas lojas; não são necessários para contribuir e testar localmente. Consulta a [configuração](../store-listing/AUTOMATION.md).
 
-## Verification
+## Validação
 
-Verified locally: 33 unit tests and all three native browser suites pass, along with lint, formatting, manifest checks, all-browser builds, listing validation and submission-pack generation. The final dependency audit reports zero vulnerabilities. Use the checks in [CONTRIBUTING.md](../CONTRIBUTING.md), plus `npm run store-listing:pack`. The preparation branch is verified against the patched lockfile, rather than merely editing dependency declarations. CI repeats unit/browser checks and the new security scans on subsequent changes. History and dependency audit reports contain no secret values and are kept outside the source tree.
+Passaram localmente 33 testes unitários, os testes nativos nos três navegadores, estilo, formatação, manifesto, geração dos pacotes, validação das páginas das lojas e geração do pacote de submissão. A auditoria final de dependências indica zero vulnerabilidades. Segue os comandos de [CONTRIBUTING.md](../CONTRIBUTING.md) e `npm run store-listing:pack`. A validação usa as dependências corrigidas, não apenas declarações editadas. A CI repete os testes e análises nas alterações seguintes. Os relatórios de auditoria não contêm valores secretos e ficam fora do código-fonte.

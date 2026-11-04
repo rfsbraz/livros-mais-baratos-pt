@@ -18,7 +18,7 @@ if (!apply) {
       {
         repository,
         operations,
-        note: 'Preview only. Apply after publication and after these checks have run on main.'
+        note: 'Apenas pré-visualização. Aplica após a publicação e depois de estas verificações terem sido executadas no ramo main.'
       },
       null,
       2
@@ -28,11 +28,11 @@ if (!apply) {
   const repo = JSON.parse(execFileSync('gh', ['api', `repos/${repository}`], { encoding: 'utf8' }));
   if (repo.private) {
     throw new Error(
-      'Repository is private. This setup is for public launch and does not change visibility.'
+      'O repositório é privado. Esta configuração destina-se à publicação e não altera a visibilidade.'
     );
   }
   if (!repo.permissions?.admin) {
-    throw new Error('Repository administrator access is required.');
+    throw new Error('É necessário acesso de administrador ao repositório.');
   }
   for (const operation of operations) {
     const args = ['api', '--method', operation.method, operation.endpoint, '--silent'];
@@ -43,6 +43,6 @@ if (!apply) {
       input: operation.body ? JSON.stringify(operation.body) : undefined,
       stdio: ['pipe', 'inherit', 'inherit']
     });
-    console.log(`Configured ${operation.endpoint}`);
+    console.log(`Configurado: ${operation.endpoint}`);
   }
 }

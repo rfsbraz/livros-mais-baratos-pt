@@ -1,4 +1,4 @@
-name: Store drift
+name: Diferenças nas fichas das lojas
 on:
   schedule:
     - cron: '23 6 * * 1'
@@ -45,14 +45,15 @@ jobs:
             const report = JSON.parse(fs.readFileSync('report/report.json'));
             for (const result of report.results) {
               if (result.status === 'skipped' || (report.mode === 'drift' && result.status === 'error')) continue;
-              const title = `Store ${report.mode}: ${result.store}`;
+              const legacyTitle = `Store ${report.mode}: ${result.store}`;
+              const title = `${report.mode === 'drift' ? 'Ficha da loja' : 'Credenciais da loja'}: ${result.store}`;
               const issues = await github.paginate(github.rest.issues.listForRepo, {...context.repo, state:'open'});
-              const issue = issues.find(i => i.title === title && !i.pull_request);
+              const issue = issues.find(i => (i.title === title || i.title === legacyTitle) && !i.pull_request);
               if (result.status === 'clean') {
                 if (issue) await github.rest.issues.update({...context.repo, issue_number:issue.number, state:'closed'});
               } else {
-                const body = `${title} needs attention. Status: ${result.status}. ${result.detail || 'Compare the live listing with store-listing/metadata/description-pt-PT.txt.'}\n\nRun: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-                if (issue) await github.rest.issues.update({...context.repo, issue_number:issue.number, body});
+                const body = `${title} requer atenção. Estado: ${result.status}. ${result.detail || 'Compara a ficha publicada com store-listing/metadata/description-pt-PT.txt.'}\n\nExecução: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+                if (issue) await github.rest.issues.update({...context.repo, issue_number:issue.number, title, body});
                 else await github.rest.issues.create({...context.repo, title, body});
               }
             }

@@ -55,7 +55,7 @@
   "overrides": {
     "minimatch": "11.0.1"
   },
-  "description": "Compare book prices by ISBN across Portuguese bookshops in Chrome, Firefox and Edge.",
+  "description": "Comparação de preços de livros por ISBN em livrarias portuguesas, para Chrome, Firefox e Edge.",
   "repository": {
     "type": "git",
     "url": "https://github.com/rfsbraz/livros-mais-baratos-pt.git"

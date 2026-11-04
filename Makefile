@@ -2,7 +2,7 @@
 build:
 	npm run build:all
 run:
-	@echo "Load dist/chrome or dist/edge through Developer mode; load dist/firefox/manifest.json through Firefox about:debugging."
+	@echo "Carrega dist/chrome ou dist/edge no modo de programador; no Firefox, carrega dist/firefox/manifest.json através de about:debugging."
 clean:
 	node -e "require('fs').rmSync('dist', { recursive: true, force: true })"
 test: unit integration

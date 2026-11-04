@@ -1,32 +1,32 @@
-# Targets, shipping and observed history
+# Preços-alvo, portes e histórico observado
 
-## Saved-book targets
+## Preços-alvo da estante
 
-Save a book and enter a target in euros, choosing either item price or delivered total. Only exact-ISBN, new, in-stock EUR offers from non-marketplace shops qualify. Delivered targets require known shipping for the selected destination. A first match produces a system notification and a persistent in-extension notice. The same price does not notify again; a lower qualifying price does. Editing a target resets this comparison.
+Guarda um livro e introduz um alvo em euros, para o preço do livro ou para o total entregue. Só são elegíveis ofertas novas em EUR, com stock confirmado, ISBN exato e sem vendedores externos. Um alvo com portes exige custos conhecidos para o destino. A primeira correspondência gera uma notificação do sistema e um aviso persistente na extensão. O mesmo preço não volta a notificar; um preço inferior elegível volta a fazê-lo. Editar o alvo reinicia esta comparação.
 
-A five-minute Chrome alarm selects the oldest due target. Starts are spaced at least ten minutes apart, with one saved book active at a time. Initial checks are due after one to five minutes; completed checks are next due after 24 hours plus up to 15 minutes of jitter. Sleeping/closed browsers delay checks, and missed work does not produce a simultaneous burst. No server runs checks when Chrome is closed.
+Um alarme de cinco em cinco minutos escolhe o alvo vencido há mais tempo. Os inícios ficam separados por pelo menos dez minutos e só há um livro em verificação de cada vez. A primeira consulta fica prevista para um a cinco minutos depois; após conclusão, a próxima fica para daí a 24 horas, com até 15 minutos de atraso aleatório. Suspender ou fechar o navegador adia consultas, sem criar uma rajada ao retomar. Não existe servidor a consultar preços com o navegador fechado.
 
-The background worker persists a job token and target revision before asking the offscreen document to work. The document replies immediately, performs bounded comparisons, and sends a completion message that can wake a stopped worker. Results for removed, edited, disabled or cleared targets are rejected. Expired in-flight jobs become retryable after three minutes, subject to the ten-minute spacing. Changes to page-alert settings can close the offscreen document; an interrupted target job is then recovered through that persisted state.
+O processo de segundo plano guarda um identificador de tarefa e a revisão do alvo antes de pedir trabalho ao documento de análise. Este confirma imediatamente a receção e envia depois a conclusão, podendo acordar o processo entretanto suspenso. Resultados de alvos removidos, editados, desativados ou apagados são rejeitados. Uma tarefa sem conclusão pode ser repetida após três minutos, respeitando os dez minutos entre inícios. Alterar os avisos de página pode fechar o documento; o estado persistente permite recuperar uma tarefa interrompida.
 
-The shelf and history are mutated through a serialized background queue. Manual comparisons merge observations into the latest history rather than overwriting scheduled results from a stale popup snapshot. Clearing data invalidates the in-flight token and disables scheduled checks. A notification click opens the extension, not an affiliate URL. Notifications may be blocked by the OS; the in-extension notice remains available.
+As alterações à estante e ao histórico passam por uma fila serializada. Comparações manuais acrescentam observações ao estado mais recente, sem substituir resultados agendados por uma cópia antiga do menu. Apagar dados invalida tarefas pendentes e desativa consultas agendadas. Clicar numa notificação abre a extensão, não uma ligação de afiliado. Se o sistema bloquear notificações, o aviso na extensão mantém-se.
 
-## Shipping model
+## Modelo de portes
 
-Estimates are for one book with standard delivery. Regions are mainland Portugal (default), Madeira, Azores and other destinations. Every automatic store supports a user-entered fee, free-shipping threshold, rule expiry and optional dated free-shipping promotion. Unknown shipping is null, never zero. Unknown totals cannot receive a cheapest-delivered badge or trigger a delivered-target alert.
+As estimativas são para um livro com entrega normal. Os destinos são Portugal continental (predefinido), Madeira, Açores e outros. Cada loja automática permite introduzir portes, mínimo para entrega gratuita, validade da regra e uma promoção opcional com datas. Portes desconhecidos são `null`, nunca zero. Totais desconhecidos não recebem a indicação de menor preço entregue nem acionam alvos com portes.
 
-The manual comparison defaults to delivered totals, with an item-price sorting option. On-page comparisons use totals when both relevant rules are known; an item-only fallback is explicitly labelled when shipping is unknown. Marketplace shipping, import charges, heavy parcels and paid extras are not inferred.
+A comparação manual ordena por total entregue, com opção de ordenar apenas pelo livro. Na página, compara totais quando ambas as regras são conhecidas; caso contrário, identifica explicitamente a comparação sem portes. Não infere portes de vendedores externos, taxas de importação, encomendas pesadas ou serviços pagos.
 
-Initial published rules, verified 2026-11-03 and expiring after 30 days:
+Regras iniciais verificadas em 3 de novembro de 2026, com validade de 30 dias:
 
-- Wook: standard delivery for mainland orders of at least EUR 16 is free; the fee below the threshold is unknown. Loyalty reimbursement is not deducted. Standard shipping to Madeira/Azores is free under the stated conditions. Maximum 10 kg, excluding marketplace items. [Source](https://www.wook.pt/Mensagem/index/?key=portes-gratis)
-- Presença: mainland standard shipping EUR 3 below EUR 20, free above EUR 20. Exactly EUR 20 is left unknown because the published wording is ambiguous. Madeira/Azores EUR 4. [Source](https://www.presenca.pt/policies/shipping-policy)
+- Wook: entrega normal gratuita no continente a partir de 16 €. O custo abaixo desse valor é desconhecido. Não desconta reembolso em cartão. Entrega normal para Madeira/Açores gratuita nas condições publicadas, até 10 kg e excluindo vendedores externos. [Fonte](https://www.wook.pt/Mensagem/index/?key=portes-gratis)
+- Presença: no continente, 3 € abaixo de 20 € e gratuito acima de 20 €. Exatamente 20 € fica desconhecido devido à ambiguidade do texto publicado. Madeira/Açores: 4 €. [Fonte](https://www.presenca.pt/policies/shipping-policy)
 
-Other stores initially remain unknown. These are editable estimates, not a checkout guarantee. Published rules retain source URLs, timestamps, conditions and expiry. User overrides are marked manual. An expired rule becomes unknown until reviewed, unless an independently valid promotion applies.
+As restantes lojas começam com portes desconhecidos. São estimativas editáveis, não garantias de pagamento final. As regras publicadas guardam fonte, datas, condições e validade; as alterações do utilizador são marcadas como manuais. Uma regra expirada fica desconhecida até revisão, salvo se existir uma promoção válida independente.
 
-Promotion records require verified evidence, an explicit destination, minimum order value, start and end timestamps. They apply at the start boundary and stop at the end boundary. The current UI accepts user-confirmed promotions. Future page detectors can populate the same model after validating destination, scope, conditions and evidence; no automatic promotion scraping is implemented or claimed.
+Uma promoção exige informação confirmada, destino explícito, valor mínimo e datas de início e fim. Aplica-se desde o início e deixa de se aplicar no instante de fim. A interface aceita campanhas confirmadas pelo utilizador. Futuros detetores podem preencher este modelo depois de validar destino, âmbito, condições e provas. A deteção automática ainda não existe.
 
-## Own observed data only
+## Apenas observações próprias
 
-Charts use only book-price observations recorded by this extension installation during manual and scheduled comparisons. They never query third-party history, reuse the CI monitoring dataset, infer pre-installation prices or recalculate historical shipping using today's rules. Series are separated by store, currency and condition. Dots represent observations; lines merely connect those observations and do not assert prices between checks.
+Os gráficos usam preços do livro observados por esta instalação em comparações manuais e agendadas. Não consultam históricos externos, não reutilizam dados da monitorização em CI, não inferem preços anteriores à instalação e não recalculam portes históricos com regras atuais. As séries separam loja, moeda e condição. Os pontos são observações; as linhas apenas os ligam, sem afirmar preços entre consultas.
 
-Each observation records source, time, price, currency, condition and availability. Limits remain 100 saved books, 200 ISBN histories, up to 360 observations per ISBN and a 90-day window pruned when that ISBN is updated. The display includes an accessible textual list of recent observations. A single observation is shown as a point, not a fabricated trend.
+Cada observação regista fonte, instante, preço, moeda, condição e disponibilidade. Os limites são 100 livros guardados, 200 históricos por ISBN, 360 observações por ISBN e uma janela de 90 dias, aplicada quando esse ISBN é atualizado. Há uma lista textual acessível das observações recentes. Uma única observação aparece como ponto, não como uma tendência inventada.
