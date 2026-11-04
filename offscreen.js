@@ -103,7 +103,9 @@ async function compare(message) {
         currency: best.currency,
         saving,
         basis,
-        checkedAt: entry.at
+        checkedAt: entry.at,
+        promotion: best.promotion,
+        id: best.id
       }
     : null;
   const offers = entry.offers.map(o =>
@@ -117,6 +119,7 @@ async function compare(message) {
         'availability',
         'marketplace',
         'seller',
+        'promotion',
         'url',
         'title'
       ]

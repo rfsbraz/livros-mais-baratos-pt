@@ -94,6 +94,96 @@ try {
   );
   await page.goto(`http://127.0.0.1:${server.address().port}/popup.html`);
   await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
+  const promoCheck = await page.evaluate(async () => {
+    const { parseOffer } = await import('./parser.js');
+    const { enrichPromotion, parseVoucherTerms } = await import('./promotions.js');
+    const { promotionCard } = await import('./promotion-view.js');
+    const { cachePrices, cachedPrices } = await import('./price-cache.js');
+    const now = Date.parse('2026-11-04T12:00:00Z');
+    const url = 'https://www.wook.pt/livro/teste/123';
+    const termsUrl = 'https://www.wook.pt/Mensagem/index/?key=nome-alterado';
+    const terms =
+      'Encomendas registadas e pagas nos dias 4 e 5 de novembro de 2026, Portugal Continental. O valor pago será devolvido sob a forma de vale de compras (VALE 100%), 15 dias após o envio da totalidade da encomenda. O vale não é reembolsável em dinheiro. Validade do vale: 60 dias. Até ao limite de 50% do valor total da encomenda.';
+    const json = JSON.stringify({
+      '@type': 'Book',
+      isbn: '9780306406157',
+      name: 'Exemplo',
+      offers: { price: '18.85', priceCurrency: 'EUR', availability: 'https://schema.org/InStock' }
+    });
+    const html = `<script type="application/ld+json">${json}</script><h1>Exemplo</h1><div class="sale-container"><div class="wook-container"><a href="${termsUrl}">Festa da leitura</a></div></div>`;
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const offer = parseOffer(doc, '9780306406157', url);
+    let requests = 0;
+    const loader = async target => {
+      if (target !== termsUrl) {
+        throw new Error('Unexpected destination');
+      }
+      requests++;
+      return new DOMParser().parseFromString(`<main>${terms}</main>`, 'text/html');
+    };
+    const [enriched, second] = await Promise.all([
+      enrichPromotion(offer, loader, new AbortController().signal, now),
+      enrichPromotion(offer, loader, new AbortController().signal, now)
+    ]);
+    const failed = await enrichPromotion(
+      { ...offer, promotionUrl: termsUrl.replace('nome-alterado', 'indisponivel') },
+      async () => {
+        throw new Error('HTTP 403');
+      },
+      new AbortController().signal,
+      now
+    );
+    if (failed.promotion || failed.price !== 1885) {
+      throw new Error('Failed campaign must preserve price only');
+    }
+    const full = { ...enriched, id: 'wook', status: 'ok' };
+    const cached = cachedPrices(
+      cachePrices({}, '9780306406157', [full], now, now),
+      '9780306406157',
+      ['wook'],
+      now
+    );
+    window.__promotionEnabled = true;
+    const card = promotionCard(cached.offers[0], () => window.__promotionEnabled, now);
+    card.id = 'promotion-fixture';
+    document.body.append(card);
+    card.querySelector('a').addEventListener('click', e => {
+      e.preventDefault();
+      window.__promotionClicked = e.currentTarget.href;
+    });
+    const unrelated = new DOMParser().parseFromString(
+      html.replace('sale-container', 'recommendations'),
+      'text/html'
+    );
+    return {
+      price: enriched.price,
+      requests,
+      second: !!second.promotion,
+      unrelated: parseOffer(unrelated, '9780306406157', url).promotionUrl,
+      invalidIsbn: parseOffer(doc, '9789720046710', url),
+      parsed: !!parseVoucherTerms(terms, termsUrl, now)
+    };
+  });
+  assert.deepEqual(promoCheck, {
+    price: 1885,
+    requests: 1,
+    second: true,
+    unrelated: null,
+    invalidIsbn: null,
+    parsed: true
+  });
+  assert((await page.locator('#promotion-fixture').textContent()).includes('33,3%'));
+  assert((await page.locator('#promotion-fixture').textContent()).includes('37,70'));
+  assert(!(await page.locator('#promotion-fixture a').getAttribute('href')).includes('a_aid'));
+  await page.locator('#promotion-fixture a').click();
+  assert((await page.evaluate(() => window.__promotionClicked)).includes('a_aid=5d3ee4327c2fd'));
+  await page.evaluate(() => {
+    window.__promotionEnabled = false;
+  });
+  await page.locator('#promotion-fixture a').click();
+  assert(!(await page.evaluate(() => window.__promotionClicked)).includes('a_aid'));
+  await page.locator('#promotion-fixture').evaluate(e => e.remove());
+
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
@@ -137,6 +227,7 @@ try {
   assert(!(await captureWookClick()).includes('a_aid'));
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
+
   assert.equal(await page.locator('#affiliate-toggle').isChecked(), false);
   await page.getByRole('status').filter({ hasText: 'Preços guardados:' }).waitFor();
   assert.equal(

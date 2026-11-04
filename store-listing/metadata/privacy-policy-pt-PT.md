@@ -22,7 +22,7 @@ Não existe servidor de recolha de dados da extensão, conta de utilizador, tele
 
 ## Afiliados opcionais
 
-A opção Apoiar através de ligações de afiliado está ativa por predefinição e pode ser desativada na extensão. Esta preferência fica guardada localmente, incluindo após atualizações e ao apagar a estante. Só ao clicar numa oferta Wook confirmada mais barata é acrescentado o identificador a_aid=5d3ee4327c2fd. Não substituímos identificadores já presentes. Os pedidos de comparação e a ordenação não dependem de comissões. A Wook recebe o identificador após o clique e pode usar cookies segundo a sua própria política. Podemos receber uma comissão. Desativar impede futuras adições, mas não apaga cookies já definidos pela Wook.
+A opção Apoiar através de ligações de afiliado está ativa por predefinição e pode ser desativada na extensão. Esta preferência fica guardada localmente, incluindo após atualizações e ao apagar a estante. Só ao clicar numa oferta Wook confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada é acrescentado o identificador a_aid=5d3ee4327c2fd. Não substituímos identificadores já presentes. Os pedidos de comparação e a ordenação não dependem de comissões. A Wook recebe o identificador após o clique e pode usar cookies segundo a sua própria política. Podemos receber uma comissão. Desativar impede futuras adições, mas não apaga cookies já definidos pela Wook.
 
 ## Conservação
 

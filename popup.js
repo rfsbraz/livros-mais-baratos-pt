@@ -1,3 +1,4 @@
+import { promotionCard } from './promotion-view.js';
 import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
@@ -259,6 +260,10 @@ function renderOffers(offers) {
       value(offer) !== null &&
       available.some(other => value(other) !== null && value(other) > value(offer));
     row.append(link(offer.name, offer.url, cheaper), price, detail);
+    const promotion = promotionCard(offer, () => affiliateEnabled);
+    if (promotion) {
+      row.append(promotion);
+    }
     if (best !== null && value(offer) === best && available.includes(offer)) {
       row.classList.add('best');
       const badge = document.createElement('span');

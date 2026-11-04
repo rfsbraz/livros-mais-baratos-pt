@@ -57,13 +57,17 @@ Os totais com portes são estimativas para um livro com entrega normal, sem taxa
 
 Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 26 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
 
+## Campanhas de vales Wook
+
+Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. O preço a pagar, a ordenação, os alvos e o histórico não descontam o vale. Consulta as [regras e limitações](docs/wook-promotions.md).
+
 ## Permissões e privacidade
 
 O acesso às lojas é pedido na instalação e continua sob controlo do navegador. Uma preferência guardada para desativar avisos é respeitada nas atualizações. Cada loja consultada recebe o ISBN e, quando necessário, o título, juntamente com dados normais de ligação, como o endereço IP. Os pedidos de comparação não enviam cookies de sessão. Não existe telemetria nem um serviço externo de histórico de preços.
 
 `activeTab` permite a deteção manual; `scripting`, a deteção automática nos sites autorizados; `storage`, o armazenamento local; `alarms`, as verificações agendadas; e `notifications`, os avisos do sistema. Chrome e Edge usam `offscreen` para analisar páginas em segundo plano. Firefox usa uma página local de segundo plano e uma moldura de análise. A extensão não contorna captchas, não inicia sessão nas lojas e não executa código descarregado.
 
-As ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas em **Definições**. O código só é acrescentado num clique deliberado numa oferta Wook elegível e confirmada mais barata. Não influencia os pedidos, a comparação ou a ordenação. Consulta a [política de privacidade](PRIVACY.md).
+As ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas em **Definições**. O código só é acrescentado num clique deliberado numa oferta Wook elegível e confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada. Não influencia os pedidos, a comparação ou a ordenação. Consulta a [política de privacidade](PRIVACY.md).
 
 ## Desenvolvimento
 

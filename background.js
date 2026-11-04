@@ -173,7 +173,11 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
         return data;
       });
     }
-    return result?.alert || null;
+    const sourceOffer = result?.prices?.offers?.find(o => o.id === source.id && o.promotion);
+    if (sourceOffer || result?.alert) {
+      return { ...result?.alert, isbn: message.book.isbn, sourceOffer };
+    }
+    return result?.busy ? { busy: true } : null;
   })()
     .then(reply)
     .catch(() => reply(null));

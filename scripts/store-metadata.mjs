@@ -76,7 +76,7 @@ Não existe servidor de recolha de dados da extensão, conta de utilizador, tele
 
 ## Afiliados opcionais
 
-A opção Apoiar através de ligações de afiliado está ativa por predefinição e pode ser desativada na extensão. Esta preferência fica guardada localmente, incluindo após atualizações e ao apagar a estante. Só ao clicar numa oferta Wook confirmada mais barata é acrescentado o identificador a_aid=5d3ee4327c2fd. Não substituímos identificadores já presentes. Os pedidos de comparação e a ordenação não dependem de comissões. A Wook recebe o identificador após o clique e pode usar cookies segundo a sua própria política. Podemos receber uma comissão. Desativar impede futuras adições, mas não apaga cookies já definidos pela Wook.
+A opção Apoiar através de ligações de afiliado está ativa por predefinição e pode ser desativada na extensão. Esta preferência fica guardada localmente, incluindo após atualizações e ao apagar a estante. Só ao clicar numa oferta Wook confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada é acrescentado o identificador a_aid=5d3ee4327c2fd. Não substituímos identificadores já presentes. Os pedidos de comparação e a ordenação não dependem de comissões. A Wook recebe o identificador após o clique e pode usar cookies segundo a sua própria política. Podemos receber uma comissão. Desativar impede futuras adições, mas não apaga cookies já definidos pela Wook.
 
 ## Conservação
 
@@ -104,11 +104,11 @@ Escreve para rfsbraz@proton.me. Inclui a versão da extensão, a versão do nave
 
 ## Avisos automáticos sem configuração
 
-Depois de instalar a extensão e aceitar as permissões no Chrome, basta visitar uma página de livro suportada. As consultas decorrem em segundo plano, sem abrir a extensão. Se desativaste os avisos anteriormente, podes voltar a ativá-los no botão da extensão. O aviso só aparece se o preço atual e uma oferta nova mais barata da mesma edição forem verificáveis em EUR, com stock confirmado na outra loja.
+Depois de instalar a extensão e aceitar as permissões no Chrome, basta visitar uma página de livro suportada. As consultas decorrem em segundo plano, sem abrir a extensão. Se desativaste os avisos anteriormente, podes voltar a ativá-los no botão da extensão. O aviso de menor preço só aparece se o preço atual e uma oferta nova mais barata da mesma edição forem verificáveis em EUR, com stock confirmado na outra loja.
 
 ## Porque não aparece um aviso?
 
-Pode não existir uma oferta mais barata. A página pode não identificar a edição ou o preço de forma suportada, ou uma loja pode bloquear o acesso. Páginas de pesquisa, marketplaces e formatos digitais identificados não originam estes avisos. Confirma as lojas selecionadas e as permissões no Chrome. Podes usar a comparação manual por ISBN e abrir as ligações das lojas.
+Pode não existir uma oferta mais barata. A página pode não identificar a edição ou o preço de forma suportada, ou uma loja pode bloquear o acesso. Páginas de pesquisa, marketplaces e formatos digitais identificados não originam estes avisos. Um livro Wook abrangido por uma campanha de vale reconhecida também pode mostrar um aviso informativo com a poupança combinada e a ligação Saber mais. Confirma as lojas selecionadas e as permissões no Chrome. Podes usar a comparação manual por ISBN e abrir as ligações das lojas.
 
 ## Os preços incluem portes?
 
@@ -143,7 +143,7 @@ await writeFile(`${out}/website/support.html`, htmlDoc(support, 'Suporte'));
 await writeFile(
   `${out}/website/index.html`,
   htmlDoc(
-    `# Livros Mais Baratos PT\n\nO mesmo livro. Um preço melhor.\n\nCompara a mesma edição por ISBN em livrarias portuguesas, recebe automaticamente avisos de ofertas mais baratas e guarda o histórico das tuas consultas neste navegador.\n\n## Como funciona\n\nInstala, aceita as permissões de acesso às lojas e visita um livro. As comparações e os avisos começam automaticamente. Podes ajustar as lojas ou desativar os avisos a qualquer momento. Os avisos exigem um livro novo da mesma edição, em EUR, mais barato e com stock confirmado na outra loja. Os preços não incluem portes e a disponibilidade depende de cada loja.\n\n## Sem conta. Afiliados opcionais\n\nAfiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata podemos receber uma comissão. Os dados da estante e do histórico são locais. As consultas enviam o ISBN e, quando necessário, o título às lojas selecionadas. Consulta a política de privacidade para conhecer todos os detalhes.\n\n## Apoio\n\nContacto: rfsbraz@proton.me.`,
+    `# Livros Mais Baratos PT\n\nO mesmo livro. Um preço melhor.\n\nCompara a mesma edição por ISBN em livrarias portuguesas, recebe automaticamente avisos de ofertas mais baratas e guarda o histórico das tuas consultas neste navegador.\n\n## Como funciona\n\nInstala, aceita as permissões de acesso às lojas e visita um livro. As comparações e os avisos começam automaticamente. Podes ajustar as lojas ou desativar os avisos a qualquer momento. Os avisos exigem um livro novo da mesma edição, em EUR, mais barato e com stock confirmado na outra loja. Os preços não incluem portes e a disponibilidade depende de cada loja.\n\n## Sem conta. Afiliados opcionais\n\nAfiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Os dados da estante e do histórico são locais. As consultas enviam o ISBN e, quando necessário, o título às lojas selecionadas. Consulta a política de privacidade para conhecer todos os detalhes.\n\n## Apoio\n\nContacto: rfsbraz@proton.me.`,
     'Comparar preços de livros'
   )
 );

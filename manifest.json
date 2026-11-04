@@ -28,7 +28,9 @@
         "core.js",
         "stores.js",
         "auto-rules.js",
-        "affiliate.js"
+        "affiliate.js",
+        "promotions.js",
+        "promotion-view.js"
       ],
       "matches": [
         "https://www.wook.pt/*",

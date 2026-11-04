@@ -1,3 +1,5 @@
+import { validPromotion } from './promotions.js';
+import { promotionCard } from './promotion-view.js';
 import { selectedStoreIds } from './stores.js';
 import { bindAffiliateLink } from './affiliate.js';
 import { detectBook, parseOffer, structured } from './parser.js';
@@ -24,7 +26,7 @@ export function start() {
     host = document.createElement('div');
     host.id = 'lmb-price-alert';
     host.style.cssText =
-      'all:initial;position:fixed;right:20px;bottom:20px;z-index:2147483647;width:min(360px,calc(100vw - 40px));';
+      'all:initial;position:fixed;right:20px;bottom:20px;z-index:2147483647;width:min(360px,calc(100vw - 40px));max-height:calc(100vh - 40px);overflow:auto;';
     const shadow = host.attachShadow({ mode: 'open' });
     const style = document.createElement('style');
     style.textContent =
@@ -43,7 +45,10 @@ export function start() {
     brand.className = 'brand';
     brand.textContent = 'LIVROS MAIS BARATOS PT';
     const title = document.createElement('h2');
-    title.textContent = `Poupa ${money(result.saving)} neste livro`;
+    title.textContent =
+      result.saving > 0
+        ? `Poupa ${money(result.saving)} neste livro`
+        : 'Campanha Wook: percebe a poupança';
     const detail = document.createElement('p');
     detail.textContent = `${result.name}: ${money(result.price)} · Nesta loja: ${money(result.currentPrice ?? book.price)}`;
     const edition = document.createElement('small');
@@ -58,10 +63,20 @@ export function start() {
     note.textContent = `${result.basis === 'delivered' ? 'Total estimado com portes. ' : 'Preço do livro; portes por confirmar. '}Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
     const disclosure = document.createElement('small');
     disclosure.textContent =
-      new URL(result.url).hostname === 'www.wook.pt' && affiliateEnabled
+      new URL(result.url || location.href).hostname === 'www.wook.pt' && affiliateEnabled
         ? 'Ligação de afiliado: podemos receber uma comissão ao clicares. Podes desativar na extensão.'
         : '';
-    panel.append(close, brand, title, detail, edition, link, disclosure, note);
+    panel.append(close, brand, title);
+    if (result.saving > 0) {
+      panel.append(detail, edition, link, disclosure, note);
+    }
+    const promoOffer =
+      result.sourceOffer ||
+      (result.promotion ? { ...result, price: result.itemPrice, status: 'ok' } : null);
+    const promotion = promotionCard(promoOffer, () => affiliateEnabled);
+    if (promotion) {
+      panel.append(promotion);
+    }
     shadow.append(style, panel);
     document.documentElement.append(host);
   }
@@ -130,7 +145,11 @@ export function start() {
         }, 30_000);
         return;
       }
-      if (result?.isbn === book.isbn && result.saving > 0 && !dismissed.has(book.isbn)) {
+      if (
+        result?.isbn === book.isbn &&
+        (result.saving > 0 || validPromotion(result.sourceOffer?.promotion)) &&
+        !dismissed.has(book.isbn)
+      ) {
         show(result, book);
       }
     } catch {
