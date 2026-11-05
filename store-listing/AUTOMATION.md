@@ -48,7 +48,7 @@ Não estavam configuradas variáveis ou credenciais de publicação quando este 
 
 Usa segredos do repositório: a verificação semanal não seleciona um ambiente. A publicação mantém `chrome-store`, `firefox-store` e `edge-store` para regras opcionais de proteção. Mantém cada loja desativada até ter uma submissão inicial e credenciais prontas. O GUID Firefox é `livros-mais-baratos-pt@rfsbraz.github.io`.
 
-Preenche os URLs públicos e os identificadores públicos Chrome/Edge em `listing.json` para ativar a deteção de divergências. O identificador público Edge não é o identificador do produto no Partner Center. Acrescenta URLs HTTPS públicos de privacidade, apoio e página inicial e regenera o pacote. Um repositório privado não é uma página pública de privacidade. Email de apoio: `rfsbraz@proton.me`.
+Preenche os URLs públicos e os identificadores públicos Chrome/Edge em `listing.json` para ativar a deteção de divergências. O identificador público Edge não é o identificador do produto no Partner Center. Acrescenta URLs HTTPS públicos de privacidade, apoio e página inicial e regenera o pacote. Um repositório privado não é uma página pública de privacidade. Email de apoio: `rfsbraz@gmail.com`.
 
 Podes prever alterações com `npm run store-listing:amo` e `npm run store-listing:edge-notes`, sem pedidos de rede. `npm run store-listing:release` faz pedidos AMO apenas de leitura. Gerar materiais ou abrir um PR não publica a extensão.
 

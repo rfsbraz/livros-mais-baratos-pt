@@ -25,7 +25,7 @@ await writeFile(
       defaultLanguage: 'pt-PT',
       category: 'Shopping',
       price: 'Free',
-      supportEmail: 'rfsbraz@proton.me',
+      supportEmail: 'rfsbraz@gmail.com',
       automaticAlertsEnabledByDefault: true,
       affiliateLinksEnabledByDefault: true,
       affiliatePartners: [{ store: 'wook', parameter: 'a_aid', id: '5d3ee4327c2fd' }],
@@ -56,7 +56,7 @@ const privacy = `# Política de privacidade
 
 Livros Mais Baratos PT · Versão ${version} · Atualizada em 3 de novembro de 2026
 
-Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@proton.me.
+Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@gmail.com.
 
 ## Finalidade
 
@@ -72,7 +72,7 @@ Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, p
 
 Ao comparar, a extensão envia o ISBN e, quando necessário, o título diretamente às lojas selecionadas. Estas recebem também informações normais da ligação, incluindo o endereço IP. Os pedidos usam HTTPS e não enviam cookies de sessão. As lojas tratam os pedidos de acordo com as suas próprias políticas de privacidade. Abrir uma ligação de oferta usa o navegador normal, sujeito às permissões e cookies desse site. A extensão não efetua compras nem trata dados de pagamento.
 
-Não existe servidor de recolha de dados da extensão, conta de utilizador, telemetria ou conta de análise. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
+A extensão não tem conta de utilizador. Nesta versão não envia telemetria nem estatísticas de utilização para um servidor do responsável. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
 
 ## Afiliados opcionais
 
@@ -92,7 +92,7 @@ O acesso às lojas é solicitado na instalação e os avisos automáticos estão
 
 ## Contacto de suporte
 
-Se enviares uma mensagem para rfsbraz@proton.me, os dados que incluíres no email são usados para responder ao pedido de suporte. Esse contacto é separado do funcionamento da extensão. Não envies palavras-passe, dados de pagamento ou informação pessoal desnecessária. Podes usar o mesmo contacto para pedir a eliminação da correspondência de suporte.
+Se enviares uma mensagem para rfsbraz@gmail.com, os dados que incluíres no email são usados para responder ao pedido de suporte. Esse contacto é separado do funcionamento da extensão. Não envies palavras-passe, dados de pagamento ou informação pessoal desnecessária. Podes usar o mesmo contacto para pedir a eliminação da correspondência de suporte.
 
 ## Avaliação e comunicação de problemas
 
@@ -106,7 +106,7 @@ const support = `# Suporte
 
 ## Contacto
 
-Escreve para rfsbraz@proton.me. Inclui a versão da extensão, a versão do navegador, a loja e o ISBN afetado. Se enviares uma captura de ecrã, remove primeiro qualquer informação pessoal. Não envies palavras-passe nem dados de pagamento.
+Escreve para rfsbraz@gmail.com. Inclui a versão da extensão, a versão do navegador, a loja e o ISBN afetado. Se enviares uma captura de ecrã, remove primeiro qualquer informação pessoal. Não envies palavras-passe nem dados de pagamento.
 
 ## Avisos automáticos sem configuração
 
@@ -138,18 +138,18 @@ function htmlDoc(markdown, title) {
         ? `<h2>${esc(p.slice(3))}</h2>`
         : p.startsWith('# ')
           ? `<h1>${esc(p.slice(2))}</h1>`
-          : `<p>${esc(p).replaceAll('rfsbraz@proton.me', '<a href="mailto:rfsbraz@proton.me">rfsbraz@proton.me</a>')}</p>`
+          : `<p>${esc(p).replaceAll('rfsbraz@gmail.com', '<a href="mailto:rfsbraz@gmail.com">rfsbraz@gmail.com</a>')}</p>`
     )
     .join(
       '\n'
-    )}</main><footer>Livros Mais Baratos PT · <a href="mailto:rfsbraz@proton.me">rfsbraz@proton.me</a></footer></body></html>`;
+    )}</main><footer>Livros Mais Baratos PT · <a href="mailto:rfsbraz@gmail.com">rfsbraz@gmail.com</a></footer></body></html>`;
 }
 await writeFile(`${out}/website/privacy.html`, htmlDoc(privacy, 'Política de privacidade'));
 await writeFile(`${out}/website/support.html`, htmlDoc(support, 'Suporte'));
 await writeFile(
   `${out}/website/index.html`,
   htmlDoc(
-    `# Livros Mais Baratos PT\n\nO mesmo livro. Um preço melhor.\n\nCompara a mesma edição por ISBN em livrarias portuguesas, recebe automaticamente avisos de ofertas mais baratas e guarda o histórico das tuas consultas neste navegador.\n\n## Como funciona\n\nInstala, aceita as permissões de acesso às lojas e visita um livro. As comparações e os avisos começam automaticamente. Podes ajustar as lojas ou desativar os avisos a qualquer momento. Os avisos exigem um livro novo da mesma edição, em EUR, mais barato e com stock confirmado na outra loja. Comparamos o preço do livro; a disponibilidade e o valor final dependem de cada loja.\n\n## Sem conta. Afiliados opcionais\n\nAfiliados Wook ativos por predefinição, com opção de desativar. Ao abrires uma ligação para a Wook a partir da extensão, mesmo que não seja a oferta mais barata, podemos receber uma comissão. Os dados da estante e do histórico são locais. As consultas enviam o ISBN e, quando necessário, o título às lojas selecionadas. Consulta a política de privacidade para conhecer todos os detalhes.\n\n## Apoio\n\nContacto: rfsbraz@proton.me.`,
+    `# Livros Mais Baratos PT\n\nO mesmo livro. Um preço melhor.\n\nCompara a mesma edição por ISBN em livrarias portuguesas, recebe automaticamente avisos de ofertas mais baratas e guarda o histórico das tuas consultas neste navegador.\n\n## Como funciona\n\nInstala, aceita as permissões de acesso às lojas e visita um livro. As comparações e os avisos começam automaticamente. Podes ajustar as lojas ou desativar os avisos a qualquer momento. Os avisos exigem um livro novo da mesma edição, em EUR, mais barato e com stock confirmado na outra loja. Comparamos o preço do livro; a disponibilidade e o valor final dependem de cada loja.\n\n## Sem conta. Afiliados opcionais\n\nAfiliados Wook ativos por predefinição, com opção de desativar. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Os dados da estante e do histórico são locais. As consultas enviam o ISBN e, quando necessário, o título às lojas selecionadas. Consulta a política de privacidade para conhecer todos os detalhes.\n\n## Apoio\n\nContacto: rfsbraz@gmail.com.`,
     'Comparar preços de livros'
   )
 );

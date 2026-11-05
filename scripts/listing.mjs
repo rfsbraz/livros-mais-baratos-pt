@@ -20,6 +20,51 @@ export function amoPayload({ locales }) {
   return payload;
 }
 
+export const SUPPORT_EMAIL = 'rfsbraz@gmail.com';
+
+export function validateListingAccuracy({ config, locales }) {
+  const errors = [];
+  if (config.supportEmail !== SUPPORT_EMAIL) {
+    errors.push(`supportEmail must be ${SUPPORT_EMAIL}`);
+  }
+  for (const [id, locale] of Object.entries(locales)) {
+    const description = locale.description?.join('\n') || '';
+    if (
+      !/Afiliados Wook ativos por predefinição/i.test(description) ||
+      !/Podes desativar/i.test(description)
+    ) {
+      errors.push(`${id}: missing Wook affiliate default-on optional disclosure`);
+    }
+    if (/Sem conta ou telemetria/i.test(description)) {
+      errors.push(`${id}: absolute permanent zero-telemetry claim`);
+    }
+    if (
+      !/Nesta versão[^.\n]{0,120}não envia[^.\n]{0,80}(estatísticas|telemetria)/i.test(description)
+    ) {
+      errors.push(`${id}: missing current-state telemetry wording`);
+    }
+    if (
+      /envia estatísticas de utilização\./i.test(description) &&
+      !/não envia estatísticas de utilização/i.test(description)
+    ) {
+      errors.push(`${id}: claims metrics already exist`);
+    }
+    if (
+      /26 (lojas|adaptadores)[^.\n]{0,60}verificad/i.test(description) ||
+      /todas as 26/i.test(description)
+    ) {
+      errors.push(`${id}: unsupported all-stores-verified claim`);
+    }
+    if (/proton\.me/i.test(description)) {
+      errors.push(`${id}: support contact still uses proton.me`);
+    }
+    if (!description.includes(SUPPORT_EMAIL)) {
+      errors.push(`${id}: support contact missing ${SUPPORT_EMAIL}`);
+    }
+  }
+  return errors;
+}
+
 export function validateListing({ config, locales }, root = '.') {
   const errors = [];
   if (!config.locales.includes(config.defaultLocale)) {
@@ -63,6 +108,7 @@ export function validateListing({ config, locales }, root = '.') {
   if (locales[config.defaultLocale]?.summary !== config.summary) {
     errors.push('Default summary differs from listing.json');
   }
+  errors.push(...validateListingAccuracy({ config, locales }));
   for (const field of ['privacyPolicyUrl', 'supportUrl', 'homepageUrl']) {
     if (config[field] && !/^https:\/\//.test(config[field])) {
       errors.push(`${field} must be public HTTPS`);

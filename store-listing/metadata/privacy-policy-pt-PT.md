@@ -2,7 +2,7 @@
 
 Livros Mais Baratos PT · Versão 0.1.5 · Atualizada em 3 de novembro de 2026
 
-Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@proton.me.
+Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@gmail.com.
 
 ## Finalidade
 
@@ -18,7 +18,7 @@ Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, p
 
 Ao comparar, a extensão envia o ISBN e, quando necessário, o título diretamente às lojas selecionadas. Estas recebem também informações normais da ligação, incluindo o endereço IP. Os pedidos usam HTTPS e não enviam cookies de sessão. As lojas tratam os pedidos de acordo com as suas próprias políticas de privacidade. Abrir uma ligação de oferta usa o navegador normal, sujeito às permissões e cookies desse site. A extensão não efetua compras nem trata dados de pagamento.
 
-Não existe servidor de recolha de dados da extensão, conta de utilizador, telemetria ou conta de análise. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
+A extensão não tem conta de utilizador. Nesta versão não envia telemetria nem estatísticas de utilização para um servidor do responsável. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
 
 ## Afiliados opcionais
 
@@ -38,7 +38,7 @@ O acesso às lojas é solicitado na instalação e os avisos automáticos estão
 
 ## Contacto de suporte
 
-Se enviares uma mensagem para rfsbraz@proton.me, os dados que incluíres no email são usados para responder ao pedido de suporte. Esse contacto é separado do funcionamento da extensão. Não envies palavras-passe, dados de pagamento ou informação pessoal desnecessária. Podes usar o mesmo contacto para pedir a eliminação da correspondência de suporte.
+Se enviares uma mensagem para rfsbraz@gmail.com, os dados que incluíres no email são usados para responder ao pedido de suporte. Esse contacto é separado do funcionamento da extensão. Não envies palavras-passe, dados de pagamento ou informação pessoal desnecessária. Podes usar o mesmo contacto para pedir a eliminação da correspondência de suporte.
 
 ## Avaliação e comunicação de problemas
 

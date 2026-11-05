@@ -12,7 +12,7 @@ As comparações automáticas reutilizam resultados na memória do documento ocu
 
 Os preços confirmados automáticos, agendados e manuais também ficam em cache local para o menu, até 50 ISBN. O menu oculta entradas com mais de 24 horas e assinala as que têm mais de dez minutos. As entradas expiradas são removidas na próxima escrita; apagar dados elimina toda esta cache. Abrir resultados em cache não contacta lojas nem cria histórico. Fechar um aviso só o suprime no documento atual.
 
-Não existe recolha do histórico geral de navegação, análise de utilização, código remoto ou sistema de contas. Livros com preços-alvo ativos são verificados aproximadamente todos os dias enquanto o navegador estiver aberto. Só observações manuais e agendadas entram no histórico; não são importados históricos externos ou anteriores à instalação.
+Não existe recolha do histórico geral de navegação nem sistema de contas. Nesta versão a extensão não envia análise de utilização. Não há código remoto. Livros com preços-alvo ativos são verificados aproximadamente todos os dias enquanto o navegador estiver aberto. Só observações manuais e agendadas entram no histórico; não são importados históricos externos ou anteriores à instalação.
 
 ## Controlo
 
@@ -36,7 +36,7 @@ Sem uma seleção guardada, só são consultadas Wook, Bertrand, Almedina, Conti
 
 Firefox usa uma página de segundo plano e uma moldura local de análise em vez de `offscreen`. O manifesto declara consentimento para transmissão de conteúdo de sites e atividade de navegação porque as consultas de ISBN/título seguem diretamente para as lojas. Firefox e Edge aplicam as mesmas regras de conservação e preferências de afiliados.
 
-Contacto: **rfsbraz@proton.me**.
+Contacto: **rfsbraz@gmail.com**.
 
 ## Condições de vales Wook
 

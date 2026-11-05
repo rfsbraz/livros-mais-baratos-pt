@@ -28,7 +28,7 @@ O processamento local também deve ser divulgado. A extensão não deve ser desc
 | ----------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
 | Conteúdo de sites                   | Sim              | Página do livro, ISBN, título, preço e disponibilidade; HTML permanece local.                         |
 | Histórico/atividade de navegação    | Sim              | URL atual de lojas suportadas para deteção e encaminhamento; sem registo geral de navegação.          |
-| Atividade do utilizador             | Sim              | Seleção de lojas, ações da estante e preferências locais; sem telemetria de cliques, rato ou teclado. |
+| Atividade do utilizador             | Sim              | Seleção de lojas, ações da estante e preferências locais; sem registo de cliques, rato ou teclado para análise. |
 | Informação de identificação pessoal | Não, na extensão | Sem recolha de conta, nome ou email; contactos voluntários de apoio são tratados separadamente.       |
 | Informação de saúde                 | Não              | Sem recolha para fins de saúde.                                                                       |
 | Informação financeira/pagamento     | Não              | Só preços públicos de produtos; sem acesso a pagamentos.                                              |
