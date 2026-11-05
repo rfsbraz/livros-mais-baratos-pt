@@ -1,6 +1,6 @@
 # Política de privacidade
 
-Livros Mais Baratos PT · Versão 0.1.5 · Atualizada em 3 de novembro de 2026
+Livros Mais Baratos PT · Versão 0.1.6 · Atualizada em 3 de novembro de 2026
 
 Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@gmail.com.
 
