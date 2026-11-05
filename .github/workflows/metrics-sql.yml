@@ -1,0 +1,29 @@
+name: Consultas de métricas
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'docs/metrics.md'
+      - 'worker/**'
+      - 'scripts/metrics-*'
+      - 'tests/fixtures/metrics-schema.json'
+      - '.github/workflows/metrics-sql.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  queries:
+    if: ${{ !startsWith(github.head_ref || '', 'release-please--') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: npm run test:metrics-sql

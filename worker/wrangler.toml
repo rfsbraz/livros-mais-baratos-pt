@@ -1,0 +1,23 @@
+# Sem segredos neste ficheiro. O deploy e os custos estão descritos em docs/metrics.md.
+name = "livros-mais-baratos-pt-metrics"
+main = "index.js"
+compatibility_date = "2026-11-05"
+workers_dev = true
+preview_urls = false
+logpush = false
+
+[observability]
+enabled = false
+
+[[analytics_engine_datasets]]
+binding = "METRICS"
+dataset = "livros_metrics"
+
+# Contadores em memória por localização da Cloudflare. O IP é a chave e não é guardado.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60

@@ -11,6 +11,7 @@
     "check": "node scripts/check.mjs",
     "build": "npm run sync-version && node scripts/build-multi.mjs --browser chrome",
     "test:live": "node scripts/live-monitor.mjs",
+    "test:metrics-sql": "node scripts/metrics-sql-check.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
