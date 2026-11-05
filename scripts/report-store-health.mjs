@@ -1,7 +1,7 @@
 import { STORES } from '../stores.js';
 export const marker = '<!-- store-health-monitor:v1 -->';
 const statePattern = /<!-- store-health-state:([A-Za-z0-9+/=]+) -->/;
-const known = new Set([
+const accessOrNetwork = new Set([
   'access-blocked',
   'rate-limited',
   'authentication-required',
@@ -10,12 +10,15 @@ const known = new Set([
   'shop-server-error',
   'network-error',
   'page-missing',
-  'request-failed',
+  'request-failed'
+]);
+const parserFailure = new Set([
   'pattern-unverified',
   'invalid-offer',
   'product-pattern',
   'page-detection'
 ]);
+const known = new Set([...accessOrNetwork, ...parserFailure]);
 
 export function readFailures(body = '') {
   try {
@@ -104,19 +107,28 @@ export function issueBody(report, runUrl, previousBody = '') {
     );
   }
   const rows = Object.values(failures).sort((a, b) => a.store.localeCompare(b.store));
-  if (rows.length) {
+  const accessRows = rows.filter(r => accessOrNetwork.has(r.status));
+  const parserRows = rows.filter(r => parserFailure.has(r.status));
+  const appendTable = (title, group) => {
+    if (!group.length) {
+      return;
+    }
+    lines.push('### ' + title, '');
     lines.push(
       '| Loja | ISBN de exemplo | Falha | Última verificação (UTC) |',
       '|---|---|---|---|'
     );
-    for (const r of rows) {
+    for (const r of group) {
       const s = STORES.find(s => s.id === r.store);
       const checked = Number.isFinite(Date.parse(r.checkedAt))
         ? new Date(r.checkedAt).toISOString()
         : 'Verificação anterior';
       lines.push('| ' + s.name + ' | ' + s.sample + ' | ' + r.status + ' | ' + checked + ' |');
     }
-  }
+    lines.push('');
+  };
+  appendTable('Acesso ou rede', accessRows);
+  appendTable('Extração', parserRows);
   lines.push(
     '',
     'Usa npm run test:live -- STORE_ID para verificar uma loja; --all executa explicitamente uma verificação local completa.',
