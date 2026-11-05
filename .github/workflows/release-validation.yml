@@ -1,0 +1,29 @@
+name: Validar versão
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  release-validation:
+    if: ${{ startsWith(github.head_ref || '', 'release-please--') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: node scripts/check-release.mjs
+      - run: npm test
+      - run: npm run build:all
+      - run: npm run store-listing:check && npm run store-listing:pack
