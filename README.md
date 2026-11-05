@@ -60,6 +60,8 @@ Comparamos o preço do livro. Confirma sempre o preço final na loja.
 
 Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 26 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
 
+Na Devir e na Penguin, a comparação utiliza a API de produtos após confirmar a edição. As associações verificadas permitem atualizar preços sem repetir as páginas durante a sessão, mantendo a alternativa por HTML quando necessário. Consulta o [funcionamento e limites das APIs](docs/product-apis.md).
+
 ## Campanhas de vales Wook
 
 Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. A opção **Considerar vales Wook na comparação**, ativa por predefinição em Definições, aplica essa percentagem ao preço Wook para ordenar ofertas e apresentar avisos, mesmo quando visitas outra loja. O preço equivalente é identificado como estimativa e o valor a pagar agora aparece em separado. Desativar a opção repõe a comparação pelo preço a pagar. Os alvos e o histórico continuam a usar preços reais. Consulta as [regras e limitações](docs/wook-promotions.md).

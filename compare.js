@@ -2,6 +2,7 @@ import { enrichPromotion } from './promotions.js';
 import { parseOffer, productLinks } from './parser.js';
 import { safeUrl, wooOffer, svelteProductLinks } from './core.js';
 import { searchUrl } from './stores.js';
+import { lookupWooProduct } from './woo-products.js';
 
 async function loadText(url, signal) {
   const response = await fetch(url, {
@@ -34,6 +35,11 @@ export async function loadPage(url, signal) {
 
 export async function compareStore(store, isbn, signal, loader = loadPage, title = '') {
   const url = store.search(isbn);
+  const json = async (endpoint, abort) => JSON.parse((await loadText(endpoint, abort)).text);
+  const woo = (target, verify) =>
+    store.adapter === 'woo-product'
+      ? lookupWooProduct(store, isbn, target, signal, json, verify)
+      : Promise.resolve(null);
   try {
     if (signal.aborted) {
       throw new Error('Cancelado');
@@ -53,8 +59,11 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
       searches.push(searchUrl(store, title.trim().slice(0, 150), true));
     }
     const visited = new Set();
-    let offer = null;
+    let offer = await woo(null);
     for (const search of searches) {
+      if (offer) {
+        break;
+      }
       if (signal.aborted) {
         throw new Error('Cancelado');
       }
@@ -69,6 +78,9 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
         const doc = await loader(search, signal);
         const resolvedUrl = doc.shopUrl || search;
         offer = parseOffer(doc, isbn, resolvedUrl);
+        if (offer) {
+          offer = (await woo(offer.url, async () => offer)) || offer;
+        }
         links = productLinks(doc, store, resolvedUrl);
       }
       if (!offer) {
@@ -81,8 +93,15 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
           }
           visited.add(link);
           try {
-            const product = await loader(link, signal);
-            offer = parseOffer(product, isbn, product.shopUrl || link);
+            let pageOffer;
+            const verify = async target => {
+              if (pageOffer === undefined) {
+                const product = await loader(target, signal);
+                pageOffer = parseOffer(product, isbn, product.shopUrl || target);
+              }
+              return pageOffer;
+            };
+            offer = (await woo(link, verify)) || (await verify(link));
           } catch {
             /* Try the next exact-edition candidate. */
           }

@@ -67,6 +67,7 @@ export const CATALOGUE = [
     { sample: '9789895819812', uncertainStock: true }
   ),
   html('penguin', 'Penguin Livros', 'https://penguinlivros.pt', '/?s={q}', '/loja/.+/livro/', {
+    adapter: 'woo-product',
     sample: '9789895968244'
   }),
   html(
@@ -256,6 +257,7 @@ export const CATALOGUE = [
     { adapter: 'svelte-search', sample: '9781591163596', sampleTitle: 'Naruto Vol. 5' }
   ),
   html('devir', 'Devir', 'https://editoradevir.pt', '/?s={q}&post_type=product', '/livro/', {
+    adapter: 'woo-product',
     sample: '9789895598762',
     sampleTitle: 'Ichi the Witch'
   }),

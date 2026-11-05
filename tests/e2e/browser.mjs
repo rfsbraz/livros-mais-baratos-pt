@@ -340,6 +340,78 @@ try {
   assert.equal(fallback.price, 1800);
   assert.equal(fallback.fetched.length, 4);
   assert(!fallback.fetched.some(url => url.includes('add-to-cart')));
+  const apiComparisons = await page.evaluate(async html => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const originalFetch = window.fetch;
+    const results = [];
+    try {
+      for (const id of ['penguin', 'devir']) {
+        const store = STORES.find(s => s.id === id);
+        const path = id === 'devir' ? '/livro/exemplo/' : '/loja/penguin/livro/exemplo/';
+        const url = store.origin + path;
+        let pageRequests = 0;
+        let price = '1600';
+        let fail = false;
+        window.fetch = async endpoint => {
+          if (fail) {
+            throw new Error('HTTP 503');
+          }
+          const response = new Response(
+            JSON.stringify([
+              {
+                id: 123,
+                type: 'simple',
+                sku: 'INTERNAL',
+                permalink: url,
+                prices: { price, currency_code: 'EUR', currency_minor_unit: 2 },
+                is_in_stock: true
+              }
+            ])
+          );
+          Object.defineProperty(response, 'url', { value: endpoint });
+          return response;
+        };
+        const loader = async target => {
+          pageRequests++;
+          return new DOMParser().parseFromString(
+            target === url ? html : `<a href="${path}">Livro</a>`,
+            'text/html'
+          );
+        };
+        const compare = () =>
+          compareStore(store, '9780306406157', new AbortController().signal, loader);
+        const first = await compare();
+        const initialRequests = pageRequests;
+        pageRequests = 0;
+        price = '1400';
+        const second = await compare();
+        const updateRequests = pageRequests;
+        fail = true;
+        const fallback = await compare();
+        results.push({
+          id,
+          initialRequests,
+          updateRequests,
+          fallbackRequests: pageRequests,
+          first: first.price,
+          second: second.price,
+          fallback: fallback.price
+        });
+      }
+    } finally {
+      window.fetch = originalFetch;
+    }
+    return results;
+  }, product('18.00'));
+  for (const result of apiComparisons) {
+    assert.equal(result.first, 1600, result.id);
+    assert.equal(result.second, 1400, result.id);
+    assert.equal(result.fallback, 1800, result.id);
+    assert.equal(result.initialRequests, 2, result.id);
+    assert.equal(result.updateRequests, 0, result.id);
+    assert.equal(result.fallbackRequests, 2, result.id);
+  }
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'válido' }).waitFor();
