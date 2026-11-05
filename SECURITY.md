@@ -5,7 +5,7 @@
 | 0.1.x              | Sim, experimental |
 | Versões anteriores | Não               |
 
-Comunica vulnerabilidades para **rfsbraz@proton.me**, ou usa **Security > Report a vulnerability** no GitHub quando essa opção estiver disponível. Não publiques vulnerabilidades por corrigir em issues ou discussões públicas. O contacto por email permanece disponível independentemente da visibilidade do repositório.
+Comunica vulnerabilidades para **rfsbraz@gmail.com**, ou usa **Security > Report a vulnerability** no GitHub quando essa opção estiver disponível. Não publiques vulnerabilidades por corrigir em issues ou discussões públicas. O contacto por email permanece disponível independentemente da visibilidade do repositório.
 
 Inclui passos de reprodução, versão afetada e impacto. Não envies credenciais reais ou dados pessoais. O objetivo é responder inicialmente em sete dias; o prazo de correção depende da gravidade e da disponibilidade do responsável.
 

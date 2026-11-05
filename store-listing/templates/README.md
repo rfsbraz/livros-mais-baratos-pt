@@ -18,7 +18,7 @@ Consulta [AUTOMATION.md](AUTOMATION.md) para configuração e publicação em Ch
 | Descrição                  | metadata/description-pt-PT.txt       |
 | Privacidade e permissões   | metadata/privacy-and-permissions.md  |
 | Instruções de revisão      | metadata/reviewer-notes.txt          |
-| Apoio                      | rfsbraz@proton.me                    |
+| Apoio                      | rfsbraz@gmail.com                    |
 | Categoria e idioma         | Compras; português de Portugal       |
 
 ## Antes da submissão

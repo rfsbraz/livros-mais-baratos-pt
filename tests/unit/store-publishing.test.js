@@ -1,7 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { loadListing, validateListing, amoPayload } from '../../scripts/listing.mjs';
+import {
+  loadListing,
+  validateListing,
+  validateListingAccuracy,
+  SUPPORT_EMAIL,
+  amoPayload
+} from '../../scripts/listing.mjs';
 import { syncListing } from '../../scripts/amo-listing.mjs';
 import {
   buildPlan,
@@ -138,4 +144,24 @@ test('rate limiting retries with Retry-After and authentication errors stop imme
     }, '1.2.3'),
     /denied/
   );
+});
+
+test('listing accuracy covers support email, affiliates, telemetry and store claims', () => {
+  const listing = loadListing();
+  assert.deepEqual(validateListingAccuracy(listing), []);
+  assert.equal(listing.config.supportEmail, SUPPORT_EMAIL);
+  const bad = structuredClone(listing);
+  bad.config.supportEmail = 'rfsbraz@proton.me';
+  bad.locales['pt-PT'].description = bad.locales['pt-PT'].description.map(line =>
+    line
+      .replaceAll(SUPPORT_EMAIL, 'rfsbraz@proton.me')
+      .replace(
+        'Sem conta. Nesta versão a extensão não envia estatísticas de utilização.',
+        'Sem conta ou telemetria.'
+      )
+  );
+  const errors = validateListingAccuracy(bad);
+  assert(errors.some(e => e.includes('supportEmail')));
+  assert(errors.some(e => e.includes('absolute permanent zero-telemetry')));
+  assert(errors.some(e => e.includes('proton.me')));
 });
