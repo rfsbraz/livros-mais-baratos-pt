@@ -14,21 +14,21 @@ A comparação tem limite de 60 segundos e a verificação do produto de 15 segu
 
 ## Erros e pausas
 
-| Identificador             | Significado                                |
-| ------------------------- | ------------------------------------------ |
-| `access-blocked`           | Bloqueio suave (ex.: HTTP 202); sem repetição imediata |
-| `rate-limited`            | HTTP 429; sem repetição imediata           |
-| `authentication-required` | HTTP 401; sem repetição imediata           |
-| `access-forbidden`        | HTTP 403; sem repetição imediata           |
-| `method-not-allowed`      | HTTP 405; sem repetição imediata           |
-| `shop-server-error`       | HTTP 5xx                                   |
-| `network-error`           | Pedido falhado ou tempo excedido           |
-| `page-missing`            | HTTP 404 ou 410                            |
-| `pattern-unverified`      | Não foi possível confirmar uma oferta      |
-| `invalid-offer`           | Preço ausente/inválido ou moeda inesperada |
-| `product-pattern`         | URL fora do padrão de produto da loja      |
-| `page-detection`          | Página sem o ISBN esperado                 |
-| `request-failed`          | Falha sem prova mais específica            |
+| Identificador             | Significado                                            |
+| ------------------------- | ------------------------------------------------------ |
+| `access-blocked`          | Bloqueio suave (ex.: HTTP 202); sem repetição imediata |
+| `rate-limited`            | HTTP 429; sem repetição imediata                       |
+| `authentication-required` | HTTP 401; sem repetição imediata                       |
+| `access-forbidden`        | HTTP 403; sem repetição imediata                       |
+| `method-not-allowed`      | HTTP 405; sem repetição imediata                       |
+| `shop-server-error`       | HTTP 5xx                                               |
+| `network-error`           | Pedido falhado ou tempo excedido                       |
+| `page-missing`            | HTTP 404 ou 410                                        |
+| `pattern-unverified`      | Não foi possível confirmar uma oferta                  |
+| `invalid-offer`           | Preço ausente/inválido ou moeda inesperada             |
+| `product-pattern`         | URL fora do padrão de produto da loja                  |
+| `page-detection`          | Página sem o ISBN esperado                             |
+| `request-failed`          | Falha sem prova mais específica                        |
 
 Um HTTP 403, por si só, não demonstra limitação de frequência. Um HTTP 202 sem oferta verificável é classificado como `access-blocked` (bloqueio suave), não como falha de extração. HTTP 5xx, incluindo 520, continua a ser `shop-server-error`.
 

@@ -175,7 +175,11 @@ test('issue report groups access or network failures apart from parser failures'
     checkedAt: '2026-11-03T17:54:42.000Z',
     results: [
       { store: 'devir', status: 'access-blocked', attempts: [{ status: 'access-blocked' }] },
-      { store: 'almedina', status: 'method-not-allowed', attempts: [{ status: 'method-not-allowed' }] },
+      {
+        store: 'almedina',
+        status: 'method-not-allowed',
+        attempts: [{ status: 'method-not-allowed' }]
+      },
       { store: 'wook', status: 'pattern-unverified', attempts: [{ status: 'pattern-unverified' }] }
     ]
   };
