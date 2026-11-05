@@ -248,15 +248,14 @@ test('WooCommerce matches the ISBN SKU, currency and minor units without using p
   );
 });
 
-test('affiliate destinations require an eligible click, preserve attribution and exact HTTPS host', async () => {
+test('affiliate destinations follow the preference, preserve attribution and exact HTTPS host', async () => {
   const { affiliateUrl } = await import('../../affiliate.js');
   const raw = 'https://www.wook.pt/livro/exemplo/123?x=1#details';
   assert.equal(
-    affiliateUrl(raw, true, true),
+    affiliateUrl(raw, true),
     'https://www.wook.pt/livro/exemplo/123?x=1&a_aid=5d3ee4327c2fd#details'
   );
-  assert.equal(affiliateUrl(raw, false, true), raw);
-  assert.equal(affiliateUrl(raw, true, false), raw);
+  assert.equal(affiliateUrl(raw, false), raw);
   for (const url of [
     'https://www.wook.pt/livro/x?a_aid=existing',
     'https://www.wook.pt.evil.test/x',
@@ -267,6 +266,6 @@ test('affiliate destinations require an eligible click, preserve attribution and
     'javascript:alert(1)',
     'invalid'
   ]) {
-    assert.equal(affiliateUrl(url, true, true), url);
+    assert.equal(affiliateUrl(url, true), url);
   }
 });

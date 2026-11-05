@@ -1,8 +1,8 @@
 // Add future partners here; comparison requests and stored offers stay unchanged.
 const PARTNERS = { 'www.wook.pt': { parameter: 'a_aid', value: '5d3ee4327c2fd' } };
 
-export function affiliateUrl(raw, enabled, eligible) {
-  if (!enabled || !eligible) {
+export function affiliateUrl(raw, enabled) {
+  if (!enabled) {
     return raw;
   }
   try {
@@ -22,18 +22,14 @@ export function affiliateUrl(raw, enabled, eligible) {
   }
 }
 
-export function bindAffiliateLink(link, enabled, eligible) {
+export function bindAffiliateLink(link, enabled) {
   const original = link.href;
-  const activate = event => {
-    if (!event.isTrusted || (event.type === 'auxclick' && event.button !== 1)) {
-      return;
-    }
-    link.href = affiliateUrl(original, enabled(), eligible);
-    // Keep copied/context-menu links clean. Only a deliberate click adds attribution.
-    setTimeout(() => {
-      link.href = original;
-    }, 0);
+  const sync = () => {
+    link.href = affiliateUrl(original, enabled());
   };
-  link.addEventListener('click', activate);
-  link.addEventListener('auxclick', activate);
+  sync();
+  // The preference can change while the link is on screen, so follow it before it is opened or copied.
+  for (const type of ['click', 'auxclick', 'contextmenu']) {
+    link.addEventListener(type, sync);
+  }
 }

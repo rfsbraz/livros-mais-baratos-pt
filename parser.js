@@ -101,6 +101,13 @@ function primaryPrice(doc, selector) {
   return /€/.test(displayed) ? euros(displayed) : null;
 }
 
+// Wook's structured data has no availability, so read the product's own label, never the help modal.
+function wookInStock(doc) {
+  return [...doc.querySelectorAll('#disp-information span')].some(
+    span => !span.children.length && /^em stock$/i.test(span.textContent.trim())
+  );
+}
+
 export function parseOffer(doc, isbn, url) {
   const store = storeForUrl(url);
   const source = new URL(url);
@@ -172,7 +179,10 @@ export function parseOffer(doc, isbn, url) {
     ...(verifiedPage && store?.id === 'wook' && offer.currency === 'EUR'
       ? { promotionUrl: discoverPromotion(doc, url) }
       : {}),
-    availability: store?.uncertainStock ? '' : offer.availability || '',
+    availability: store?.uncertainStock
+      ? ''
+      : offer.availability ||
+        (verifiedPage && store?.id === 'wook' && wookInStock(doc) ? 'InStock' : ''),
     condition: offer.condition || (store?.marketplace ? 'UnknownCondition' : 'NewCondition')
   };
 }

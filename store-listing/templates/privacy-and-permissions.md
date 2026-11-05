@@ -38,7 +38,7 @@ O processamento local também deve ser divulgado. A extensão não deve ser desc
 
 ## Utilização de dados
 
-A extensão não vende nem transfere dados para finalidades alheias, não os usa para crédito/empréstimos nem recolhe navegação para perfis publicitários. Cliques de afiliado divulgados enviam o identificador à Wook, que pode usar cookies segundo a sua política. ISBN/título só seguem para lojas selecionadas para a comparação descrita. Nenhum servidor do responsável recebe páginas ou dados de navegação. Revê a política de privacidade antes de confirmar as certificações de utilização limitada.
+A extensão não vende nem transfere dados para finalidades alheias, não os usa para crédito/empréstimos nem recolhe navegação para perfis publicitários. As ligações de afiliado divulgadas enviam o identificador à Wook quando são abertas, que pode usar cookies segundo a sua política. ISBN/título só seguem para lojas selecionadas para a comparação descrita. Nenhum servidor do responsável recebe páginas ou dados de navegação. Revê a política de privacidade antes de confirmar as certificações de utilização limitada.
 
 ## URL de privacidade
 

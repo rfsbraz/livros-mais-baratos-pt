@@ -29,10 +29,8 @@ export function promotionCard(offer, enabled, now = Date.now()) {
   link.href = p.url;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
-  bindAffiliateLink(link, enabled, true);
-  const disclosure = document.createElement('small');
-  disclosure.textContent = enabled() ? 'Ligação de afiliado. Podes desativar em Definições.' : '';
-  box.append(title, explanation, terms, link, disclosure);
+  bindAffiliateLink(link, enabled);
+  box.append(title, explanation, terms, link);
   setTimeout(() => box.remove(), Math.min(p.endsAt, p.verifiedAt + PROMOTION_TTL) - now);
   return box;
 }

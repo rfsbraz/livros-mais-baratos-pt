@@ -70,7 +70,7 @@ O acesso às lojas é pedido na instalação e continua sob controlo do navegado
 
 `activeTab` permite a deteção manual; `scripting`, a deteção automática nos sites autorizados; `storage`, o armazenamento local; `alarms`, as verificações agendadas; e `notifications`, os avisos do sistema. Chrome e Edge usam `offscreen` para analisar páginas em segundo plano. Firefox usa uma página local de segundo plano e uma moldura de análise. A extensão não contorna captchas, não inicia sessão nas lojas e não executa código descarregado.
 
-As ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas em **Definições**. O código só é acrescentado num clique deliberado numa oferta Wook elegível e confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada. Não influencia os pedidos, a comparação ou a ordenação. Consulta a [política de privacidade](PRIVACY.md).
+As ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas em **Definições**. Enquanto a opção estiver ativa, todas as ligações para a Wook mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» e ligações copiadas, incluem o código. Não influencia os pedidos, a comparação ou a ordenação. Consulta a [política de privacidade](PRIVACY.md).
 
 ## Desenvolvimento
 
