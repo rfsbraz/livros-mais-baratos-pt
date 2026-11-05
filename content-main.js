@@ -66,14 +66,9 @@ export function start() {
     bindAffiliateLink(link, () => affiliateEnabled);
     const note = document.createElement('small');
     note.textContent = `Preço do livro. Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
-    const disclosure = document.createElement('small');
-    disclosure.textContent =
-      new URL(result.url || location.href).hostname === 'www.wook.pt' && affiliateEnabled
-        ? 'Ligação de afiliado: podemos receber uma comissão ao clicares. Podes desativar na extensão.'
-        : '';
     panel.append(close, brand, title);
     if (result.saving > 0) {
-      panel.append(detail, edition, link, disclosure, note);
+      panel.append(detail, edition, link, note);
     }
     const promoOffer =
       result.sourceOffer ||

@@ -99,6 +99,13 @@ try {
     await other.getByRole('link', { name: 'Saber mais' }).getAttribute('href'),
     termsUrl
   );
+  await settings.evaluate(() => chrome.storage.local.set({ affiliateEnabled: true }));
+  await other.reload();
+  await other.getByRole('link', { name: 'Ver oferta na Wook' }).waitFor();
+  assert.doesNotMatch(await other.locator('#lmb-price-alert section').textContent(), /afiliad/i);
+  await settings.evaluate(() => chrome.storage.local.set({ affiliateEnabled: false }));
+  await other.reload();
+  await other.getByRole('link', { name: 'Ver oferta na Wook' }).waitFor();
   await settings.goto(`chrome-extension://${id}/popup.html?isbn=${isbn}`);
   await settings.locator('#results .voucher-promotion').waitFor();
   assert(
