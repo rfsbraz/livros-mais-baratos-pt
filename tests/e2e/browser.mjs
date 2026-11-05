@@ -402,6 +402,213 @@ try {
   assert.equal(fallback.price, 1800);
   assert.equal(fallback.fetched.length, 4);
   assert(!fallback.fetched.some(url => url.includes('add-to-cart')));
+  const apiComparisons = await page.evaluate(async html => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const originalFetch = window.fetch;
+    const results = [];
+    try {
+      for (const id of ['penguin', 'devir', 'gradiva', 'guerraepaz', 'relogiodagua', 'mbooks']) {
+        const store = STORES.find(s => s.id === id);
+        const path =
+          id === 'devir'
+            ? '/livro/exemplo/'
+            : id === 'penguin'
+              ? '/loja/penguin/livro/exemplo/'
+              : '/produto/exemplo/';
+        const url = store.origin + path;
+        let pageRequests = 0;
+        let price = '1600';
+        let fail = false;
+        window.fetch = async endpoint => {
+          if (fail) {
+            throw new Error('HTTP 503');
+          }
+          const response = new Response(
+            JSON.stringify([
+              {
+                id: 123,
+                type: 'simple',
+                sku: 'INTERNAL',
+                permalink: url,
+                prices: { price, currency_code: 'EUR', currency_minor_unit: 2 },
+                is_in_stock: true
+              }
+            ])
+          );
+          Object.defineProperty(response, 'url', { value: endpoint });
+          return response;
+        };
+        const loader = async target => {
+          pageRequests++;
+          return new DOMParser().parseFromString(
+            target === url ? html : `<a href="${path}">Livro</a>`,
+            'text/html'
+          );
+        };
+        const compare = () =>
+          compareStore(store, '9780306406157', new AbortController().signal, loader);
+        const first = await compare();
+        const initialRequests = pageRequests;
+        pageRequests = 0;
+        price = '1400';
+        const second = await compare();
+        const updateRequests = pageRequests;
+        fail = true;
+        const fallback = await compare();
+        results.push({
+          id,
+          initialRequests,
+          updateRequests,
+          fallbackRequests: pageRequests,
+          first: first.price,
+          second: second.price,
+          fallback: fallback.price
+        });
+      }
+    } finally {
+      window.fetch = originalFetch;
+    }
+    return results;
+  }, product('18.00'));
+  for (const result of apiComparisons) {
+    assert.equal(result.first, 1600, result.id);
+    assert.equal(result.second, 1400, result.id);
+    assert.equal(result.fallback, 1800, result.id);
+    assert.equal(result.initialRequests, 2, result.id);
+    assert.equal(result.updateRequests, 0, result.id);
+    assert.equal(result.fallbackRequests, 2, result.id);
+  }
+  const shopifyComparisons = await page.evaluate(
+    async ({ good, wrong }) => {
+      const { compareStore } = await import('./compare.js');
+      const { STORES } = await import('./stores.js');
+      const originalFetch = window.fetch;
+      const results = [];
+      try {
+        for (const id of ['presenca', 'antigona', 'kingpin']) {
+          const store = STORES.find(s => s.id === id);
+          for (const empty of [false, true]) {
+            const pages = [];
+            window.fetch = async endpoint => {
+              const response = new Response(
+                JSON.stringify({
+                  resources: {
+                    results: {
+                      products: empty
+                        ? []
+                        : [
+                            { url: '/products/wrong', price: '0.01' },
+                            { url: '/products/right?_pos=2', price: '0.01' }
+                          ]
+                    }
+                  }
+                })
+              );
+              Object.defineProperty(response, 'url', { value: endpoint });
+              return response;
+            };
+            const result = await compareStore(
+              store,
+              '9780306406157',
+              new AbortController().signal,
+              async url => {
+                pages.push(url);
+                const html = url.includes('/search')
+                  ? '<a href="/products/right">Livro</a>'
+                  : url.includes('/wrong')
+                    ? wrong
+                    : good;
+                return new DOMParser().parseFromString(html, 'text/html');
+              }
+            );
+            results.push({ id, empty, status: result.status, price: result.price, pages });
+          }
+        }
+      } finally {
+        window.fetch = originalFetch;
+      }
+      return results;
+    },
+    { good: product('18.00'), wrong: product('1.00', 'EUR', 'InStock', '9780804429573') }
+  );
+  for (const result of shopifyComparisons) {
+    assert.equal(result.status, 'ok', result.id);
+    assert.equal(result.price, 1800, result.id);
+    assert.equal(result.pages.length, 2, result.id);
+    assert.equal(
+      result.pages.some(url => url.includes('/search')),
+      result.empty,
+      result.id
+    );
+  }
+  const shopifyDetails = await page.evaluate(async html => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const originalFetch = window.fetch;
+    const results = [];
+    try {
+      for (const id of ['presenca', 'antigona', 'kingpin']) {
+        const store = STORES.find(s => s.id === id);
+        let price = 1600,
+          pages = 0;
+        const requests = [];
+        window.fetch = async endpoint => {
+          requests.push(new URL(endpoint).pathname);
+          const payload = endpoint.includes('/search/')
+            ? { resources: { results: { products: [{ url: '/products/details' }] } } }
+            : endpoint.endsWith('/cart.js')
+              ? { currency: 'EUR' }
+              : {
+                  id: 901,
+                  handle: 'details',
+                  variants: [
+                    {
+                      id: 902,
+                      sku: id === 'antigona' ? 'internal' : '9780306406157',
+                      price,
+                      available: true
+                    }
+                  ]
+                };
+          const response = new Response(JSON.stringify(payload), {
+            headers: { 'Content-Type': 'text/javascript' }
+          });
+          Object.defineProperty(response, 'url', { value: endpoint });
+          return response;
+        };
+        const compare = () =>
+          compareStore(store, '9780306406157', new AbortController().signal, async () => {
+            pages++;
+            return new DOMParser().parseFromString(html, 'text/html');
+          });
+        const first = await compare();
+        const initialPages = pages;
+        pages = 0;
+        requests.length = 0;
+        price = 1400;
+        const second = await compare();
+        results.push({
+          id,
+          first: first.price,
+          second: second.price,
+          initialPages,
+          pages,
+          requests: [...requests]
+        });
+      }
+    } finally {
+      window.fetch = originalFetch;
+    }
+    return results;
+  }, product('18.00'));
+  for (const result of shopifyDetails) {
+    assert.equal(result.first, 1600, result.id);
+    assert.equal(result.second, 1400, result.id);
+    assert.equal(result.initialPages, result.id === 'antigona' ? 1 : 0, result.id);
+    assert.equal(result.pages, 0, result.id);
+    assert.deepEqual(result.requests, ['/products/details.js', '/cart.js'], result.id);
+  }
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'válido' }).waitFor();

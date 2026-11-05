@@ -26,7 +26,7 @@ test('Firefox automatic comparison, persisted prices and scheduled targets', asy
     root + '/extension/background.js',
     (await readFile('background.js', 'utf8')) +
       `
-chrome.runtime.onMessage.addListener((m,s,reply)=>{if(m.type!=='fixture-state')return;chrome.storage.local.get(null).then(d=>reply({cache:d.priceCache?.['${isbn}']?.offers.length || 0,notices:d.watchNotices?.length || 0}));return true;});
+chrome.runtime.onMessage.addListener((m,s,reply)=>{if(m.type!=='fixture-state')return;chrome.storage.local.get(null).then(async d=>reply({cache:d.priceCache?.['${isbn}']?.offers.length || 0,notices:d.watchNotices?.length || 0,watch:d.saved?.['${isbn}']?.watch,job:d.watchJob,alarm:await chrome.alarms.get('saved-book-check')}));return true;});
 chrome.storage.local.set({selectedStores:['wook','bertrand']});
 let fixtureScheduled=false;
 chrome.storage.onChanged.addListener(async changes=>{if(!changes.priceCache || fixtureScheduled)return;fixtureScheduled=true;
@@ -80,11 +80,10 @@ await chrome.alarms.create('saved-book-check',{when:Date.now()+100});});
     await expect
       .poll(
         async () =>
-          JSON.parse((await page.locator('html').getAttribute('data-fixture-state')) || '{}')
-            .notices,
+          JSON.parse((await page.locator('html').getAttribute('data-fixture-state')) || '{}'),
         { timeout: 30000 }
       )
-      .toBe(1);
+      .toEqual(expect.objectContaining({ notices: 1 }));
     await page.screenshot({ path: 'work/firefox-alert.png', fullPage: true });
   } finally {
     await context.close();
