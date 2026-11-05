@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "limits": {
+    "maxBodyBytes": 32768,
+    "maxPoints": 249,
+    "maxCount": 1000000,
+    "maxStringLength": 32
+  },
+  "browsers": ["chrome", "edge", "firefox"],
+  "sets": {
+    "stores": [
+      "wook",
+      "bertrand",
+      "almedina",
+      "bookcover",
+      "continente",
+      "porto",
+      "lyvros",
+      "penguin",
+      "presenca",
+      "guerraepaz",
+      "gradiva",
+      "relogiodagua",
+      "saida",
+      "quetzal",
+      "antigona",
+      "snob",
+      "kingpin",
+      "mbooks",
+      "auchan",
+      "blackwells",
+      "waterstones",
+      "iberlibro",
+      "abebooks",
+      "fnac",
+      "amazon",
+      "kobo",
+      "google",
+      "apple",
+      "audible",
+      "worten",
+      "elcorteingles",
+      "tintadachina",
+      "mundofantasma",
+      "devir",
+      "planeta",
+      "lello",
+      "reread",
+      "olx",
+      "vinted",
+      "custojusto",
+      "pingodoce",
+      "intermarche",
+      "cultura",
+      "storytel",
+      "traca",
+      "tigre",
+      "ferin",
+      "distopia",
+      "drkartoon",
+      "comicheart",
+      "barata",
+      "bulhosa",
+      "depository",
+      "dott",
+      "jumbo",
+      "asa",
+      "leyaonline",
+      "cavalo",
+      "elsinore",
+      "alfarrabistas"
+    ],
+    "buckets": [
+      "250",
+      "500",
+      "1000",
+      "1500",
+      "2000",
+      "3000",
+      "5000",
+      "8000",
+      "12000",
+      "20000",
+      "35000",
+      "inf"
+    ],
+    "storeCounts": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20",
+      "21",
+      "22",
+      "23",
+      "24",
+      "25",
+      "26",
+      "27",
+      "28",
+      "29",
+      "30",
+      "31",
+      "32",
+      "33",
+      "34",
+      "35",
+      "36",
+      "37",
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43",
+      "44",
+      "45",
+      "46",
+      "47",
+      "48",
+      "49",
+      "50",
+      "51",
+      "52",
+      "53",
+      "54",
+      "55",
+      "56",
+      "57",
+      "58",
+      "59",
+      "60"
+    ],
+    "surfaces": ["popup", "auto", "scheduled"],
+    "affiliateSurfaces": ["popup_offer", "promotion_more", "banner"],
+    "triggers": ["page", "isbn_typed", "cache_shown"],
+    "timedOutcomes": ["price", "no_price", "blocked", "error", "timeout", "aborted"],
+    "untimedOutcomes": ["disabled", "cached"],
+    "totalOutcomes": ["settled", "abandoned"],
+    "toggles": ["enabled", "disabled"]
+  },
+  "metrics": {
+    "popup_open": {},
+    "compare_run": {
+      "surface": "surfaces",
+      "outcome": "triggers"
+    },
+    "active_stores": {
+      "bucket": "storeCounts"
+    },
+    "store_active": {
+      "store": "stores"
+    },
+    "auto_enabled": {
+      "outcome": "toggles"
+    },
+    "wook_promotion_enabled": {
+      "outcome": "toggles"
+    },
+    "affiliate_setting": {
+      "outcome": "toggles"
+    },
+    "store_latency": {
+      "surface": "surfaces",
+      "store": "stores",
+      "outcome": "timedOutcomes",
+      "bucket": "buckets"
+    },
+    "store_untimed": {
+      "surface": "surfaces",
+      "store": "stores",
+      "outcome": "untimedOutcomes"
+    },
+    "t_first_result": {
+      "outcome": "totalOutcomes",
+      "bucket": "buckets"
+    },
+    "t_all_settled": {
+      "outcome": "totalOutcomes",
+      "bucket": "buckets"
+    },
+    "t_compare_settled": {
+      "outcome": "totalOutcomes",
+      "bucket": "buckets"
+    },
+    "t_banner_shown": {
+      "bucket": "buckets"
+    },
+    "banner_shown": {},
+    "banner_closed": {},
+    "slowest_store": {
+      "surface": "surfaces",
+      "store": "stores"
+    },
+    "affiliate_click": {
+      "surface": "affiliateSurfaces"
+    },
+    "wook_click_no_affiliate": {
+      "surface": "affiliateSurfaces"
+    }
+  }
+}
