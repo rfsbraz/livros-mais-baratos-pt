@@ -10,13 +10,27 @@ Fechar o contexto de comparação, reiniciar o navegador ou expirar a associaç�
 
 Se a API falhar, devolver dados incompletos ou não permitir confirmar o livro, mantém-se a alternativa pelas páginas. A mesma regra se aplica quando a API não disponibiliza o produto. Cancelar a comparação não guarda novas associações.
 
-## Pesquisa Shopify
+## Pesquisa e detalhes Shopify
 
-Presença, Antígona e Kingpin usam a pesquisa pública `/search/suggest.json`, limitada a seis sugestões de produtos, incluindo pesquisa por título, SKU e código de barras. As sugestões apenas descobrem páginas: o preço indicado na sugestão nunca é usado como oferta. A página final continua a ter de confirmar ISBN, preço, moeda e disponibilidade.
+Presença, Antígona e Kingpin usam a pesquisa pública `/search/suggest.json`, limitada a seis sugestões de produtos, incluindo pesquisa por título, SKU e código de barras. As sugestões apenas descobrem produtos: o preço indicado na sugestão nunca é usado como oferta.
+
+O detalhe `/products/{handle}.js` fornece as variantes, preço e disponibilidade. A extensão seleciona uma única variante com ISBN exato em SKU ou código de barras; identificadores contraditórios ou variantes ambíguas são rejeitados. Quando há apenas uma variante sem ISBN reconhecido, a página tem de confirmar inicialmente a edição. Esta situação foi observada na Antígona. A associação entre ISBN, produto e variante fica em memória até 24 horas, limitada a 200 entradas, sem guardar o preço nessa associação.
+
+A moeda é confirmada através de uma consulta de leitura a `/cart.js`, com `credentials: 'omit'`: não se lê o carrinho pessoal nem se enviam cookies. Só são aceites preços em EUR. A ligação da oferta inclui o identificador da variante confirmada. As respostas `.js` são analisadas como JSON, nunca executadas como código remoto.
 
 Uma resposta vazia ou inválida permite recorrer à pesquisa HTML existente. Respostas HTTP 401, 403 ou 429 interrompem a consulta da loja, sem repetir a pesquisa por HTML. Não são necessários tokens, novas permissões ou cookies de sessão.
 
-A consulta real de 5 de novembro de 2026 devolveu sugestões por ISBN na Presença e Kingpin. Na Antígona, a pesquisa por ISBN ficou vazia, mas a pesquisa pelo título encontrou o livro. Os endpoints `/products/{handle}.js` devolveram HTTP 429 nas três lojas: por isso, não foram ativados para obter preços. A moeda também teria de ser confirmada, pois o preço Shopify depende do mercado. Referências: [pesquisa preditiva](https://shopify.dev/docs/api/ajax/reference/predictive-search) e [API de produtos](https://shopify.dev/docs/api/ajax/reference/product).
+A consulta real de 5 de novembro de 2026 devolveu sugestões por ISBN na Presença e Kingpin. Na Antígona, a pesquisa por ISBN ficou vazia, mas a pesquisa pelo título encontrou o livro. Os primeiros pedidos de detalhe por Node devolveram HTTP 429; a repetição num Chromium real e no contexto da extensão devolveu HTTP 200 nas três lojas, sem cabeçalhos personalizados ou cookies na extensão. Na Presença, Node com cabeçalhos observados no Chromium também devolveu 200. Estes resultados não permitem atribuir a diferença a um único cabeçalho. Não é necessário simular cabeçalhos ou abrir separadores nas comparações: os pedidos partem normalmente do contexto de fundo da extensão.
+
+Referências: [pesquisa preditiva](https://shopify.dev/docs/api/ajax/reference/predictive-search) e [API de produtos](https://shopify.dev/docs/api/ajax/reference/product).
+
+## Investigação Wook e Bertrand
+
+Em 5 de novembro de 2026, as pesquisas públicas por ISBN devolveram HTTP 403 num Chromium real com perfil isolado. As páginas iniciais consultadas a partir do contexto da extensão também devolveram HTTP 403, com uma página de bloqueio Cloudflare. Isto impediu inspecionar os recursos da aplicação e validar chamadas de catálogo nesse ambiente. Não demonstra que as lojas estejam indisponíveis para todos os utilizadores, nem que não existam integrações privadas.
+
+Não foi encontrada documentação oficial que confirme uma API pública de preços por ISBN utilizável pela extensão. Os programas de [afiliados Wook](https://www.wook.pt/Afiliados) e [Bertrand](https://www.bertrand.pt/online/afiliados) são canais para solicitar acesso, mas a existência do programa não garante um feed. Os adaptadores existentes mantêm-se; não se acrescentaram endpoints especulativos, serviços de extração externos ou mecanismos para contornar os bloqueios.
+
+Para avançar com uma integração de parceiro, é necessário confirmar disponibilidade de catálogo por ISBN/EAN, preço e moeda, stock, URL de produto, atualização dos dados, condições das campanhas e autorização de utilização numa extensão. O código de afiliado Wook existente serve para atribuição de ligações, não constitui uma credencial de API.
 
 ## Integrações que continuam pendentes
 
@@ -43,3 +57,5 @@ Referência: [WooCommerce Store API, produtos](https://developer.woocommerce.com
 A verificação real do adaptador implementado passou em 5 de novembro de 2026 para Devir (`9789895598762`) e Penguin (`9789895968244`). As consultas por slug devolveram HTTP 200 e o monitor confirmou também o ISBN e a oferta nas páginas finais. Na Devir, a pesquisa por ISBN apresentou candidatos de outras edições e foi necessária a alternativa por título. Esta primeira descoberta ainda pode exigir vários pedidos; a redução aplica-se sobretudo às atualizações com associação já confirmada.
 
 A expansão passou também no monitor real para Gradiva (`9789897855320`), Guerra & Paz (`9789895764808`), Relógio d'Água (`9789897837449`) e MBooks (`9789898297839`), na mesma data. Os testes de navegador verificam nas seis lojas a confirmação inicial, a atualização só por API e a recuperação por HTML quando a API falha. Os testes Shopify verificam descoberta, rejeição de outra edição, ignorar preços das sugestões e pesquisa HTML quando a API não encontra candidatos.
+
+O adaptador Shopify completo passou no monitor real para Presença (`9789722378543`), Antígona (`9789726084495`) e Kingpin (`9789895598571`) em 5 de novembro de 2026. O monitor usou o pacote da extensão, confirmou a oferta e verificou também a deteção do ISBN na página final. Os testes determinísticos adicionais cobrem detalhe com MIME `text/javascript`, seleção de variante, moeda, disponibilidade e atualizações pela API sem repetir a descoberta.

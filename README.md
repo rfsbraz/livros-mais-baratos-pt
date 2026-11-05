@@ -60,7 +60,7 @@ Comparamos o preço do livro. Confirma sempre o preço final na loja.
 
 Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 26 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
 
-A comparação utiliza APIs de produtos em seis lojas WooCommerce adicionais ao Bookcover e pesquisa por API na Presença, Antígona e Kingpin. As associações verificadas permitem atualizar preços WooCommerce sem repetir as páginas durante a sessão, mantendo a alternativa por HTML quando necessário. A pesquisa Shopify continua a confirmar a edição e o preço na página final. Consulta as [lojas abrangidas, funcionamento e limites das APIs](docs/product-apis.md).
+A comparação utiliza APIs de produtos em seis lojas WooCommerce adicionais ao Bookcover e APIs de pesquisa e detalhe na Presença, Antígona e Kingpin. As associações verificadas permitem atualizar preços sem repetir as páginas durante a sessão, mantendo a alternativa por HTML quando necessário. Na Antígona, a página continua a confirmar inicialmente o ISBN quando este não consta da API. Consulta as [lojas abrangidas, funcionamento e limites das APIs](docs/product-apis.md).
 
 ## Campanhas de vales Wook
 

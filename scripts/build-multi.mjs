@@ -31,6 +31,7 @@ export const runtimeFiles = () => [
   'watch.js',
   'woo-products.js',
   'shopify-search.js',
+  'shopify-products.js',
   ...readdirSync('icons').map(f => 'icons/' + f),
   'LICENSE'
 ];

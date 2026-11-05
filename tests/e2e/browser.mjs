@@ -480,6 +480,73 @@ try {
       result.id
     );
   }
+  const shopifyDetails = await page.evaluate(async html => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const originalFetch = window.fetch;
+    const results = [];
+    try {
+      for (const id of ['presenca', 'antigona', 'kingpin']) {
+        const store = STORES.find(s => s.id === id);
+        let price = 1600,
+          pages = 0;
+        const requests = [];
+        window.fetch = async endpoint => {
+          requests.push(new URL(endpoint).pathname);
+          const payload = endpoint.includes('/search/')
+            ? { resources: { results: { products: [{ url: '/products/details' }] } } }
+            : endpoint.endsWith('/cart.js')
+              ? { currency: 'EUR' }
+              : {
+                  id: 901,
+                  handle: 'details',
+                  variants: [
+                    {
+                      id: 902,
+                      sku: id === 'antigona' ? 'internal' : '9780306406157',
+                      price,
+                      available: true
+                    }
+                  ]
+                };
+          const response = new Response(JSON.stringify(payload), {
+            headers: { 'Content-Type': 'text/javascript' }
+          });
+          Object.defineProperty(response, 'url', { value: endpoint });
+          return response;
+        };
+        const compare = () =>
+          compareStore(store, '9780306406157', new AbortController().signal, async () => {
+            pages++;
+            return new DOMParser().parseFromString(html, 'text/html');
+          });
+        const first = await compare();
+        const initialPages = pages;
+        pages = 0;
+        requests.length = 0;
+        price = 1400;
+        const second = await compare();
+        results.push({
+          id,
+          first: first.price,
+          second: second.price,
+          initialPages,
+          pages,
+          requests: [...requests]
+        });
+      }
+    } finally {
+      window.fetch = originalFetch;
+    }
+    return results;
+  }, product('18.00'));
+  for (const result of shopifyDetails) {
+    assert.equal(result.first, 1600, result.id);
+    assert.equal(result.second, 1400, result.id);
+    assert.equal(result.initialPages, result.id === 'antigona' ? 1 : 0, result.id);
+    assert.equal(result.pages, 0, result.id);
+    assert.deepEqual(result.requests, ['/products/details.js', '/cart.js'], result.id);
+  }
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'válido' }).waitFor();
