@@ -155,3 +155,42 @@ test('hourly reports retain unchecked failures and migrate the original tracking
     true
   );
 });
+
+test('HTTP 202 soft blocks and Cloudflare 520 are access or server failures, not parser failures', () => {
+  // Devir on GitHub runners returned 202 with empty challenge-like bodies (run 41688758367).
+  assert.equal(failureCode('pattern-unverified', [{ status: 202 }]), 'access-blocked');
+  assert.equal(failureCode('request-failed', [{ status: 202 }]), 'access-blocked');
+  // Cloudflare 520 must stay a shop server error when the status is observed.
+  assert.equal(failureCode('pattern-unverified', [{ status: 520 }]), 'shop-server-error');
+  assert.equal(failureCode('request-failed', [{ status: 520 }]), 'shop-server-error');
+  // Almedina returned 405; that is method-not-allowed, not a captcha or parser miss.
+  assert.equal(failureCode('request-failed', [{ status: 405 }]), 'method-not-allowed');
+  assert.equal(canRetry('access-blocked', []), false);
+});
+
+test('issue report groups access or network failures apart from parser failures', () => {
+  const report = {
+    complete: true,
+    plannedStores: ['devir', 'almedina', 'wook'],
+    checkedAt: '2026-11-03T17:54:42.000Z',
+    results: [
+      { store: 'devir', status: 'access-blocked', attempts: [{ status: 'access-blocked' }] },
+      { store: 'almedina', status: 'method-not-allowed', attempts: [{ status: 'method-not-allowed' }] },
+      { store: 'wook', status: 'pattern-unverified', attempts: [{ status: 'pattern-unverified' }] }
+    ]
+  };
+  const { body, healthy } = issueBody(report, 'https://example.test/run');
+  assert.equal(healthy, false);
+  assert.match(body, /Acesso ou rede/);
+  assert.match(body, /Extração|Extrac/);
+  const accessIdx = body.indexOf('Acesso ou rede');
+  const parseIdx = body.search(/Extração|Extrac/);
+  assert.ok(accessIdx >= 0 && parseIdx > accessIdx);
+  const accessSection = body.slice(accessIdx, parseIdx);
+  const parseSection = body.slice(parseIdx);
+  assert.match(accessSection, /Devir/);
+  assert.match(accessSection, /Almedina/);
+  assert.doesNotMatch(accessSection, /Wook/);
+  assert.match(parseSection, /Wook/);
+  assert.doesNotMatch(parseSection, /Devir/);
+});
