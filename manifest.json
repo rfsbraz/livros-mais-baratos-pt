@@ -1,14 +1,24 @@
 {
   "manifest_version": 3,
   "name": "Livros Mais Baratos PT",
-  "version": "0.1.5",
+  "version": "0.1.1",
   "description": "Compara preços de livros em Portugal, recebe alertas de preço-alvo e consulta o histórico das tuas pesquisas.",
   "minimum_chrome_version": "120",
-  "permissions": ["activeTab", "scripting", "storage", "offscreen", "alarms", "notifications"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "offscreen",
+    "alarms",
+    "notifications"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Comparar preços de livros",
-    "default_icon": { "16": "icons/16.png", "32": "icons/32.png" }
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
   },
   "icons": {
     "16": "icons/16.png",
@@ -19,7 +29,10 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
   },
-  "background": { "service_worker": "background.js", "type": "module" },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "web_accessible_resources": [
     {
       "resources": [
