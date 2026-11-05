@@ -45,6 +45,10 @@ export function failureCode(check, requests) {
   if (requests.some(r => r.status === 404 || r.status === 410)) {
     return 'page-missing';
   }
+  // Soft blocks (e.g. Cloudflare 202) look like empty successful pages to the parser.
+  if (requests.some(r => r.status === 202)) {
+    return 'access-blocked';
+  }
   return check;
 }
 
@@ -58,8 +62,12 @@ export function retryAfterUntil(value, now = Date.now()) {
 
 export function canRetry(status, requests) {
   return (
-    !['rate-limited', 'authentication-required', 'access-forbidden', 'method-not-allowed'].includes(
-      status
-    ) && !requests.some(r => r.retryAfterUntil > Date.now())
+    ![
+      'access-blocked',
+      'rate-limited',
+      'authentication-required',
+      'access-forbidden',
+      'method-not-allowed'
+    ].includes(status) && !requests.some(r => r.retryAfterUntil > Date.now())
   );
 }

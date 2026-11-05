@@ -62,7 +62,7 @@ try {
         if (response.status === 429 && !record.retryAfterUntil) {
           record.retryAfterUntil = Date.now() + 86400000;
         }
-        if ([401, 403, 405, 429].includes(response.status) || record.retryAfterUntil) {
+        if ([202, 401, 403, 405, 429].includes(response.status) || record.retryAfterUntil) {
           stoppedOrigins.add(origin);
         }
         return response;

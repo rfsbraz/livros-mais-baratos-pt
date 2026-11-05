@@ -16,6 +16,7 @@ A comparação tem limite de 60 segundos e a verificação do produto de 15 segu
 
 | Identificador             | Significado                                |
 | ------------------------- | ------------------------------------------ |
+| `access-blocked`           | Bloqueio suave (ex.: HTTP 202); sem repetição imediata |
 | `rate-limited`            | HTTP 429; sem repetição imediata           |
 | `authentication-required` | HTTP 401; sem repetição imediata           |
 | `access-forbidden`        | HTTP 403; sem repetição imediata           |
@@ -29,9 +30,9 @@ A comparação tem limite de 60 segundos e a verificação do produto de 15 segu
 | `page-detection`          | Página sem o ISBN esperado                 |
 | `request-failed`          | Falha sem prova mais específica            |
 
-Um HTTP 403, por si só, não demonstra limitação de frequência. Um HTTP 202 pode não ter conteúdo suficiente para verificar a oferta e resultar em `pattern-unverified`.
+Um HTTP 403, por si só, não demonstra limitação de frequência. Um HTTP 202 sem oferta verificável é classificado como `access-blocked` (bloqueio suave), não como falha de extração. HTTP 5xx, incluindo 520, continua a ser `shop-server-error`.
 
-Após 401/403/405/429, não há mais pedidos à mesma origem nessa execução, incluindo alternativas do adaptador. `Retry-After` também interrompe pedidos e define uma pausa, aceitando segundos ou uma data HTTP. Um 429 sem esse cabeçalho impõe 24 horas de pausa. O estado fica na issue gerida pelo bot e é lido nas consultas seguintes. Uma loja ignorada por estar em pausa não é considerada recuperada.
+Após 202/401/403/405/429, não há mais pedidos à mesma origem nessa execução, incluindo alternativas do adaptador. `Retry-After` também interrompe pedidos e define uma pausa, aceitando segundos ou uma data HTTP. Um 429 sem esse cabeçalho impõe 24 horas de pausa. O estado fica na issue gerida pelo bot e é lido nas consultas seguintes. Uma loja ignorada por estar em pausa não é considerada recuperada.
 
 Outras falhas permitem no máximo uma repetição após 20 a 40 segundos aleatórios, desde que não exista pausa pedida pela loja. Não há contorno de captchas nem pedidos de afiliado.
 
