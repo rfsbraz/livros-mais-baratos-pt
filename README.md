@@ -60,6 +60,8 @@ Comparamos o preço do livro. Confirma sempre o preço final na loja.
 
 Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 26 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
 
+A comparação utiliza APIs de produtos em seis lojas WooCommerce adicionais ao Bookcover e APIs de pesquisa e detalhe na Presença, Antígona e Kingpin. As associações verificadas permitem atualizar preços sem repetir as páginas durante a sessão, mantendo a alternativa por HTML quando necessário. Na Antígona, a página continua a confirmar inicialmente o ISBN quando este não consta da API. Consulta as [lojas abrangidas, funcionamento e limites das APIs](docs/product-apis.md).
+
 ## Campanhas de vales Wook
 
 Quando o livro liga a condições reconhecidas de devolução em vale, a extensão mostra a poupança combinada e uma ligação **Saber mais** para a campanha. Não depende do nome comercial da promoção. Por exemplo, devolver 100% num vale limitado a 50% de compras futuras equivale a cerca de 33,3% de poupança no conjunto, se o vale for gasto integralmente. A opção **Considerar vales Wook na comparação**, ativa por predefinição em Definições, aplica essa percentagem ao preço Wook para ordenar ofertas e apresentar avisos, mesmo quando visitas outra loja. O preço equivalente é identificado como estimativa e o valor a pagar agora aparece em separado. Desativar a opção repõe a comparação pelo preço a pagar. Os alvos e o histórico continuam a usar preços reais. Consulta as [regras e limitações](docs/wook-promotions.md).
@@ -70,7 +72,7 @@ O acesso às lojas é pedido na instalação e continua sob controlo do navegado
 
 `activeTab` permite a deteção manual; `scripting`, a deteção automática nos sites autorizados; `storage`, o armazenamento local; `alarms`, as verificações agendadas; e `notifications`, os avisos do sistema. Chrome e Edge usam `offscreen` para analisar páginas em segundo plano. Firefox usa uma página local de segundo plano e uma moldura de análise. A extensão não contorna captchas, não inicia sessão nas lojas e não executa código descarregado.
 
-As ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas em **Definições**. O código só é acrescentado num clique deliberado numa oferta Wook elegível e confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada. Não influencia os pedidos, a comparação ou a ordenação. Consulta a [política de privacidade](PRIVACY.md).
+As ligações de afiliado Wook estão ativas por predefinição e podem ser desativadas em **Definições**. Enquanto a opção estiver ativa, todas as ligações para a Wook mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» e ligações copiadas, incluem o código. Não influencia os pedidos, a comparação ou a ordenação. Consulta a [política de privacidade](PRIVACY.md).
 
 ## Desenvolvimento
 

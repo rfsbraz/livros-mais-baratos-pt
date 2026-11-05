@@ -22,8 +22,8 @@ Os preços-alvo e o histórico mantêm os valores reais. O aviso informativo da 
 
 As condições são consultadas sem cookies, com os limites de tempo, tamanho e origem usados nas comparações. Consultas simultâneas da mesma campanha partilham um pedido. A memória temporária é limitada a 20 campanhas, reutilizadas durante dez minutos. A apresentação expira também no fim da campanha. Recomendações e faixas genéricas fora da área de compra não tornam o livro elegível.
 
-**Saber mais** abre a ligação de condições encontrada no livro. A preferência de afiliados existente aplica-se: só um clique deliberado acrescenta o identificador, com divulgação junto à ligação. Não há afiliado nos pedidos de deteção ou nos endereços guardados. Desativar a opção mantém a ligação normal.
+**Saber mais** abre a ligação de condições encontrada no livro. A preferência de afiliados existente aplica-se: enquanto estiver ativa, a ligação inclui o identificador. Não há afiliado nos pedidos de deteção ou nos endereços guardados. Desativar a opção mantém a ligação normal.
 
 ## Verificação
 
-Os testes cobrem nomes alternativos, percentagens diferentes, datas de inverno/verão, condições incompletas, endereços externos, campanha expirada, cálculo, preservação do preço e da cache, cliques com e sem afiliado e um aviso automático numa instalação real de Chromium.
+Os testes cobrem nomes alternativos, percentagens diferentes, datas de inverno/verão, condições incompletas, endereços externos, campanha expirada, cálculo, preservação do preço e da cache, ligações com e sem afiliado e um aviso automático numa instalação real de Chromium.

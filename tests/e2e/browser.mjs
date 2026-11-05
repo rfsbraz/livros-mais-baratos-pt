@@ -180,7 +180,8 @@ try {
   });
   assert((await page.locator('#promotion-fixture').textContent()).includes('33,3%'));
   assert((await page.locator('#promotion-fixture').textContent()).includes('37,70'));
-  assert(!(await page.locator('#promotion-fixture a').getAttribute('href')).includes('a_aid'));
+  assert(!(await page.locator('#promotion-fixture').textContent()).includes('Ligação de afiliado'));
+  assert((await page.locator('#promotion-fixture a').getAttribute('href')).includes('a_aid'));
   await page.locator('#promotion-fixture a').click();
   assert((await page.evaluate(() => window.__promotionClicked)).includes('a_aid=5d3ee4327c2fd'));
   await page.evaluate(() => {
@@ -218,11 +219,13 @@ try {
     return page.evaluate(() => window.__clicked);
   }
   assert(
-    !(await page.locator('#results a').filter({ hasText: 'Wook' }).getAttribute('href')).includes(
-      'a_aid'
-    )
+    (await page.locator('#results a').filter({ hasText: 'Wook' }).getAttribute('href')).includes(
+      'a_aid=5d3ee4327c2fd'
+    ),
+    'the link carries the id before any click, so a copied link has it too'
   );
   assert((await captureWookClick()).includes('a_aid=5d3ee4327c2fd'));
+  assert.doesNotMatch(await page.locator('footer').textContent(), /afiliad/i);
   assert.equal(await page.locator('#settings-view').isVisible(), false);
   await page.locator('#open-settings').click();
   assert.equal(await page.locator('#main-view').isVisible(), false);
@@ -231,6 +234,13 @@ try {
   assert.equal(await page.locator('#results .offer').count(), 3);
   await page.waitForFunction(() => window.__data.affiliateEnabled === false);
   assert(!(await captureWookClick()).includes('a_aid'));
+  await page.locator('#results a').filter({ hasText: 'Wook' }).dispatchEvent('contextmenu');
+  assert(
+    !(await page.locator('#results a').filter({ hasText: 'Wook' }).getAttribute('href')).includes(
+      'a_aid'
+    ),
+    'turning the option off also cleans a link that is already on screen'
+  );
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
 
@@ -253,6 +263,20 @@ try {
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#count').textContent === '1');
   assert.equal(await page.evaluate(() => window.__data.history['9780306406157'].length), 9);
+  // The dearest offer in the list still carries the id.
+  await page.locator('#open-settings').click();
+  await page.locator('#affiliate-toggle').check();
+  await page.locator('#close-settings').click();
+  await page.route('https://www.wook.pt/**', route =>
+    route.fulfill({ contentType: 'text/html', body: product('99.00') })
+  );
+  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  await page.locator('#results .offer').filter({ hasText: '99,00' }).waitFor();
+  assert(
+    (await page.locator('#results a').filter({ hasText: 'Wook' }).getAttribute('href')).includes(
+      'a_aid=5d3ee4327c2fd'
+    )
+  );
   // Parser regressions: wrong edition, script injection, currency and search/product separation.
   const parsed = await page.evaluate(
     async ({ good, wrong }) => {
@@ -268,6 +292,36 @@ try {
           '9789895701124',
           'https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345'
         )?.price,
+        // Wook's real shape: no availability in JSON-LD, the label in #disp-information.
+        wookStock: (() => {
+          const isbn = '9789895701124';
+          const page = (label, offers = '{"price":"19.46"}', extra = '') =>
+            parse(
+              `<script type="application/ld+json">{"@type":"Book","isbn":"${isbn}","name":"A Criada","offers":${offers}}</script><div id="product-price"><span class="price">19,46€</span></div><span id="disp-information"><span class="text-align-right"><span class="text-green font-bold"> ${label} </span><span>-</span></span><button>i</button></span>${extra}`
+            );
+          const wook = 'https://www.wook.pt/livro/a-criada-freida-mcfadden/28535345';
+          const modal = '<div id="info-availability-toggle-modal"><p>EM STOCK</p></div>';
+          return {
+            label: parseOffer(page('EM STOCK'), isbn, wook).availability,
+            empty: parseOffer(page('', undefined, modal), isbn, wook).availability,
+            prelaunch: parseOffer(page('PRÉ-LANÇAMENTO', undefined, modal), isbn, wook)
+              .availability,
+            structuredWins: parseOffer(
+              page(
+                'EM STOCK',
+                '{"price":"19.46","priceCurrency":"EUR","availability":"https://schema.org/OutOfStock"}'
+              ),
+              isbn,
+              wook
+            ).availability,
+            otherStore: parseOffer(
+              page('EM STOCK', '{"price":"19.46","priceCurrency":"EUR"}'),
+              isbn,
+              'https://www.bertrand.pt/livro/a-criada/28535345'
+            ).availability,
+            otherEdition: parseOffer(page('EM STOCK'), '9780306406157', wook)
+          };
+        })(),
         wrong: parseOffer(parse(wrong), '9780306406157', 'https://www.wook.pt/livro/example'),
         malformed: detectBook(parse('<script type="application/ld+json">broken</script>')).isbn,
         links: productLinks(
@@ -281,6 +335,14 @@ try {
   );
   assert.equal(parsed.good, 1800);
   assert.equal(parsed.wook, 1946);
+  assert.deepEqual(parsed.wookStock, {
+    label: 'InStock',
+    empty: '',
+    prelaunch: '',
+    structuredWins: 'OutOfStock',
+    otherStore: '',
+    otherEdition: null
+  });
   assert.equal(parsed.wrong, null);
   assert.equal(parsed.malformed, null);
   assert.deepEqual(parsed.links, ['https://www.wook.pt/livro/good']);
@@ -340,6 +402,213 @@ try {
   assert.equal(fallback.price, 1800);
   assert.equal(fallback.fetched.length, 4);
   assert(!fallback.fetched.some(url => url.includes('add-to-cart')));
+  const apiComparisons = await page.evaluate(async html => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const originalFetch = window.fetch;
+    const results = [];
+    try {
+      for (const id of ['penguin', 'devir', 'gradiva', 'guerraepaz', 'relogiodagua', 'mbooks']) {
+        const store = STORES.find(s => s.id === id);
+        const path =
+          id === 'devir'
+            ? '/livro/exemplo/'
+            : id === 'penguin'
+              ? '/loja/penguin/livro/exemplo/'
+              : '/produto/exemplo/';
+        const url = store.origin + path;
+        let pageRequests = 0;
+        let price = '1600';
+        let fail = false;
+        window.fetch = async endpoint => {
+          if (fail) {
+            throw new Error('HTTP 503');
+          }
+          const response = new Response(
+            JSON.stringify([
+              {
+                id: 123,
+                type: 'simple',
+                sku: 'INTERNAL',
+                permalink: url,
+                prices: { price, currency_code: 'EUR', currency_minor_unit: 2 },
+                is_in_stock: true
+              }
+            ])
+          );
+          Object.defineProperty(response, 'url', { value: endpoint });
+          return response;
+        };
+        const loader = async target => {
+          pageRequests++;
+          return new DOMParser().parseFromString(
+            target === url ? html : `<a href="${path}">Livro</a>`,
+            'text/html'
+          );
+        };
+        const compare = () =>
+          compareStore(store, '9780306406157', new AbortController().signal, loader);
+        const first = await compare();
+        const initialRequests = pageRequests;
+        pageRequests = 0;
+        price = '1400';
+        const second = await compare();
+        const updateRequests = pageRequests;
+        fail = true;
+        const fallback = await compare();
+        results.push({
+          id,
+          initialRequests,
+          updateRequests,
+          fallbackRequests: pageRequests,
+          first: first.price,
+          second: second.price,
+          fallback: fallback.price
+        });
+      }
+    } finally {
+      window.fetch = originalFetch;
+    }
+    return results;
+  }, product('18.00'));
+  for (const result of apiComparisons) {
+    assert.equal(result.first, 1600, result.id);
+    assert.equal(result.second, 1400, result.id);
+    assert.equal(result.fallback, 1800, result.id);
+    assert.equal(result.initialRequests, 2, result.id);
+    assert.equal(result.updateRequests, 0, result.id);
+    assert.equal(result.fallbackRequests, 2, result.id);
+  }
+  const shopifyComparisons = await page.evaluate(
+    async ({ good, wrong }) => {
+      const { compareStore } = await import('./compare.js');
+      const { STORES } = await import('./stores.js');
+      const originalFetch = window.fetch;
+      const results = [];
+      try {
+        for (const id of ['presenca', 'antigona', 'kingpin']) {
+          const store = STORES.find(s => s.id === id);
+          for (const empty of [false, true]) {
+            const pages = [];
+            window.fetch = async endpoint => {
+              const response = new Response(
+                JSON.stringify({
+                  resources: {
+                    results: {
+                      products: empty
+                        ? []
+                        : [
+                            { url: '/products/wrong', price: '0.01' },
+                            { url: '/products/right?_pos=2', price: '0.01' }
+                          ]
+                    }
+                  }
+                })
+              );
+              Object.defineProperty(response, 'url', { value: endpoint });
+              return response;
+            };
+            const result = await compareStore(
+              store,
+              '9780306406157',
+              new AbortController().signal,
+              async url => {
+                pages.push(url);
+                const html = url.includes('/search')
+                  ? '<a href="/products/right">Livro</a>'
+                  : url.includes('/wrong')
+                    ? wrong
+                    : good;
+                return new DOMParser().parseFromString(html, 'text/html');
+              }
+            );
+            results.push({ id, empty, status: result.status, price: result.price, pages });
+          }
+        }
+      } finally {
+        window.fetch = originalFetch;
+      }
+      return results;
+    },
+    { good: product('18.00'), wrong: product('1.00', 'EUR', 'InStock', '9780804429573') }
+  );
+  for (const result of shopifyComparisons) {
+    assert.equal(result.status, 'ok', result.id);
+    assert.equal(result.price, 1800, result.id);
+    assert.equal(result.pages.length, 2, result.id);
+    assert.equal(
+      result.pages.some(url => url.includes('/search')),
+      result.empty,
+      result.id
+    );
+  }
+  const shopifyDetails = await page.evaluate(async html => {
+    const { compareStore } = await import('./compare.js');
+    const { STORES } = await import('./stores.js');
+    const originalFetch = window.fetch;
+    const results = [];
+    try {
+      for (const id of ['presenca', 'antigona', 'kingpin']) {
+        const store = STORES.find(s => s.id === id);
+        let price = 1600,
+          pages = 0;
+        const requests = [];
+        window.fetch = async endpoint => {
+          requests.push(new URL(endpoint).pathname);
+          const payload = endpoint.includes('/search/')
+            ? { resources: { results: { products: [{ url: '/products/details' }] } } }
+            : endpoint.endsWith('/cart.js')
+              ? { currency: 'EUR' }
+              : {
+                  id: 901,
+                  handle: 'details',
+                  variants: [
+                    {
+                      id: 902,
+                      sku: id === 'antigona' ? 'internal' : '9780306406157',
+                      price,
+                      available: true
+                    }
+                  ]
+                };
+          const response = new Response(JSON.stringify(payload), {
+            headers: { 'Content-Type': 'text/javascript' }
+          });
+          Object.defineProperty(response, 'url', { value: endpoint });
+          return response;
+        };
+        const compare = () =>
+          compareStore(store, '9780306406157', new AbortController().signal, async () => {
+            pages++;
+            return new DOMParser().parseFromString(html, 'text/html');
+          });
+        const first = await compare();
+        const initialPages = pages;
+        pages = 0;
+        requests.length = 0;
+        price = 1400;
+        const second = await compare();
+        results.push({
+          id,
+          first: first.price,
+          second: second.price,
+          initialPages,
+          pages,
+          requests: [...requests]
+        });
+      }
+    } finally {
+      window.fetch = originalFetch;
+    }
+    return results;
+  }, product('18.00'));
+  for (const result of shopifyDetails) {
+    assert.equal(result.first, 1600, result.id);
+    assert.equal(result.second, 1400, result.id);
+    assert.equal(result.initialPages, result.id === 'antigona' ? 1 : 0, result.id);
+    assert.equal(result.pages, 0, result.id);
+    assert.deepEqual(result.requests, ['/products/details.js', '/cart.js'], result.id);
+  }
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'válido' }).waitFor();

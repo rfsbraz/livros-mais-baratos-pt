@@ -39,7 +39,10 @@ try {
   assert(
     (await shop.locator('#lmb-price-alert .voucher-promotion').textContent()).includes('33,3%')
   );
-  assert.equal(await shop.getByRole('link', { name: 'Saber mais' }).getAttribute('href'), termsUrl);
+  assert.equal(
+    await shop.getByRole('link', { name: 'Saber mais' }).getAttribute('href'),
+    `${termsUrl}&a_aid=5d3ee4327c2fd`
+  );
   assert.equal(await shop.getByRole('link', { name: /Ver oferta/ }).count(), 0);
   await shop.getByRole('link', { name: 'Saber mais' }).evaluate(a =>
     a.addEventListener('click', e => {
@@ -96,6 +99,13 @@ try {
     await other.getByRole('link', { name: 'Saber mais' }).getAttribute('href'),
     termsUrl
   );
+  await settings.evaluate(() => chrome.storage.local.set({ affiliateEnabled: true }));
+  await other.reload();
+  await other.getByRole('link', { name: 'Ver oferta na Wook' }).waitFor();
+  assert.doesNotMatch(await other.locator('#lmb-price-alert section').textContent(), /afiliad/i);
+  await settings.evaluate(() => chrome.storage.local.set({ affiliateEnabled: false }));
+  await other.reload();
+  await other.getByRole('link', { name: 'Ver oferta na Wook' }).waitFor();
   await settings.goto(`chrome-extension://${id}/popup.html?isbn=${isbn}`);
   await settings.locator('#results .voucher-promotion').waitFor();
   assert(

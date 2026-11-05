@@ -9,7 +9,7 @@ O mesmo livro. Um preço melhor.
 Livros Mais Baratos PT ajuda-te a comparar preços da mesma edição em livrarias portuguesas e em catálogos internacionais selecionados. O ISBN identifica a edição, para não confundires livros com o mesmo título.
 
 AFILIADOS OPCIONAIS
-Afiliados Wook ativos por predefinição. Ao clicares numa oferta confirmada mais barata ou em «Saber mais» de uma campanha Wook detetada podemos receber uma comissão. Podes desativar na extensão.
+Afiliados Wook ativos por predefinição. Ao abrires uma ligação para a Wook a partir da extensão, mesmo que não seja a oferta mais barata, podemos receber uma comissão. Podes desativar na extensão.
 
 AVISOS NA PÁGINA DO LIVRO
 Instala a extensão e aceita as permissões de acesso às lojas no navegador. Os avisos ficam ativos por predefinição, sem configuração adicional. Ao visitar uma página de livro suportada, a extensão procura ofertas noutras lojas selecionadas. Se confirmar uma edição nova mais barata, em EUR e com stock, mostra um aviso discreto com a poupança e a ligação para a oferta. Podes fechar o aviso ou desativar a função.

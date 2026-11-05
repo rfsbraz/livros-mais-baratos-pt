@@ -67,6 +67,7 @@ export const CATALOGUE = [
     { sample: '9789895819812', uncertainStock: true }
   ),
   html('penguin', 'Penguin Livros', 'https://penguinlivros.pt', '/?s={q}', '/loja/.+/livro/', {
+    adapter: 'woo-product',
     sample: '9789895968244'
   }),
   html(
@@ -75,7 +76,7 @@ export const CATALOGUE = [
     'https://www.presenca.pt',
     '/search?q={q}&type=product',
     '/products/',
-    { skuIsbn: true, sample: '9789722378543' }
+    { adapter: 'shopify-search', skuIsbn: true, sample: '9789722378543' }
   ),
   html(
     'guerraepaz',
@@ -83,13 +84,19 @@ export const CATALOGUE = [
     'https://www.guerraepaz.pt',
     '/?s={q}&post_type=product',
     '/produto/',
-    { sample: '9789895764808', sampleTitle: 'Os Enigmas dos Crimes de Natal' }
+    {
+      adapter: 'woo-product',
+      sample: '9789895764808',
+      sampleTitle: 'Os Enigmas dos Crimes de Natal'
+    }
   ),
   html('gradiva', 'Gradiva', 'https://www.gradiva.pt', '/?s={q}', '/produto/', {
+    adapter: 'woo-product',
     sample: '9789897855320',
     sampleTitle: 'O Genocídio Ocultado'
   }),
   html('relogiodagua', 'Relógio d’Água', 'https://www.relogiodagua.pt', '/?s={q}', '/produto/', {
+    adapter: 'woo-product',
     sample: '9789897837449'
   }),
   html(
@@ -114,6 +121,7 @@ export const CATALOGUE = [
     { sample: '9789897228919' }
   ),
   html('antigona', 'Antígona', 'https://antigona.pt', '/search?q={q}&type=product', '/products/', {
+    adapter: 'shopify-search',
     sample: '9789726084495',
     sampleTitle: 'Marcas de Batom'
   }),
@@ -127,9 +135,10 @@ export const CATALOGUE = [
     'https://kingpinbooks.com',
     '/search?q={q}&type=product',
     '/products/',
-    { skuIsbn: true, sample: '9789895598571' }
+    { adapter: 'shopify-search', skuIsbn: true, sample: '9789895598571' }
   ),
   html('mbooks', 'mbooks', 'https://mbooks.pt', '/?s={q}&post_type=product', '/produto/', {
+    adapter: 'woo-product',
     sample: '9789898297839',
     sampleTitle: 'Transforme-se a si Mesmo até Sexta'
   }),
@@ -256,6 +265,7 @@ export const CATALOGUE = [
     { adapter: 'svelte-search', sample: '9781591163596', sampleTitle: 'Naruto Vol. 5' }
   ),
   html('devir', 'Devir', 'https://editoradevir.pt', '/?s={q}&post_type=product', '/livro/', {
+    adapter: 'woo-product',
     sample: '9789895598762',
     sampleTitle: 'Ichi the Witch'
   }),

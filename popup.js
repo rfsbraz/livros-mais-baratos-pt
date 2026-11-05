@@ -99,13 +99,13 @@ function showCached() {
   );
   return true;
 }
-function link(text, url, eligible = false) {
+function link(text, url) {
   const a = document.createElement('a');
   a.textContent = text;
   a.href = url;
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
-  bindAffiliateLink(a, () => affiliateEnabled, eligible);
+  bindAffiliateLink(a, () => affiliateEnabled);
   return a;
 }
 function renderManual() {
@@ -252,11 +252,7 @@ function renderOffers(offers) {
       price.textContent += ' estimados';
       detail.textContent += ` · A pagar agora: ${money(offer.price, offer.currency)}. Equivalente com uso integral do vale em compras futuras.`;
     }
-    const cheaper =
-      available.includes(offer) &&
-      value(offer) !== null &&
-      available.some(other => value(other) !== null && value(other) > value(offer));
-    row.append(link(offer.name, offer.url, cheaper), price, detail);
+    row.append(link(offer.name, offer.url), price, detail);
     const promotion = promotionCard(offer, () => affiliateEnabled);
     if (promotion) {
       row.append(promotion);

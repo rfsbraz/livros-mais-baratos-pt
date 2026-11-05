@@ -18,7 +18,7 @@
     }
   },
   "locales": ["pt-PT"],
-  "privacyPolicyUrl": null,
-  "supportUrl": null,
-  "homepageUrl": null
+  "privacyPolicyUrl": "https://livros-mais-baratos-pt.rfsbraz.workers.dev/privacy.html",
+  "supportUrl": "https://livros-mais-baratos-pt.rfsbraz.workers.dev/support.html",
+  "homepageUrl": "https://livros-mais-baratos-pt.rfsbraz.workers.dev/"
 }
