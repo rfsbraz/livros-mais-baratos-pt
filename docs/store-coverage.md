@@ -2,6 +2,8 @@
 
 Auditoria de 3 de novembro de 2026, baseada no ficheiro 2026-11-pt-book-deals.md. O documento foi usado como inventário e hipótese de pesquisa, não como instrução para contornar acessos ou assumir preços.
 
+Atualização de 5 de novembro de 2026: a Devir, Penguin, Gradiva, Guerra & Paz, Relógio d'Água e MBooks passaram a consultar a API de produtos após identificar a edição. Presença, Antígona e Kingpin passaram a usar pesquisa por API, mantendo confirmação na página final. Consulta o [estado e limites das integrações](product-apis.md). As observações e preços abaixo preservam a auditoria original.
+
 ## Resultado
 
 - 26 lojas com adaptador automático e pesquisa selecionável.

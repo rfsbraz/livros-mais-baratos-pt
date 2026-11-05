@@ -346,9 +346,14 @@ try {
     const originalFetch = window.fetch;
     const results = [];
     try {
-      for (const id of ['penguin', 'devir']) {
+      for (const id of ['penguin', 'devir', 'gradiva', 'guerraepaz', 'relogiodagua', 'mbooks']) {
         const store = STORES.find(s => s.id === id);
-        const path = id === 'devir' ? '/livro/exemplo/' : '/loja/penguin/livro/exemplo/';
+        const path =
+          id === 'devir'
+            ? '/livro/exemplo/'
+            : id === 'penguin'
+              ? '/loja/penguin/livro/exemplo/'
+              : '/produto/exemplo/';
         const url = store.origin + path;
         let pageRequests = 0;
         let price = '1600';
@@ -411,6 +416,69 @@ try {
     assert.equal(result.initialRequests, 2, result.id);
     assert.equal(result.updateRequests, 0, result.id);
     assert.equal(result.fallbackRequests, 2, result.id);
+  }
+  const shopifyComparisons = await page.evaluate(
+    async ({ good, wrong }) => {
+      const { compareStore } = await import('./compare.js');
+      const { STORES } = await import('./stores.js');
+      const originalFetch = window.fetch;
+      const results = [];
+      try {
+        for (const id of ['presenca', 'antigona', 'kingpin']) {
+          const store = STORES.find(s => s.id === id);
+          for (const empty of [false, true]) {
+            const pages = [];
+            window.fetch = async endpoint => {
+              const response = new Response(
+                JSON.stringify({
+                  resources: {
+                    results: {
+                      products: empty
+                        ? []
+                        : [
+                            { url: '/products/wrong', price: '0.01' },
+                            { url: '/products/right?_pos=2', price: '0.01' }
+                          ]
+                    }
+                  }
+                })
+              );
+              Object.defineProperty(response, 'url', { value: endpoint });
+              return response;
+            };
+            const result = await compareStore(
+              store,
+              '9780306406157',
+              new AbortController().signal,
+              async url => {
+                pages.push(url);
+                const html = url.includes('/search')
+                  ? '<a href="/products/right">Livro</a>'
+                  : url.includes('/wrong')
+                    ? wrong
+                    : good;
+                return new DOMParser().parseFromString(html, 'text/html');
+              }
+            );
+            results.push({ id, empty, status: result.status, price: result.price, pages });
+          }
+        }
+      } finally {
+        window.fetch = originalFetch;
+      }
+      return results;
+    },
+    { good: product('18.00'), wrong: product('1.00', 'EUR', 'InStock', '9780804429573') }
+  );
+  for (const result of shopifyComparisons) {
+    assert.equal(result.status, 'ok', result.id);
+    assert.equal(result.price, 1800, result.id);
+    assert.equal(result.pages.length, 2, result.id);
+    assert.equal(
+      result.pages.some(url => url.includes('/search')),
+      result.empty,
+      result.id
+    );
   }
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();

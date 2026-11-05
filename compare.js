@@ -3,6 +3,7 @@ import { parseOffer, productLinks } from './parser.js';
 import { safeUrl, wooOffer, svelteProductLinks } from './core.js';
 import { searchUrl } from './stores.js';
 import { lookupWooProduct } from './woo-products.js';
+import { shopifyProductLinks, shopifySearchUrl } from './shopify-search.js';
 
 async function loadText(url, signal) {
   const response = await fetch(url, {
@@ -75,13 +76,24 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
         const resource = await loadText(endpoint.href, signal);
         links = svelteProductLinks(JSON.parse(resource.text), store.origin);
       } else {
-        const doc = await loader(search, signal);
-        const resolvedUrl = doc.shopUrl || search;
-        offer = parseOffer(doc, isbn, resolvedUrl);
-        if (offer) {
-          offer = (await woo(offer.url, async () => offer)) || offer;
+        if (store.adapter === 'shopify-search') {
+          try {
+            links = shopifyProductLinks(await json(shopifySearchUrl(store, search), signal), store);
+          } catch (error) {
+            if (signal.aborted || /HTTP (401|403|429)\b/.test(error.message)) {
+              throw error;
+            }
+          }
         }
-        links = productLinks(doc, store, resolvedUrl);
+        if (!links?.length) {
+          const doc = await loader(search, signal);
+          const resolvedUrl = doc.shopUrl || search;
+          offer = parseOffer(doc, isbn, resolvedUrl);
+          if (offer) {
+            offer = (await woo(offer.url, async () => offer)) || offer;
+          }
+          links = productLinks(doc, store, resolvedUrl);
+        }
       }
       if (!offer) {
         for (const link of links) {
