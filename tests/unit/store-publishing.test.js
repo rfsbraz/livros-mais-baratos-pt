@@ -14,6 +14,8 @@ import {
 import { releaseNotes } from '../../scripts/changelog.mjs';
 import { buildNotes } from '../../scripts/edge-cert-notes.mjs';
 
+const PUBLIC_SITE = 'https://livros-mais-baratos-pt.rfsbraz.workers.dev';
+
 test('listing uses the Portuguese locale, real images and the production summary', () => {
   const listing = loadListing();
   assert.deepEqual(validateListing(listing), []);
@@ -22,6 +24,18 @@ test('listing uses the Portuguese locale, real images and the production summary
   bad.locales['pt-PT'].screenshots = ['../../private.png'];
   bad.locales['pt-PT'].summary = 'x'.repeat(133);
   assert.equal(validateListing(bad).length, 3);
+});
+
+test('listing points public pages at the hosted Worker site', () => {
+  const listing = loadListing();
+  assert.equal(listing.config.homepageUrl, `${PUBLIC_SITE}/`);
+  assert.equal(listing.config.privacyPolicyUrl, `${PUBLIC_SITE}/privacy.html`);
+  assert.equal(listing.config.supportUrl, `${PUBLIC_SITE}/support.html`);
+  assert.deepEqual(validateListing(listing), []);
+  const metadata = JSON.parse(readFileSync('store-listing/metadata/listing.json', 'utf8'));
+  assert.equal(metadata.homepageUrl, listing.config.homepageUrl);
+  assert.equal(metadata.privacyPolicyUrl, listing.config.privacyPolicyUrl);
+  assert.equal(metadata.supportUrl, listing.config.supportUrl);
 });
 
 test('previewing listing is offline and applying requires credentials', async () => {

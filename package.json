@@ -36,7 +36,9 @@
     "store-listing:release": "node scripts/amo-release.mjs",
     "store-listing:edge-notes": "node scripts/edge-cert-notes.mjs",
     "audit:dependencies": "npm audit --audit-level=moderate",
-    "repo:configure": "node scripts/configure-repository.mjs"
+    "repo:configure": "node scripts/configure-repository.mjs",
+    "store-listing:deploy": "wrangler deploy",
+    "store-listing:deploy:dry-run": "wrangler deploy --dry-run"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -47,7 +49,8 @@
     "playwright": "1.56.1",
     "playwright-webextext": "^0.0.5",
     "prettier": "^3.9.10",
-    "tslib": "^2.9.1"
+    "tslib": "^2.9.1",
+    "wrangler": "^4.157.0"
   },
   "engines": {
     "node": ">=22.13.0"

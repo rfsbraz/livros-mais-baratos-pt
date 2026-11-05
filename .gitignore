@@ -19,3 +19,8 @@ test-results/
 store-listing/source/
 store-listing/upload/
 store-listing/preview.png
+
+# wrangler
+.wrangler
+.dev.vars*
+!.dev.vars.example

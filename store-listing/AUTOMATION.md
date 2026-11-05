@@ -52,6 +52,16 @@ Preenche os URLs públicos e os identificadores públicos Chrome/Edge em `listin
 
 Podes prever alterações com `npm run store-listing:amo` e `npm run store-listing:edge-notes`, sem pedidos de rede. `npm run store-listing:release` faz pedidos AMO apenas de leitura. Gerar materiais ou abrir um PR não publica a extensão.
 
+## Alojamento do website
+
+O Worker existente `livros-mais-baratos-pt` serve `store-listing/website` através de `wrangler.jsonc` (apenas assets estáticos). URLs públicos em `listing.json`:
+
+- `https://livros-mais-baratos-pt.rfsbraz.workers.dev/`
+- `https://livros-mais-baratos-pt.rfsbraz.workers.dev/privacy.html`
+- `https://livros-mais-baratos-pt.rfsbraz.workers.dev/support.html`
+
+Validar sem publicar: `npm run store-listing:deploy:dry-run`. Publicar (manual): `npm run store-listing:deploy`. Não cria projeto Cloudflare novo, secretos, bindings ou DNS.
+
 ## Idioma e versões
 
 Documentação, páginas das lojas, instruções de revisão e PRs usam português de Portugal. As mensagens de commit podem continuar em inglês. Antes de integrar um PR de versão, revê e traduz as entradas que Release Please extrair desses commits; os títulos das secções são configurados em português. Os códigos de idioma e identificadores técnicos não são traduzidos.

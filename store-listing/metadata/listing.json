@@ -21,9 +21,9 @@
   "interfaceLanguages": [
     "pt-PT"
   ],
-  "privacyPolicyUrl": null,
-  "supportUrl": null,
-  "homepageUrl": null,
+  "privacyPolicyUrl": "https://livros-mais-baratos-pt.rfsbraz.workers.dev/privacy.html",
+  "supportUrl": "https://livros-mais-baratos-pt.rfsbraz.workers.dev/support.html",
+  "homepageUrl": "https://livros-mais-baratos-pt.rfsbraz.workers.dev/",
   "youtubeVideoUrl": null,
   "websiteVerified": false,
   "distribution": "Ainda não submetida; escolher visibilidade e países no painel de publicação",
