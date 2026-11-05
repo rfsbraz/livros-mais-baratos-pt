@@ -29,48 +29,45 @@
 
 ## [0.1.6](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.5...v0.1.6) (2026-11-05)
 
-
 ### Funcionalidades
 
-* **affiliates:** add optional Wook referral links ([1085f72](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/1085f725bb7ae95eb5553cb044d7adeda5247e80))
-* **alerts:** detect book pages and show cheaper offers automatically ([74a092d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/74a092dcd71d8b6ba9de711dc1250111a8157721))
-* **alerts:** enable automatic comparisons with install-time permissions ([f0ba2f6](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/f0ba2f68f49a035ae2f4e2516a9a7c2d1fa417bd))
-* **cache:** show background prices immediately in the menu ([ab817e3](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/ab817e37624735b422bf84a872b779ca1e78fb34))
-* **extension:** add ISBN price comparison and local book tracking ([0ce19cc](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0ce19cc484230b141da529efbb88bafc9c613fb7))
-* **extension:** add price tracking and cross-browser support ([b028ed8](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/b028ed8149dca11f076f1038e383fd17cb813edf))
-* **extension:** align architecture and add Firefox and Edge builds ([2dec64f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/2dec64f7fc89b7a216a94fc50a4b6fbff70e80ae))
-* **i18n:** standardize project materials on European Portuguese ([0999847](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/09998478576447e0e923353bf0818a52e3740c36))
-* **lojas:** consultar preços por API em nove lojas ([#27](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/27)) ([b39ba41](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/b39ba413c93c02d452d85cc147791af91a62c3f9))
-* **métricas:** add Cloudflare Worker endpoint and latency reports ([#43](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/43)) ([e22ba03](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/e22ba03eeb062367d0c9ea3a808ca1e766ee237c))
-* **popup:** simplify price comparisons and add store feedback links ([#25](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/25)) ([c5d527d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/c5d527d4844abfdf0a74cc6edeae8716ab71279a))
-* **promotions:** compare Wook voucher equivalents with an opt-out setting ([9f8b16f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9f8b16f5372781b9bd3a3cd73246d6e950e3ea7e))
-* **promotions:** considerar vales Wook na comparação com opção de desativar ([da56c1c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/da56c1cf73effc292bb2f900476e379cf4dfa1f8))
-* **promotions:** detect Wook voucher terms and explain combined savings ([c1eea0b](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/c1eea0b7aa5d79f811f7ab4f6d920039a84e8adf))
-* **promotions:** detetar vales Wook e explicar a poupança combinada ([36d9374](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/36d9374395d2356c71f648602b26a0f40093020a))
-* **stores:** align listing assets and publishing with reference extension ([e163e17](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/e163e17518a0abf2401442e0727fa56d23d1c971))
-* **stores:** align metadata, assets and publishing with Geocaching ([34c386d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/34c386d393cc115f2c941a2f0f972b133ac70b83))
-* **stores:** expand coverage across the researched bookshops ([957d924](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/957d92411875257c8e12894771e7c733438cdd79))
-* **tracking:** add price targets, shipping totals and local history ([5919e2c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/5919e2cb96400d4e6ff6c62abb1057070074d4b2))
-* **ui:** separate settings from the price comparison menu ([0b9b29c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0b9b29cdc212c5f6bce69f2c09c2775f2b29b765))
-
+- **affiliates:** add optional Wook referral links ([1085f72](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/1085f725bb7ae95eb5553cb044d7adeda5247e80))
+- **alerts:** detect book pages and show cheaper offers automatically ([74a092d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/74a092dcd71d8b6ba9de711dc1250111a8157721))
+- **alerts:** enable automatic comparisons with install-time permissions ([f0ba2f6](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/f0ba2f68f49a035ae2f4e2516a9a7c2d1fa417bd))
+- **cache:** show background prices immediately in the menu ([ab817e3](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/ab817e37624735b422bf84a872b779ca1e78fb34))
+- **extension:** add ISBN price comparison and local book tracking ([0ce19cc](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0ce19cc484230b141da529efbb88bafc9c613fb7))
+- **extension:** add price tracking and cross-browser support ([b028ed8](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/b028ed8149dca11f076f1038e383fd17cb813edf))
+- **extension:** align architecture and add Firefox and Edge builds ([2dec64f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/2dec64f7fc89b7a216a94fc50a4b6fbff70e80ae))
+- **i18n:** standardize project materials on European Portuguese ([0999847](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/09998478576447e0e923353bf0818a52e3740c36))
+- **lojas:** consultar preços por API em nove lojas ([#27](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/27)) ([b39ba41](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/b39ba413c93c02d452d85cc147791af91a62c3f9))
+- **métricas:** add Cloudflare Worker endpoint and latency reports ([#43](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/43)) ([e22ba03](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/e22ba03eeb062367d0c9ea3a808ca1e766ee237c))
+- **popup:** simplify price comparisons and add store feedback links ([#25](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/25)) ([c5d527d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/c5d527d4844abfdf0a74cc6edeae8716ab71279a))
+- **promotions:** compare Wook voucher equivalents with an opt-out setting ([9f8b16f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9f8b16f5372781b9bd3a3cd73246d6e950e3ea7e))
+- **promotions:** considerar vales Wook na comparação com opção de desativar ([da56c1c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/da56c1cf73effc292bb2f900476e379cf4dfa1f8))
+- **promotions:** detect Wook voucher terms and explain combined savings ([c1eea0b](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/c1eea0b7aa5d79f811f7ab4f6d920039a84e8adf))
+- **promotions:** detetar vales Wook e explicar a poupança combinada ([36d9374](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/36d9374395d2356c71f648602b26a0f40093020a))
+- **stores:** align listing assets and publishing with reference extension ([e163e17](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/e163e17518a0abf2401442e0727fa56d23d1c971))
+- **stores:** align metadata, assets and publishing with Geocaching ([34c386d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/34c386d393cc115f2c941a2f0f972b133ac70b83))
+- **stores:** expand coverage across the researched bookshops ([957d924](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/957d92411875257c8e12894771e7c733438cdd79))
+- **tracking:** add price targets, shipping totals and local history ([5919e2c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/5919e2cb96400d4e6ff6c62abb1057070074d4b2))
+- **ui:** separate settings from the price comparison menu ([0b9b29c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0b9b29cdc212c5f6bce69f2c09c2775f2b29b765))
 
 ### Correções
 
-* **ci:** pin supported Ubuntu browser test runner ([3f578cf](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/3f578cf08f1e3e5d674ac60fe1d50a216452040b))
-* **ci:** require branch protection before dependency auto-merge ([67a7041](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/67a704134834346e11a05805b40e7f566ba54f50))
-* **ci:** restore Validar versão workflow on main ([#40](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/40)) ([f2b931c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/f2b931c061b735a4d2b2e66de32f9a4e6c0424e6))
-* **parser:** read ISBN text without cloning retailer elements ([235dae7](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/235dae713c3f8727d153f987018b8afdf51044f2))
-* **release:** align Release Please baseline with 0.1.5 ([#39](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/39)) ([9ee4fcc](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9ee4fcc83bfe60e03d101ec37f045af5f757f595))
-* **store-listing:** remove retailer lists from the description ([2c442ec](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/2c442ec9d12c3453958427d76847d1f9f0de65b0))
-* **store-listing:** remove retailer lists from the description ([9441e90](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9441e90939251889ca50af3b1d8d83e5bf59793b))
-* **store:** align support email and listing copy ([#34](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/34)) ([d8d49ec](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/d8d49ecc1b4c880338186143490a7dc1bf72d534))
-* **stores:** classify soft blocks apart from parser failures ([#42](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/42)) ([a85904d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/a85904da5dcb7270b7d38ffae288360cc970ec32))
-* **wook:** read stock and keep the affiliate id on every link ([#26](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/26)) ([afa4be8](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/afa4be8b3768dda5f62d8f67c4b02a9aaef38019))
-
+- **ci:** pin supported Ubuntu browser test runner ([3f578cf](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/3f578cf08f1e3e5d674ac60fe1d50a216452040b))
+- **ci:** require branch protection before dependency auto-merge ([67a7041](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/67a704134834346e11a05805b40e7f566ba54f50))
+- **ci:** restore Validar versão workflow on main ([#40](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/40)) ([f2b931c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/f2b931c061b735a4d2b2e66de32f9a4e6c0424e6))
+- **parser:** read ISBN text without cloning retailer elements ([235dae7](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/235dae713c3f8727d153f987018b8afdf51044f2))
+- **release:** align Release Please baseline with 0.1.5 ([#39](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/39)) ([9ee4fcc](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9ee4fcc83bfe60e03d101ec37f045af5f757f595))
+- **store-listing:** remove retailer lists from the description ([2c442ec](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/2c442ec9d12c3453958427d76847d1f9f0de65b0))
+- **store-listing:** remove retailer lists from the description ([9441e90](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9441e90939251889ca50af3b1d8d83e5bf59793b))
+- **store:** align support email and listing copy ([#34](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/34)) ([d8d49ec](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/d8d49ecc1b4c880338186143490a7dc1bf72d534))
+- **stores:** classify soft blocks apart from parser failures ([#42](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/42)) ([a85904d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/a85904da5dcb7270b7d38ffae288360cc970ec32))
+- **wook:** read stock and keep the affiliate id on every link ([#26](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/26)) ([afa4be8](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/afa4be8b3768dda5f62d8f67c4b02a9aaef38019))
 
 ### Desempenho
 
-* **stores:** default comparisons to six Portuguese shops ([b4ac15f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/b4ac15fb58f472297d37c5af0f319f65935f9827))
+- **stores:** default comparisons to six Portuguese shops ([b4ac15f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/b4ac15fb58f472297d37c5af0f319f65935f9827))
 
 ## 0.1.5
 
