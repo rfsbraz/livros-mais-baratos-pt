@@ -138,6 +138,19 @@ export function issueBody(report, runUrl, previousBody = '') {
   return { healthy, body: lines.join('\n') };
 }
 
+export function requireReportInputs({ scriptPath, reportPath, access }) {
+  if (!access(scriptPath)) {
+    throw new Error(
+      'Checkout missing: ' + scriptPath + ' not found. Refuse to update the monitor issue.'
+    );
+  }
+  if (!access(reportPath)) {
+    throw new Error(
+      'Probe artifact missing: ' + reportPath + ' not found. Refuse to update the monitor issue.'
+    );
+  }
+}
+
 export async function syncIssue({ github, repo, report, runUrl }) {
   const issues = await github.paginate(github.rest.issues.listForRepo, {
     ...repo,

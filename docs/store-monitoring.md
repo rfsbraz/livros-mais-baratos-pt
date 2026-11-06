@@ -42,6 +42,8 @@ Uma única issue do bot acompanha as falhas pendentes. Cada execução só alter
 
 Um comentário JSON codificado guarda o estado e as pausas. São dados codificados, não encriptados nem executáveis. O relatório migra as linhas da issue antiga que verificava o catálogo completo. Não cria uma issue ou comentário novo a cada hora.
 
+A tarefa de relatório só atualiza a issue do bot depois do checkout e com o artefacto `work/store-health.json` presente; sem um destes, a issue fica inalterada.
+
 O artefacto `store-health` é conservado durante 14 dias. Contém ISBN de exemplo, URLs, códigos HTTP, tipos de erro, datas de pausa e resultados das repetições. Exclui HTML, cookies e outros cabeçalhos de resposta.
 
 ## Reprodução local

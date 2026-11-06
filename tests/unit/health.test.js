@@ -6,7 +6,13 @@ import {
   retryAfterUntil,
   canRetry
 } from '../../scripts/health-check.mjs';
-import { issueBody, syncIssue, marker, readFailures } from '../../scripts/report-store-health.mjs';
+import {
+  issueBody,
+  syncIssue,
+  marker,
+  readFailures,
+  requireReportInputs
+} from '../../scripts/report-store-health.mjs';
 import { STORES } from '../../stores.js';
 
 const healthy = () => ({
@@ -197,4 +203,34 @@ test('issue report groups access or network failures apart from parser failures'
   assert.doesNotMatch(accessSection, /Wook/);
   assert.match(parseSection, /Wook/);
   assert.doesNotMatch(parseSection, /Devir/);
+});
+
+test('requireReportInputs refuses to proceed without checkout or probe artifact', () => {
+  const present = new Set(['scripts/report-store-health.mjs', 'work/store-health.json']);
+  const access = path => present.has(path);
+  assert.doesNotThrow(() =>
+    requireReportInputs({
+      scriptPath: 'scripts/report-store-health.mjs',
+      reportPath: 'work/store-health.json',
+      access
+    })
+  );
+  assert.throws(
+    () =>
+      requireReportInputs({
+        scriptPath: 'scripts/report-store-health.mjs',
+        reportPath: 'work/missing.json',
+        access
+      }),
+    /Probe artifact missing/
+  );
+  assert.throws(
+    () =>
+      requireReportInputs({
+        scriptPath: 'scripts/missing.mjs',
+        reportPath: 'work/store-health.json',
+        access
+      }),
+    /Checkout missing/
+  );
 });
