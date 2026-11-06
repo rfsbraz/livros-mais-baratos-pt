@@ -377,8 +377,8 @@ try {
     assert.equal(actual.detected, expected.isbn, `${expected.store}: detected ISBN`);
     assert.equal(actual.wrong, null, `${expected.store}: wrong edition must be rejected`);
   }
-  assert.equal(await page.locator('.shop-option').count(), 26);
-  assert.equal(await page.locator('#manual-results .manual-row').count(), 17);
+  assert.equal(await page.locator('.shop-option').count(), 27);
+  assert.equal(await page.locator('#manual-results .manual-row').count(), 16);
   const fallback = await page.evaluate(
     async ({ good, wrong }) => {
       const { compareStore } = await import('./compare.js');
@@ -667,7 +667,7 @@ try {
   await page.waitForFunction(() => window.__data.selectedStores.join() === 'wook');
   await page.reload();
   await page.waitForFunction(
-    () => document.querySelector('#coverage').textContent === 'Lojas: 1 de 26 selecionadas'
+    () => document.querySelector('#coverage').textContent === 'Lojas: 1 de 27 selecionadas'
   );
   const beforeCancel = await page.evaluate(() => JSON.stringify(window.__data.history));
   let releaseRequest;

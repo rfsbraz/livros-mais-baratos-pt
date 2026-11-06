@@ -234,13 +234,13 @@ export const CATALOGUE = [
     'Audiolivros identificados por ASIN; assinaturas não equivalem ao preço do livro.',
     { format: 'audio' }
   ),
-  manual(
-    'worten',
-    'Worten',
-    'https://www.worten.pt',
-    '/search?query={q}',
-    'Pesquisa carregada por JavaScript; não foi confirmado um resultado verificável por ISBN.'
-  ),
+  html('worten', 'Worten', 'https://www.worten.pt', '/search?query={q}', '/produtos/', {
+    adapter: 'worten-search',
+    marketplace: true,
+    sample: '9788521000518',
+    group: 'marketplace',
+    titleQuery: '/search?query={q}'
+  }),
   html(
     'elcorteingles',
     'El Corte Inglés PT',

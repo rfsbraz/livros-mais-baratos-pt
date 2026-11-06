@@ -8,7 +8,8 @@ import {
   safeUrl,
   remember,
   wooOffer,
-  svelteProductLinks
+  svelteProductLinks,
+  wortenProductLinks
 } from '../../core.js';
 import { pooled, compareStore } from '../../compare.js';
 import { STORES, searchUrl } from '../../stores.js';
@@ -293,4 +294,97 @@ test('affiliate destinations follow the preference, preserve attribution and exa
   ]) {
     assert.equal(affiliateUrl(url, true), url);
   }
+});
+
+test('Worten search keeps only ISBN-matched product paths and ignores wrong editions', () => {
+  const payload = {
+    detailsResponse: {
+      productsCanonicalsData: {
+        web_items: [
+          {
+            id: 'web-ok',
+            url: '/produtos/livro-moreninha-portugues-mrkean-9788521000518',
+            type: 'product'
+          },
+          {
+            id: 'web-wrong',
+            url: '/produtos/livro-outro-mrkean-9789895701124',
+            type: 'product'
+          },
+          {
+            id: 'web-bad',
+            url: '/livros/livros-tecnicos',
+            type: 'category'
+          }
+        ]
+      },
+      productsData: {
+        products: [
+          {
+            meta: { refs: { webitem_id: 'web-ok', ean: ['9788521000518'] } },
+            properties: { text: { isbn: '9788521000518' } }
+          },
+          {
+            meta: { refs: { webitem_id: 'web-wrong', ean: ['9789895701124'] } },
+            properties: { text: { isbn: '9789895701124' } }
+          },
+          {
+            meta: { refs: { webitem_id: 'web-bad', ean: ['9788521000518'] } }
+          }
+        ]
+      }
+    }
+  };
+  assert.deepEqual(wortenProductLinks(payload, 'https://www.worten.pt', '9788521000518'), [
+    'https://www.worten.pt/produtos/livro-moreninha-portugues-mrkean-9788521000518'
+  ]);
+  assert.deepEqual(wortenProductLinks(payload, 'https://www.worten.pt', '9789895701124'), [
+    'https://www.worten.pt/produtos/livro-outro-mrkean-9789895701124'
+  ]);
+  assert.deepEqual(wortenProductLinks({}, 'https://www.worten.pt', '9788521000518'), []);
+  assert.deepEqual(wortenProductLinks(null, 'https://www.worten.pt', '9788521000518'), []);
+});
+
+test('Worten search errors stay classified and marketplace offers cannot win the new-price badge', async () => {
+  const worten = STORES.find(s => s.id === 'worten');
+  assert.equal(worten?.adapter, 'worten-search');
+  assert.equal(worten.marketplace, true);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    throw new Error('HTTP 403');
+  };
+  try {
+    const failed = await compareStore(worten, '9788521000518', AbortSignal.timeout(5000));
+    assert.equal(failed.status, 'blocked');
+    assert.equal(failed.id, 'worten');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  const current = {
+    isbn: '9788521000518',
+    price: 2000,
+    currency: 'EUR',
+    condition: 'NewCondition',
+    url: 'https://www.wook.pt/livro/teste'
+  };
+  assert.equal(
+    cheaperOffer(
+      current,
+      [
+        {
+          id: 'worten',
+          origin: 'https://www.worten.pt',
+          status: 'ok',
+          price: 1333,
+          currency: 'EUR',
+          condition: 'NewCondition',
+          availability: 'InStock',
+          marketplace: true,
+          url: 'https://www.worten.pt/produtos/livro-ok'
+        }
+      ],
+      'wook'
+    ),
+    null
+  );
 });

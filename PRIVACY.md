@@ -2,7 +2,7 @@
 
 Os avisos automáticos estão ativos por predefinição após a instalação. A extensão identifica páginas de livros nas lojas selecionadas e autorizadas sem exigir a abertura do menu. Uma preferência guardada para os desativar é respeitada nas atualizações. A comparação manual também lê a página atual quando abres a extensão.
 
-O HTML é processado localmente para encontrar ISBN, título e preço; não é enviado para um servidor. Ao comparar, o ISBN e, quando necessário, o título são enviados diretamente às lojas selecionadas. Estas recebem os dados normais de ligação, incluindo o endereço IP, e aplicam as próprias políticas de privacidade. Os pedidos não enviam cookies de sessão. As 26 origens configuradas são declaradas como permissões obrigatórias na instalação, mas só as lojas selecionadas são consultadas. Abrir uma ligação manual usa as definições normais de privacidade do navegador.
+O HTML é processado localmente para encontrar ISBN, título e preço; não é enviado para um servidor. Ao comparar, o ISBN e, quando necessário, o título são enviados diretamente às lojas selecionadas. Estas recebem os dados normais de ligação, incluindo o endereço IP, e aplicam as próprias políticas de privacidade. Os pedidos não enviam cookies de sessão. As 27 origens configuradas são declaradas como permissões obrigatórias na instalação, mas só as lojas selecionadas são consultadas. Abrir uma ligação manual usa as definições normais de privacidade do navegador.
 
 ## Dados locais e conservação
 
