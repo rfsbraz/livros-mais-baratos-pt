@@ -122,11 +122,12 @@ test('rate limits and access denials stop retries; Retry-After supports seconds 
   assert.equal(retryAfterUntil('0', now), null);
   assert.equal(failureCode('request-failed', [{ status: 429 }]), 'rate-limited');
   assert.equal(failureCode('request-failed', [{ status: 401 }]), 'authentication-required');
-  assert.equal(failureCode('request-failed', [{ status: 405 }]), 'method-not-allowed');
+  assert.equal(failureCode('request-failed', [{ status: 405 }]), 'access-blocked');
   for (const status of [
     'rate-limited',
     'access-forbidden',
     'authentication-required',
+    'access-blocked',
     'method-not-allowed'
   ]) {
     assert.equal(canRetry(status, []), false);
@@ -169,8 +170,9 @@ test('HTTP 202 soft blocks and Cloudflare 520 are access or server failures, not
   // Cloudflare 520 must stay a shop server error when the status is observed.
   assert.equal(failureCode('pattern-unverified', [{ status: 520 }]), 'shop-server-error');
   assert.equal(failureCode('request-failed', [{ status: 520 }]), 'shop-server-error');
-  // Almedina returned 405; that is method-not-allowed, not a captcha or parser miss.
-  assert.equal(failureCode('request-failed', [{ status: 405 }]), 'method-not-allowed');
+  // Almedina returned 405 on runners (403 residential); treat as anti-bot soft block.
+  assert.equal(failureCode('request-failed', [{ status: 405 }]), 'access-blocked');
+  assert.equal(failureCode('pattern-unverified', [{ status: 405 }]), 'access-blocked');
   assert.equal(canRetry('access-blocked', []), false);
 });
 
@@ -183,8 +185,8 @@ test('issue report groups access or network failures apart from parser failures'
       { store: 'devir', status: 'access-blocked', attempts: [{ status: 'access-blocked' }] },
       {
         store: 'almedina',
-        status: 'method-not-allowed',
-        attempts: [{ status: 'method-not-allowed' }]
+        status: 'access-blocked',
+        attempts: [{ status: 'access-blocked' }]
       },
       { store: 'wook', status: 'pattern-unverified', attempts: [{ status: 'pattern-unverified' }] }
     ]
