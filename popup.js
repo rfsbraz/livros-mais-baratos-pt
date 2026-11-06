@@ -357,17 +357,18 @@ async function start(book) {
       complete++;
       if (token === run) {
         if (eligibleOffer(offers[index])) {
-          applyData(
-            await changeData({
-              type: 'observe-incremental',
-              isbn,
-              offer: offers[index],
-              source: 'manual'
+          changeData({
+            type: 'observe-incremental',
+            isbn,
+            offer: offers[index],
+            source: 'manual'
+          })
+            .then(data => {
+              if (token === run) {
+                applyData(data);
+              }
             })
-          );
-        }
-        if (token !== run) {
-          return;
+            .catch(() => {});
         }
         renderOffers(offers);
         status(`${complete} de ${stores.length} lojas consultadas.`);
