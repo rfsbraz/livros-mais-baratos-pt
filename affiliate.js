@@ -22,7 +22,7 @@ export function affiliateUrl(raw, enabled) {
   }
 }
 
-export function bindAffiliateLink(link, enabled) {
+export function bindAffiliateLink(link, enabled, onNavigate) {
   const original = link.href;
   const sync = () => {
     link.href = affiliateUrl(original, enabled());
@@ -31,5 +31,17 @@ export function bindAffiliateLink(link, enabled) {
   // The preference can change while the link is on screen, so follow it before it is opened or copied.
   for (const type of ['click', 'auxclick', 'contextmenu']) {
     link.addEventListener(type, sync);
+  }
+  if (onNavigate) {
+    link.addEventListener('click', event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+      }
+      try {
+        onNavigate(link.href, enabled());
+      } catch {
+        /* Metrics must never block navigation. */
+      }
+    });
   }
 }

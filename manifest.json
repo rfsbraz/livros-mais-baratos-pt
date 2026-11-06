@@ -4,7 +4,14 @@
   "version": "0.1.6",
   "description": "Compara preços de livros em Portugal, recebe alertas de preço-alvo e consulta o histórico das tuas pesquisas.",
   "minimum_chrome_version": "120",
-  "permissions": ["activeTab", "scripting", "storage", "offscreen", "alarms", "notifications"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "offscreen",
+    "alarms",
+    "notifications"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Comparar preços de livros",
@@ -94,6 +101,7 @@
     "https://www.abebooks.com/*",
     "https://www.elcorteingles.pt/*",
     "https://mundofantasma.com/*",
-    "https://editoradevir.pt/*"
+    "https://editoradevir.pt/*",
+    "https://metrics-livros.steamhardwarestock.com/*"
   ]
 }

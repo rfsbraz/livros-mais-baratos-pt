@@ -21,7 +21,14 @@ test('browser packages preserve hosts and isolate platform-specific background A
     }
   }
   assert(runtimeFiles().includes('popup.js'));
-  assert(!runtimeFiles().some(f => /test|config|package|store-listing/.test(f)));
+  assert(runtimeFiles().includes('metrics.js'));
+  assert(runtimeFiles().includes('metrics-config.js'));
+  assert(runtimeFiles().includes('metrics-schema.json'));
+  assert(!runtimeFiles().some(f => /(^|\/)(tests?|package|store-listing)/.test(f)));
+  const firefox = manifestFor('firefox', source);
+  assert.deepEqual(firefox.browser_specific_settings.gecko.data_collection_permissions.optional, [
+    'technicalAndInteraction'
+  ]);
 });
 test('the Firefox background drops offscreen calls and keeps the parser frame', () => {
   const source = readFileSync('background.js', 'utf8');

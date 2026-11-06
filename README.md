@@ -68,7 +68,7 @@ Quando o livro liga a condições reconhecidas de devolução em vale, a extens�
 
 ## Permissões e privacidade
 
-O acesso às lojas é pedido na instalação e continua sob controlo do navegador. Uma preferência guardada para desativar avisos é respeitada nas atualizações. Cada loja consultada recebe o ISBN e, quando necessário, o título, juntamente com dados normais de ligação, como o endereço IP. Os pedidos de comparação não enviam cookies de sessão. Nesta versão a extensão não envia telemetria. Não existe um serviço externo de histórico de preços.
+O acesso às lojas é pedido na instalação e continua sob controlo do navegador. Uma preferência guardada para desativar avisos é respeitada nas atualizações. Cada loja consultada recebe o ISBN e, quando necessário, o título, juntamente com dados normais de ligação, como o endereço IP. Os pedidos de comparação não enviam cookies de sessão. Por predefinição no Chrome e no Edge partilha estatísticas anónimas de desempenho (opt-out); no Firefox só após consentimento. Desativa em Definições. Não envia ISBN, títulos, URLs nem preços. Não existe um serviço externo de histórico de preços.
 
 `activeTab` permite a deteção manual; `scripting`, a deteção automática nos sites autorizados; `storage`, o armazenamento local; `alarms`, as verificações agendadas; e `notifications`, os avisos do sistema. Chrome e Edge usam `offscreen` para analisar páginas em segundo plano. Firefox usa uma página local de segundo plano e uma moldura de análise. A extensão não contorna captchas, não inicia sessão nas lojas e não executa código descarregado.
 

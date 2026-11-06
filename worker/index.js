@@ -1,4 +1,4 @@
-import schema from '../tests/fixtures/metrics-schema.json' with { type: 'json' };
+import schema from '../metrics-schema.json' with { type: 'json' };
 import { dataPoints, tooManyPoints, validBatch } from './metrics-batch.js';
 
 const PATH = '/v1/batch';

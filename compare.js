@@ -137,8 +137,21 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
     }
     offer = await enrichPromotion(offer, loader, signal);
     return { ...store, ...offer, status: 'ok', checkedAt: Date.now() };
-  } catch {
-    return { ...store, status: 'unavailable', url };
+  } catch (error) {
+    const message = error?.message || '';
+    if (signal.aborted || error?.name === 'AbortError' || message === 'Cancelado') {
+      if (error?.name === 'TimeoutError' || /timed?\s*out/i.test(message)) {
+        return { ...store, status: 'timeout', url };
+      }
+      return { ...store, status: 'cancelled', url };
+    }
+    if (error?.name === 'TimeoutError' || /timed?\s*out/i.test(message)) {
+      return { ...store, status: 'timeout', url };
+    }
+    if (/HTTP (401|403|429)\b/.test(message)) {
+      return { ...store, status: 'blocked', url };
+    }
+    return { ...store, status: 'error', url };
   }
 }
 

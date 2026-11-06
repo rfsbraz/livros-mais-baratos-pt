@@ -92,6 +92,13 @@ export function writeData(action) {
         typeof action === 'function' ? await action(migrateData(data)) : reduceData(data, action);
       if (next) {
         const obsolete = ['shipping', 'priceOrder'].filter(key => key in data);
+        if (action && typeof action === 'object' && action.type === 'clear') {
+          for (const key of ['metricsPending', 'metricsRetry']) {
+            if (key in data) {
+              obsolete.push(key);
+            }
+          }
+        }
         if (obsolete.length) {
           await chrome.storage.local.remove(obsolete);
         }

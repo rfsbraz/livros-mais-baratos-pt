@@ -10,7 +10,7 @@ Comparar a mesma edição de um livro em lojas selecionadas, com avisos automát
 
 - `activeTab`: lê o separador atual quando o utilizador abre a extensão, para identificar ISBN e título na comparação manual.
 - `scripting`: lê a página ativa e regista o script incluído de deteção apenas em lojas selecionadas/autorizadas. Ativo por predefinição salvo desativação guardada; também inicializa separadores já abertos.
-- `storage`: guarda ISBN, títulos, histórico próprio, alvos, estado de notificações, lojas e preferências em chrome.storage.local. Sem sincronização ou análise de utilização.
+- `storage`: guarda ISBN, títulos, histórico próprio, alvos, estado de notificações, lojas e preferências em chrome.storage.local. Sem sincronização. Estatísticas anónimas de desempenho são opcionais e descritas na política.
 - `alarms`: agenda consultas espaçadas apenas para alvos ativos e restaura o agendamento após reinício.
 - `notifications`: avisa quando um alvo é atingido ou surge preço elegível inferior; o aviso também fica na extensão.
 - `offscreen`: em Chrome/Edge, fornece DOM oculto incluído no pacote para analisar HTML enquanto a comparação decorre sem o menu aberto. Firefox usa página/moldura local equivalente. Scripts descarregados não são executados.
@@ -28,7 +28,7 @@ O processamento local também deve ser divulgado. A extensão não deve ser desc
 | ----------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------- |
 | Conteúdo de sites                   | Sim              | Página do livro, ISBN, título, preço e disponibilidade; HTML permanece local.                                   |
 | Histórico/atividade de navegação    | Sim              | URL atual de lojas suportadas para deteção e encaminhamento; sem registo geral de navegação.                    |
-| Atividade do utilizador             | Sim              | Seleção de lojas, ações da estante e preferências locais; sem registo de cliques, rato ou teclado para análise. |
+| Atividade do utilizador             | Sim              | Seleção de lojas, ações da estante e preferências locais; sem registo de rato ou teclado; contadores anónimos só com estatísticas ativas. |
 | Informação de identificação pessoal | Não, na extensão | Sem recolha de conta, nome ou email; contactos voluntários de apoio são tratados separadamente.                 |
 | Informação de saúde                 | Não              | Sem recolha para fins de saúde.                                                                                 |
 | Informação financeira/pagamento     | Não              | Só preços públicos de produtos; sem acesso a pagamentos.                                                        |

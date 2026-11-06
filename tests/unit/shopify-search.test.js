@@ -58,5 +58,5 @@ test('HTTP 429 na pesquisa não provoca pedidos adicionais à loja', async t => 
     new AbortController().signal,
     async () => assert.fail('Não deve repetir por HTML depois de HTTP 429')
   );
-  assert.equal(result.status, 'unavailable');
+  assert.equal(result.status, 'blocked');
 });

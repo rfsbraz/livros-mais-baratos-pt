@@ -168,7 +168,7 @@ test('cancelled stores do not start requests and search text cannot inject query
   const result = await compareStore(STORES[0], '9780306406157', controller.signal, () =>
     assert.fail('Cancelled request started')
   );
-  assert.equal(result.status, 'unavailable');
+  assert.equal(result.status, 'cancelled');
   const store = STORES.find(s => s.id === 'guerraepaz');
   const url = new URL(searchUrl(store, 'Livros & post_type=other / ação', true));
   assert.equal(url.searchParams.get('s'), 'Livros & post_type=other / ação');

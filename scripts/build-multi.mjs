@@ -4,6 +4,9 @@ import { execFileSync } from 'node:child_process';
 import { zipFiles } from './zip.mjs';
 export const runtimeFiles = () => [
   'affiliate.js',
+  'metrics.js',
+  'metrics-config.js',
+  'metrics-schema.json',
   'auto-rules.js',
   'background.html',
   'background.js',
@@ -45,7 +48,10 @@ export function manifestFor(browser, source) {
       gecko: {
         id: 'livros-mais-baratos-pt@rfsbraz.github.io',
         strict_min_version: '140.0',
-        data_collection_permissions: { required: ['websiteContent', 'browsingActivity'] }
+        data_collection_permissions: {
+          required: ['websiteContent', 'browsingActivity'],
+          optional: ['technicalAndInteraction']
+        }
       },
       // data_collection_permissions só existe a partir do Firefox 142 para Android.
       gecko_android: { strict_min_version: '142.0' }

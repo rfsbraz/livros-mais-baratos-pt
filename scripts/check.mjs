@@ -22,7 +22,18 @@ assert(
 );
 assert(!manifest.optional_host_permissions, 'Shop access is requested at installation');
 assert.equal(new Set(CATALOGUE.map(s => s.id)).size, CATALOGUE.length, 'Store IDs must be unique');
-assert.deepEqual(manifest.host_permissions.sort(), STORES.map(s => `${s.origin}/*`).sort());
+const metricsHost = 'https://metrics-livros.steamhardwarestock.com/*';
+assert.deepEqual(
+  manifest.host_permissions.sort(),
+  [...STORES.map(s => `${s.origin}/*`), metricsHost].sort()
+);
+const config = readFileSync('metrics-config.js', 'utf8');
+assert(
+  config.includes(metricsHost.replace('/*', '/v1/batch')) ||
+    config.includes('metrics-livros.steamhardwarestock.com'),
+  'metrics endpoint missing'
+);
+assert(!/api[_-]?key\s*[:=]|secret\s*[:=]|token\s*[:=]/i.test(config), 'metrics config must not hold secrets');
 for (const group of manifest.web_accessible_resources) {
   assert.deepEqual([...group.matches].sort(), STORES.map(s => `${s.origin}/*`).sort());
   for (const file of group.resources) {
