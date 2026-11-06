@@ -30,7 +30,10 @@
         "auto-rules.js",
         "affiliate.js",
         "promotions.js",
-        "promotion-view.js"
+        "promotion-view.js",
+        "metrics.js",
+        "metrics-config.js",
+        "metrics-schema.json"
       ],
       "matches": [
         "https://www.wook.pt/*",
