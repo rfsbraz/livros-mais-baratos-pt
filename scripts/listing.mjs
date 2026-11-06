@@ -33,14 +33,16 @@ export function validateListingAccuracy({ config, locales }) {
       errors.push(`${id}: affiliate must be a footnote, not a dedicated section`);
     }
     if (
-      !/Afiliados Wook ativos por predefinição/i.test(description) ||
+      !/Afiliados Wook( e Bertrand)? ativos por predefinição/i.test(description) ||
       !/Podes desativar/i.test(description) ||
       !/comiss[aã]o/i.test(description)
     ) {
       errors.push(`${id}: missing Wook affiliate default-on optional disclosure`);
     }
     const productMarker = description.indexOf('A TUA ESTANTE');
-    const affiliateMarker = description.search(/Afiliados Wook ativos por predefinição/i);
+    const affiliateMarker = description.search(
+      /Afiliados Wook( e Bertrand)? ativos por predefinição/i
+    );
     if (productMarker >= 0 && affiliateMarker >= 0 && affiliateMarker < productMarker) {
       errors.push(`${id}: affiliate disclosure appears before the product pitch`);
     }
