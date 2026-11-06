@@ -86,7 +86,7 @@ try {
   });
   assert.equal(
     await shop.getByRole('link', { name: 'Ver oferta na Bertrand' }).getAttribute('href'),
-    `https://www.bertrand.pt/pesquisa/${isbn}`
+    `https://www.bertrand.pt/pesquisa/${isbn}?a_aid=5d3f094d9af11`
   );
   const afterFirst = await popup.evaluate(() => window.autoRequests);
   assert.equal(afterFirst, 0);
