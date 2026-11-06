@@ -38,10 +38,6 @@ try {
         localStorage.getItem('testData') ||
           '{"selectedStores":["wook","bertrand","almedina","bookcover"]}'
       );
-      window.__data.shipping ||= {
-        region: 'mainland',
-        rules: { mainland: { bertrand: { fee: 0, expiresAt: 4102444800000 } } }
-      };
       window.__permission = true;
       window.chrome = {
         runtime: { getManifest: () => ({ version: '0.1.5' }) },
