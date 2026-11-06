@@ -104,6 +104,15 @@ try {
   assert.equal(state.watchNotices[0].price, 1800);
   assert.equal(state.history[isbn].length, 2);
   assert(state.history[isbn].every(p => p.source === 'scheduled'));
+  await poll(async () => {
+    const { metricsPending } = await chrome.storage.local.get('metricsPending');
+    return Object.values(metricsPending?.points || {}).some(
+      point =>
+        point.metric === 'store_latency' &&
+        point.surface === 'scheduled' &&
+        point.outcome === 'price'
+    );
+  });
   const firstNotice = state.watchNotices[0].at;
   await trigger();
   await poll(

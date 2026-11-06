@@ -219,3 +219,7 @@ test('flush retries three times then drops (offline)', async () => {
   assert.equal(result.reason, 'dropped');
   assert.equal(storage[PENDING_KEY], undefined);
 });
+
+test('the endpoint fixture and distributed metric schema cannot drift', () => {
+  assert.deepEqual(JSON.parse(readFileSync('tests/fixtures/metrics-schema.json', 'utf8')), schema);
+});

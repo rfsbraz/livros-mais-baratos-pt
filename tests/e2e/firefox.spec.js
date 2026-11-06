@@ -2,8 +2,15 @@ import { test, expect, firefox } from '@playwright/test';
 import { withExtension } from 'playwright-webextext';
 import { cp, mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
 const isbn = '9780306406157';
 const uuid = '497d41cb-12cc-4e58-81aa-93ab18677e01';
+test('Firefox metrics require optional consent and keep the anonymous wire contract', () => {
+  execFileSync(process.execPath, ['tests/e2e/metrics-browser.mjs', 'firefox'], {
+    stdio: 'inherit',
+    timeout: 90000
+  });
+});
 test('Firefox automatic comparison, persisted prices and scheduled targets', async () => {
   await mkdir('work', { recursive: true });
   const root = await mkdtemp(resolve('work/firefox-'));
@@ -33,6 +40,9 @@ chrome.storage.onChanged.addListener(async changes=>{if(!changes.priceCache || f
 await writeData({type:'save',book:{isbn:'${isbn}',title:'Livro Firefox'}});
 await writeData({type:'watch',isbn:'${isbn}',target:1900,basis:'item',enabled:true});
 await writeData(d=>{d.saved['${isbn}'].watch.nextCheckAt=0;return d;});
+// Wait for the production setup before moving its alarm forward; otherwise its
+// asynchronous creation can overwrite this test's earlier deadline.
+for(let attempt=0;attempt<100 && !(await chrome.alarms.get('saved-book-check'));attempt++) await new Promise(resolve=>setTimeout(resolve,20));
 await chrome.alarms.create('saved-book-check',{when:Date.now()+100});});
 `
   );

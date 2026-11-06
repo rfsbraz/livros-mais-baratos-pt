@@ -1,3 +1,5 @@
+const popupOpenedAt = performance.now();
+import { comparisonMetrics } from './comparison-metrics.js';
 import { initFeedback } from './feedback.js';
 import { comparisonValue } from './comparison-values.js';
 import { eligibleOffer } from './offers.js';
@@ -34,6 +36,8 @@ function trackAffiliate(surface) {
 
 const money = (cents, currency = 'EUR') =>
   new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
+let activeMeasurement;
+window.addEventListener('pagehide', () => activeMeasurement?.finish('abandoned'));
 let priceCache = {},
   comparing = false;
 let current = null,
@@ -114,9 +118,29 @@ function showCached() {
   recordPoints([
     { metric: 'compare_run', surface: 'popup', outcome: 'cache_shown', count: 1 },
     ...entry.offers.map(o => storeResultPoint('popup', o.id, 'cached', 0)),
-    ...[...selected]
-      .filter(id => !entry.offers.some(o => o.id === id))
-      .map(id => storeResultPoint('popup', id, 'disabled', 0))
+    ...STORES.filter(store => !selected.has(store.id)).map(store =>
+      storeResultPoint('popup', store.id, 'disabled', 0)
+    ),
+    ...(entry.offers.some(offer => offer.status === 'ok')
+      ? [
+          {
+            metric: 't_first_result',
+            outcome: 'settled',
+            bucket: latencyBucket(performance.now() - popupOpenedAt),
+            count: 1
+          }
+        ]
+      : []),
+    ...(entry.offers.length === selected.size
+      ? [
+          {
+            metric: 't_all_settled',
+            outcome: 'settled',
+            bucket: latencyBucket(performance.now() - popupOpenedAt),
+            count: 1
+          }
+        ]
+      : [])
   ]).catch(() => {});
   status(
     'Preços guardados: ' +
@@ -335,6 +359,7 @@ function renderOffers(offers) {
   }
 }
 async function start(book) {
+  const compareStartedAt = performance.now();
   const isbn = isbn13(book.isbn);
   if (!isbn) {
     status('Introduz um ISBN-10 ou ISBN-13 válido. Encontras o número junto ao código de barras.');
@@ -348,6 +373,14 @@ async function start(book) {
     $('shops').open = true;
     return;
   }
+  activeMeasurement?.finish('abandoned');
+  const measurement = comparisonMetrics({
+    stores: stores.map(s => s.id),
+    openedAt: popupOpenedAt,
+    startedAt: compareStartedAt,
+    trigger: book.fromPage ? 'page' : 'isbn_typed'
+  });
+  activeMeasurement = measurement;
   comparing = true;
   const permission = chrome.permissions.contains({ origins: stores.map(s => `${s.origin}/*`) });
   controller?.abort();
@@ -362,14 +395,6 @@ async function start(book) {
   renderOffers(offers);
   $('cancel').hidden = false;
   status(`A consultar ${stores.length} lojas, até quatro de cada vez. Mantém esta janela aberta.`);
-  const openedAt = performance.now();
-  const compareStartedAt = openedAt;
-  let firstResultAt = null;
-  const storeElapsed = {};
-  const trigger = book.fromPage ? 'page' : 'isbn_typed';
-  recordPoints([{ metric: 'compare_run', surface: 'popup', outcome: trigger, count: 1 }]).catch(
-    () => {}
-  );
   try {
     const granted = await permission;
     if (token !== run) {
@@ -378,15 +403,9 @@ async function start(book) {
     if (!granted) {
       renderOffers(offers.map(o => ({ ...o, status: 'denied' })));
       status('Acesso não autorizado. Podes consultar cada loja através das ligações.');
-      recordPoints(stores.map(s => storeResultPoint('popup', s.id, 'blocked', 0))).catch(() => {});
+      stores.forEach(store => measurement.rendered(store.id, 'denied'));
+      measurement.finish();
       return;
-    }
-    // Unselected stores count as disabled for this compare.
-    const disabled = STORES.filter(s => !selected.has(s.id)).map(s =>
-      storeResultPoint('popup', s.id, 'disabled', 0)
-    );
-    if (disabled.length) {
-      recordPoints(disabled).catch(() => {});
     }
     let complete = 0;
     await pooled(stores, async (store, index) => {
@@ -397,13 +416,9 @@ async function start(book) {
       if (token === run) {
         renderOffers(offers);
       }
-      const started = performance.now();
+      measurement.start(store.id);
       const deadline = AbortSignal.any([signal, AbortSignal.timeout(35000)]);
       offers[index] = await compareStore(store, isbn, deadline, undefined, knownTitle);
-      storeElapsed[store.id] = performance.now() - started;
-      if (!firstResultAt && offers[index].status === 'ok') {
-        firstResultAt = performance.now();
-      }
       if (!knownTitle && offers[index].title) {
         knownTitle = offers[index].title;
       }
@@ -425,67 +440,15 @@ async function start(book) {
         }
         renderOffers(offers);
         status(`${complete} de ${stores.length} lojas consultadas.`);
+        measurement.rendered(store.id, offers[index].status);
       }
     });
     if (token !== run) {
-      const elapsed = performance.now() - openedAt;
-      recordPoints([
-        ...stores.map(s =>
-          storeResultPoint(
-            'popup',
-            s.id,
-            offers[stores.indexOf(s)]?.status || 'cancelled',
-            storeElapsed[s.id] ?? elapsed
-          )
-        ),
-        {
-          metric: 't_compare_settled',
-          outcome: 'abandoned',
-          bucket: latencyBucket(elapsed),
-          count: 1
-        }
-      ]).catch(() => {});
+      measurement.finish('abandoned');
       return;
     }
+    measurement.finish();
     const confirmed = offers.filter(o => o.status === 'ok');
-    const settledAt = performance.now();
-    const latencyPoints = stores.map(s => {
-      const offer = offers.find(o => o.id === s.id);
-      return storeResultPoint('popup', s.id, offer?.status || 'error', storeElapsed[s.id] ?? 0);
-    });
-    let slowest = null;
-    let slowestMs = -1;
-    for (const s of stores) {
-      const ms = storeElapsed[s.id] ?? 0;
-      if (ms >= slowestMs) {
-        slowest = s.id;
-        slowestMs = ms;
-      }
-    }
-    const totals = [
-      {
-        metric: 't_first_result',
-        outcome: 'settled',
-        bucket: latencyBucket((firstResultAt ?? settledAt) - openedAt),
-        count: 1
-      },
-      {
-        metric: 't_all_settled',
-        outcome: 'settled',
-        bucket: latencyBucket(settledAt - openedAt),
-        count: 1
-      },
-      {
-        metric: 't_compare_settled',
-        outcome: 'settled',
-        bucket: latencyBucket(settledAt - compareStartedAt),
-        count: 1
-      }
-    ];
-    if (slowest) {
-      totals.push({ metric: 'slowest_store', surface: 'popup', store: slowest, count: 1 });
-    }
-    recordPoints([...latencyPoints, ...totals]).catch(() => {});
     showBook({ isbn, title: knownTitle, referencePrice });
     if (saved[isbn] && knownTitle) {
       const updated = await changeData({ type: 'save', book: { isbn, title: knownTitle } });
@@ -509,6 +472,7 @@ async function start(book) {
       status('Não foi possível concluir a consulta ou guardar os dados. Tenta novamente.');
     }
   } finally {
+    measurement.finish(signal.aborted || token !== run ? 'abandoned' : 'settled');
     if (token === run) {
       comparing = false;
       $('cancel').hidden = true;
@@ -520,6 +484,7 @@ $('search').onsubmit = event => {
   start({ isbn: $('isbn').value, title: $('title-query').value.trim(), fromPage: false });
 };
 $('cancel').onclick = () => {
+  activeMeasurement?.finish('abandoned');
   ++run;
   comparing = false;
   controller?.abort();
@@ -595,12 +560,14 @@ $('affiliate-toggle').onchange = async () => {
 $('metrics-toggle').onchange = async () => {
   const next = $('metrics-toggle').checked;
   try {
-    await setMetricsEnabled(next);
-    metricsEnabled = next;
+    metricsEnabled = await setMetricsEnabled(next);
+    $('metrics-toggle').checked = metricsEnabled;
     status(
-      next
-        ? 'Estatísticas anónimas ativas. Podes desativá-las a qualquer momento.'
-        : 'Estatísticas anónimas desativadas. Os agregados pendentes foram apagados.'
+      next && !metricsEnabled
+        ? 'É necessária a autorização do Firefox para partilhar estatísticas anónimas.'
+        : metricsEnabled
+          ? 'Estatísticas anónimas ativas. Podes desativá-las a qualquer momento.'
+          : 'Estatísticas anónimas desativadas. Os agregados pendentes foram apagados.'
     );
   } catch {
     $('metrics-toggle').checked = metricsEnabled;
@@ -644,6 +611,7 @@ $('clear').onclick = async () => {
   ) {
     return;
   }
+  activeMeasurement?.finish('abandoned');
   ++run;
   comparing = false;
   controller?.abort();

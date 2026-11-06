@@ -1,6 +1,8 @@
 import { comparisonAlert } from './comparison-values.js';
 import { STORES } from './stores.js';
 import { compareStore, pooled } from './compare.js';
+import { comparisonMetrics } from './comparison-metrics.js';
+import { recordPoints, storeResultPoint } from './metrics.js';
 const cache = new Map(),
   pending = new Map();
 let active = 0;
@@ -32,23 +34,29 @@ async function compare(message) {
         return { busy: true };
       }
       const job = (async () => {
+        const measurement = comparisonMetrics({ stores: storeIds, surface: 'auto' });
         const deadline = AbortSignal.timeout(90_000);
         const offers = await pooled(
           STORES.filter(s => storeIds.includes(s.id)),
           store =>
             withSlot(async () => {
+              measurement.start(store.id);
               if (deadline.aborted) {
+                measurement.rendered(store.id, 'timeout');
                 return { id: store.id, status: 'unavailable' };
               }
-              return compareStore(
+              const offer = await compareStore(
                 store,
                 book.isbn,
                 AbortSignal.any([deadline, AbortSignal.timeout(35_000)]),
                 undefined,
                 String(book.title || '').slice(0, 150)
               );
+              measurement.rendered(store.id, offer.status);
+              return offer;
             })
         );
+        measurement.finish();
         const result = { at: Date.now(), offers };
         cache.delete(key);
         cache.set(key, result);
@@ -60,6 +68,11 @@ async function compare(message) {
       pending.set(key, job);
     }
     entry = await pending.get(key);
+  } else {
+    recordPoints([
+      { metric: 'compare_run', surface: 'auto', outcome: 'cache_shown', count: 1 },
+      ...entry.offers.map(offer => storeResultPoint('auto', offer.id, 'cached', 0))
+    ]).catch(() => {});
   }
   const alert = comparisonAlert(
     book,
@@ -108,13 +121,16 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
 
 let watchRunning = false;
 async function watchBook(message) {
+  const measurement = comparisonMetrics({ stores: message.storeIds, surface: 'scheduled' });
   const deadline = AbortSignal.timeout(90000);
   const offers = await pooled(
     STORES.filter(s => message.storeIds.includes(s.id)),
     store =>
       withSlot(async () => {
         await new Promise(resolve => setTimeout(resolve, 500 + Math.floor(Math.random() * 1000)));
+        measurement.start(store.id);
         if (deadline.aborted) {
+          measurement.rendered(store.id, 'timeout');
           return { id: store.id, status: 'unavailable' };
         }
         const offer = await compareStore(
@@ -124,6 +140,7 @@ async function watchBook(message) {
           undefined,
           message.book.title || ''
         );
+        measurement.rendered(store.id, offer.status);
         return Object.fromEntries(
           [
             'id',
@@ -142,6 +159,7 @@ async function watchBook(message) {
       }),
     2
   );
+  measurement.finish();
   await chrome.runtime.sendMessage({
     target: 'background',
     type: 'watch-result',

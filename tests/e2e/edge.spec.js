@@ -1,5 +1,12 @@
 import { test, expect, chromium } from '@playwright/test';
 import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+test('Edge metrics preserve outcomes, consent controls and the anonymous wire contract', () => {
+  execFileSync(process.execPath, ['tests/e2e/metrics-browser.mjs', 'edge'], {
+    stdio: 'inherit',
+    timeout: 90000
+  });
+});
 test('Edge package loads with native storage and settings', async () => {
   const root = resolve('dist/edge');
   const context = await chromium.launchPersistentContext('', {

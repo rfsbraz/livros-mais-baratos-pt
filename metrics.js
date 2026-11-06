@@ -1,6 +1,7 @@
 import { METRICS_ENDPOINT } from './metrics-config.js';
 import { selectedStoreIds } from './stores.js';
 import schema from './metrics-schema.json' with { type: 'json' };
+import { validBatch, validPoint } from './metrics-validation.js';
 
 export { METRICS_ENDPOINT };
 export const METRICS_ALARM = 'metrics-flush';
@@ -15,6 +16,32 @@ const STORE_IDS = new Set(schema.sets.stores);
 const BUCKET_MS = schema.sets.buckets.map(b => (b === 'inf' ? Infinity : Number(b)));
 const ISBN_RE = /97[89]\d{10}/;
 const HTTP_RE = /https?:/i;
+let backgroundWriter = false;
+let writes = Promise.resolve();
+let generation = 0;
+let flushJob;
+let sending;
+
+function serialWrite(action) {
+  const job = writes.catch(() => {}).then(action);
+  writes = job;
+  return job;
+}
+
+async function backgroundAction(action, values = {}) {
+  const response = await chrome.runtime.sendMessage({
+    target: 'background',
+    type: 'metrics',
+    action,
+    ...values
+  });
+  if (!response?.ok) {
+    throw new Error('Não foi possível atualizar as estatísticas.');
+  }
+  return response.value;
+}
+
+const needsBackground = () => Boolean(chrome.runtime?.id && !backgroundWriter);
 
 export function detectBrowser(ua = globalThis.navigator?.userAgent || '') {
   if (/Edg\//.test(ua)) {
@@ -90,9 +117,9 @@ function clonePending(pending) {
   return { points: { ...(pending?.points || {}) } };
 }
 
-export function mergePoint(pending, point, count = 1) {
+export function mergePoint(pending, point, count = point?.count ?? 1) {
   const next = clonePending(pending);
-  if (!point?.metric || !schema.metrics[point.metric]) {
+  if (!validPoint({ ...point, count }, schema)) {
     return next;
   }
   const dims = schema.metrics[point.metric];
@@ -119,7 +146,7 @@ export function mergePoint(pending, point, count = 1) {
 }
 
 export function pendingBytes(pending) {
-  return new TextEncoder().encode(JSON.stringify(pendingToPoints(pending))).length;
+  return new TextEncoder().encode(JSON.stringify(pending)).length;
 }
 
 export function pendingToPoints(pending) {
@@ -143,34 +170,38 @@ export function buildBatch(
   pending,
   { browser, version, day = utcDay(), sample_rate = SAMPLE_RATE }
 ) {
-  const points = pendingToPoints(pending).slice(0, schema.limits.maxPoints);
-  return {
+  const batch = {
     schema: schema.schema,
     browser,
     version,
     day,
     sample_rate,
-    points
+    points: []
   };
+  for (const point of pendingToPoints(pending)) {
+    if (batch.points.length >= schema.limits.maxPoints) {
+      break;
+    }
+    batch.points.push(point);
+    if (new TextEncoder().encode(JSON.stringify(batch)).length > MAX_PENDING_BYTES) {
+      batch.points.pop();
+      break;
+    }
+  }
+  return batch;
 }
 
 /** Reject batches that leak content or exceed whitelist rules before send. */
 export function clientBatchSafe(batch) {
+  if (!validBatch(batch, schema)) {
+    return false;
+  }
   const text = JSON.stringify(batch);
-  if (text.length > schema.limits.maxBodyBytes) {
-    return false;
-  }
-  if (ISBN_RE.test(text) || HTTP_RE.test(text)) {
-    return false;
-  }
-  for (const point of batch.points || []) {
-    for (const value of Object.values(point)) {
-      if (typeof value === 'string' && value.length > schema.limits.maxStringLength) {
-        return false;
-      }
-    }
-  }
-  return true;
+  return (
+    new TextEncoder().encode(text).length <= schema.limits.maxBodyBytes &&
+    !ISBN_RE.test(text) &&
+    !HTTP_RE.test(text)
+  );
 }
 
 export async function readMetricsState() {
@@ -207,51 +238,79 @@ export async function firefoxCollectionAllowed() {
   if (detectBrowser() !== 'firefox') {
     return true;
   }
-  // Optional AMO data-collection permission; absent API means rely on metricsEnabled only.
-  const permissions = chrome.runtime?.getDataCollectionPermissions;
-  if (typeof permissions !== 'function') {
-    return true;
-  }
   try {
-    const granted = await permissions();
-    return Boolean(
-      granted?.optional?.includes?.('technicalAndInteraction') ||
-      granted?.optionalPermissions?.includes?.('technicalAndInteraction')
-    );
+    const granted = await chrome.permissions?.getAll?.();
+    return granted?.data_collection?.includes('technicalAndInteraction') === true;
   } catch {
     return false;
   }
 }
 
 export async function clearPending() {
-  await chrome.storage.local.remove([PENDING_KEY, RETRY_KEY]);
+  if (needsBackground()) {
+    return backgroundAction('clear');
+  }
+  generation++;
+  sending?.abort();
+  await serialWrite(() => chrome.storage.local.remove([PENDING_KEY, RETRY_KEY]));
 }
 
 export async function setMetricsEnabled(enabled) {
-  if (!enabled) {
-    await chrome.storage.local.set({ [ENABLED_KEY]: false });
-    await clearPending();
-    await chrome.alarms.clear(METRICS_ALARM);
-    return;
+  if (enabled && detectBrowser() === 'firefox') {
+    // Invoke from the settings gesture, before yielding, so Firefox can show its native prompt.
+    try {
+      enabled =
+        (await chrome.permissions?.request?.({
+          data_collection: ['technicalAndInteraction']
+        })) === true && (await firefoxCollectionAllowed());
+    } catch {
+      enabled = false;
+    }
   }
-  await chrome.storage.local.set({ [ENABLED_KEY]: true });
-  await scheduleFlush();
+  if (needsBackground()) {
+    return backgroundAction('enable', { enabled });
+  }
+  return setEnabledLocally(enabled);
+}
+
+async function setEnabledLocally(enabled) {
+  if (!enabled) {
+    generation++;
+    sending?.abort();
+  }
+  return serialWrite(async () => {
+    enabled = enabled === true && (await firefoxCollectionAllowed());
+    await chrome.storage.local.set({ [ENABLED_KEY]: enabled });
+    if (!enabled) {
+      await chrome.storage.local.remove([PENDING_KEY, RETRY_KEY]);
+      await chrome.alarms.clear(METRICS_ALARM);
+    } else {
+      await ensureMetricsAlarm();
+    }
+    return enabled;
+  });
 }
 
 export async function recordPoints(points) {
-  if (!points?.length) {
+  const safe = Array.isArray(points) ? points.filter(point => validPoint(point, schema)) : [];
+  if (!safe.length) {
     return;
   }
-  const state = await readMetricsState();
-  if (!state.enabled || !(await firefoxCollectionAllowed())) {
-    return;
+  if (needsBackground()) {
+    return backgroundAction('record', { points: safe });
   }
-  let pending = state.pending;
-  for (const point of points) {
-    pending = mergePoint(pending, point);
-  }
-  pending = trimPending(pending);
-  await chrome.storage.local.set({ [PENDING_KEY]: pending });
+  return serialWrite(async () => {
+    const state = await readMetricsState();
+    if (!state.enabled || !(await firefoxCollectionAllowed())) {
+      return;
+    }
+    let pending = state.pending;
+    for (const point of safe) {
+      pending = mergePoint(pending, point);
+    }
+    await chrome.storage.local.set({ [PENDING_KEY]: trimPending(pending) });
+    await ensureMetricsAlarm();
+  });
 }
 
 export function configSnapshotPoints({
@@ -333,22 +392,37 @@ export async function ensureMetricsAlarm() {
 
 const RETRY_DELAYS_MS = [60 * 60 * 1000, 6 * 60 * 60 * 1000, 24 * 60 * 60 * 1000];
 
-export async function flushMetrics({
+export function flushMetrics(options) {
+  if (!flushJob) {
+    flushJob = flushOnce(options).finally(() => {
+      flushJob = undefined;
+      sending = undefined;
+    });
+  }
+  return flushJob;
+}
+
+async function flushOnce({
   now = Date.now(),
   fetchImpl = globalThis.fetch.bind(globalThis),
   version = chrome.runtime.getManifest().version,
   force = false
 } = {}) {
-  const state = await readMetricsState();
+  const epoch = generation;
+  const state = await serialWrite(readMetricsState);
+  if (epoch !== generation) {
+    return { sent: false, reason: 'cleared' };
+  }
   if (!state.enabled || !(await firefoxCollectionAllowed())) {
     return { sent: false, reason: 'disabled' };
   }
   const points = pendingToPoints(state.pending);
   if (!points.length) {
+    await scheduleFlush();
     return { sent: false, reason: 'empty' };
   }
   const dayMs = 24 * 60 * 60 * 1000;
-  if (!force && state.lastSentAt && now - state.lastSentAt < dayMs - 60_000) {
+  if (!force && state.lastSentAt && now - state.lastSentAt < dayMs) {
     if (!state.retry) {
       return { sent: false, reason: 'rate' };
     }
@@ -363,8 +437,11 @@ export async function flushMetrics({
     wookPromotionEnabled: state.wookPromotionEnabled,
     affiliateEnabled: state.affiliateEnabled
   });
-  let pending = state.pending;
+  let pending = emptyPending();
   for (const point of snapshot) {
+    pending = mergePoint(pending, point);
+  }
+  for (const point of points) {
     pending = mergePoint(pending, point);
   }
   const batch = buildBatch(pending, { browser: state.browser, version, day: utcDay(now) });
@@ -375,6 +452,10 @@ export async function flushMetrics({
 
   let response;
   try {
+    if (epoch !== generation) {
+      return { sent: false, reason: 'cleared' };
+    }
+    sending = new AbortController();
     response = await fetchImpl(METRICS_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -382,40 +463,127 @@ export async function flushMetrics({
       credentials: 'omit',
       cache: 'no-store',
       keepalive: true,
+      signal: sending.signal,
       referrerPolicy: 'no-referrer'
     });
   } catch {
-    return queueRetry(state, now);
+    return queueRetry(now, epoch, batch);
   }
 
   if (response.status === 204) {
-    await chrome.storage.local.set({ [LAST_SENT_KEY]: now });
-    await chrome.storage.local.remove([PENDING_KEY, RETRY_KEY]);
-    await scheduleFlush();
-    return { sent: true };
+    return serialWrite(async () => {
+      const current = await readMetricsState();
+      if (epoch !== generation || !current.enabled) {
+        return { sent: false, reason: 'cleared' };
+      }
+      const remaining = subtractBatch(current.pending, batch);
+      await chrome.storage.local.set({ [LAST_SENT_KEY]: now });
+      await chrome.storage.local.remove(RETRY_KEY);
+      if (Object.keys(remaining.points).length) {
+        await chrome.storage.local.set({ [PENDING_KEY]: trimPending(remaining) });
+      } else {
+        await chrome.storage.local.remove(PENDING_KEY);
+      }
+      await scheduleFlush();
+      return { sent: true };
+    });
   }
   if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-    await clearPending();
-    await scheduleFlush();
-    return { sent: false, reason: 'schema' };
+    return discardBatch(epoch, 'schema', batch);
   }
-  return queueRetry(state, now);
+  return queueRetry(now, epoch, batch);
 }
 
-async function queueRetry(state, now) {
-  const attempt = (state.retry?.attempt || 0) + 1;
-  if (attempt > RETRY_DELAYS_MS.length) {
-    await clearPending();
-    await scheduleFlush();
-    return { sent: false, reason: 'dropped' };
+function subtractBatch(pending, batch) {
+  const remaining = clonePending(pending);
+  for (const point of batch.points) {
+    const key = pointKey(point);
+    const stored = remaining.points[key];
+    if (!stored) {
+      continue;
+    }
+    const count = stored.count - point.count;
+    if (count > 0) {
+      remaining.points[key] = { ...stored, count };
+    } else {
+      delete remaining.points[key];
+    }
   }
-  const nextAt = now + RETRY_DELAYS_MS[attempt - 1];
-  await chrome.storage.local.set({ [RETRY_KEY]: { attempt, nextAt } });
-  await scheduleFlush(Math.ceil((nextAt - now) / 60000));
-  return { sent: false, reason: 'retry', attempt };
+  return remaining;
+}
+
+async function keepRemaining(pending, batch) {
+  const remaining = subtractBatch(pending, batch);
+  await chrome.storage.local.remove(RETRY_KEY);
+  if (Object.keys(remaining.points).length) {
+    await chrome.storage.local.set({ [PENDING_KEY]: trimPending(remaining) });
+  } else {
+    await chrome.storage.local.remove(PENDING_KEY);
+  }
+}
+
+async function discardBatch(epoch, reason, batch) {
+  return serialWrite(async () => {
+    const state = await readMetricsState();
+    if (epoch !== generation || !state.enabled) {
+      return { sent: false, reason: 'cleared' };
+    }
+    await keepRemaining(state.pending, batch);
+    await scheduleFlush();
+    return { sent: false, reason };
+  });
+}
+
+async function queueRetry(now, epoch, batch) {
+  return serialWrite(async () => {
+    const state = await readMetricsState();
+    if (epoch !== generation || !state.enabled) {
+      return { sent: false, reason: 'cleared' };
+    }
+    const attempt = (state.retry?.attempt || 0) + 1;
+    if (attempt > RETRY_DELAYS_MS.length) {
+      await keepRemaining(state.pending, batch);
+      await scheduleFlush();
+      return { sent: false, reason: 'dropped' };
+    }
+    const nextAt = now + RETRY_DELAYS_MS[attempt - 1];
+    await chrome.storage.local.set({ [RETRY_KEY]: { attempt, nextAt } });
+    await scheduleFlush(Math.ceil((nextAt - now) / 60000));
+    return { sent: false, reason: 'retry', attempt };
+  });
 }
 
 export function installMetrics() {
+  backgroundWriter = true;
+  chrome.runtime.onMessage.addListener((message, sender, reply) => {
+    if (message?.target !== 'background' || message.type !== 'metrics') {
+      return;
+    }
+    if (sender.id !== chrome.runtime.id) {
+      return;
+    }
+    let job;
+    if (message.action === 'record') {
+      job = recordPoints(message.points);
+    } else if (sender.url?.split(/[?#]/, 1)[0] === chrome.runtime.getURL('popup.html')) {
+      if (message.action === 'clear') {
+        job = clearPending();
+      }
+      if (message.action === 'enable') {
+        job = setEnabledLocally(message.enabled === true);
+      }
+    }
+    if (!job) {
+      return;
+    }
+    job.then(value => reply({ ok: true, value })).catch(() => reply({ ok: false }));
+    return true;
+  });
+  chrome.permissions?.onRemoved?.addListener(removed => {
+    if (removed.data_collection?.includes('technicalAndInteraction')) {
+      setEnabledLocally(false).catch(() => {});
+    }
+  });
   chrome.alarms.onAlarm.addListener(alarm => {
     if (alarm.name === METRICS_ALARM) {
       flushMetrics().catch(() => {});
