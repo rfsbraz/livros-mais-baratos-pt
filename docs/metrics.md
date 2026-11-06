@@ -265,9 +265,9 @@ O Analytics Engine usa um subconjunto do SQL do ClickHouse e não pode ser execu
 Nada disto corre na CI, e nenhum token entra no Git.
 
 1. Confirmar os custos do Workers, do Analytics Engine e do limite de pedidos antes de ativar.
-2. O domínio aprovado é `metrics-livros.rodrigobraz.com`. Mantém a rota ou o domínio personalizado já associado ao Worker. Um deploy não cria nem apaga domínios, conjuntos de dados ou limites.
+2. O domínio já associado ao Worker é `metrics-livros.steamhardwarestock.com`. Mantém a rota ou o domínio personalizado existente. Um deploy não cria nem apaga domínios, conjuntos de dados ou limites.
 3. Configurar a variável de repositório `CLOUDFLARE_ACCOUNT_ID` e o secret `CLOUDFLARE_METRICS_DEPLOY_TOKEN`. O token de deploy tem apenas as permissões Cloudflare necessárias para editar este Worker e escrever no Analytics Engine associado. Não usar este token para consultas nem o guardar no repositório.
-4. Publicar através do workflow **Publicar Worker de métricas**, que corre quando uma release GitHub é publicada. O workflow faz checkout do respetivo tag, testa o Worker, publica com a versão local de Wrangler e confirma `OPTIONS https://metrics-livros.rodrigobraz.com/v1/batch` antes de mostrar a versão e o endpoint no resumo do job.
+4. Publicar através do workflow **Publicar Worker de métricas**, que corre quando uma release GitHub é publicada. O workflow faz checkout do respetivo tag, testa o Worker, publica com a versão local de Wrangler e confirma `OPTIONS https://metrics-livros.steamhardwarestock.com/v1/batch` antes de mostrar a versão e o endpoint no resumo do job.
 5. Para recuperar um deploy falhado, usar `workflow_dispatch` com o mesmo tag da release. É idempotente: volta a publicar o mesmo Worker sem recriar recursos. Confirma o resumo do job e só depois investiga a configuração do domínio ou do token.
 6. Para rodar o token, criar um substituto com o mesmo âmbito mínimo, atualizar `CLOUDFLARE_METRICS_DEPLOY_TOKEN`, executar manualmente o workflow para um tag conhecido e revogar o token anterior apenas depois da verificação HTTP passar.
 7. Criar um token só com a permissão de leitura `Account Analytics` para as consultas, e guardá-lo fora do repositório.

@@ -76,7 +76,7 @@ jobs:
       - name: Confirmar o endpoint publicado
         env:
           TAG: ${{ github.event.release.tag_name || inputs.tag }}
-          METRICS_URL: https://metrics-livros.rodrigobraz.com/v1/batch
+          METRICS_URL: https://metrics-livros.steamhardwarestock.com/v1/batch
         run: |
           status=$(curl --fail --silent --show-error --output /dev/null --write-out '%{http_code}' \
             --request OPTIONS \
