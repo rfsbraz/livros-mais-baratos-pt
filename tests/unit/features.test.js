@@ -96,6 +96,22 @@ test('incremental observations preserve confirmed prices when a comparison stops
     }),
     second
   );
+  const outOfStock = {
+    ...offer,
+    id: 'bookcover',
+    availability: 'OutOfStock',
+    url: 'https://bookcover.pt/product/test/'
+  };
+  const withStock = reduceData(
+    second,
+    { type: 'observe-incremental', isbn, offer: outOfStock, source: 'manual' },
+    now + 2
+  );
+  assert.equal(withStock.priceCache[isbn].offers.length, 2);
+  assert.equal(
+    withStock.priceCache[isbn].offers.find(o => o.id === 'bookcover').availability,
+    'OutOfStock'
+  );
 });
 
 test('concurrent manual and scheduled observations merge without losing shelf preferences', async () => {
