@@ -179,3 +179,35 @@ test('listing accuracy covers support email, affiliates, telemetry and store cla
   assert(errors.some(e => e.includes('absolute permanent zero-telemetry')));
   assert(errors.some(e => e.includes('proton.me')));
 });
+
+test('listing keeps affiliate as a late footnote, not an early section', () => {
+  const listing = loadListing();
+  const description = listing.locales['pt-PT'].description.join('\n');
+  assert.equal(/AFILIADOS OPCIONAIS/i.test(description), false);
+  const errors = validateListingAccuracy(listing);
+  assert.deepEqual(errors, []);
+  const productMarker = description.indexOf('A TUA ESTANTE');
+  const affiliateMarker = description.search(/Afiliados Wook ativos por predefinição/i);
+  assert.ok(productMarker >= 0);
+  assert.ok(affiliateMarker > productMarker);
+  const early = description.slice(0, productMarker);
+  assert.equal(/afiliad/i.test(early), false);
+  const bad = structuredClone(listing);
+  bad.locales['pt-PT'].description = [
+    'O mesmo livro. Um preço melhor.',
+    '',
+    'AFILIADOS OPCIONAIS',
+    'Afiliados Wook ativos por predefinição. Podemos receber uma comissão. Podes desativar na extensão.',
+    '',
+    'A TUA ESTANTE',
+    'Guarda um livro.',
+    '',
+    'CONTROLO E PRIVACIDADE',
+    'Sem conta. Nesta versão a extensão não envia estatísticas de utilização.',
+    '',
+    `Interface em português de Portugal. Suporte: ${SUPPORT_EMAIL}.`
+  ];
+  const badErrors = validateListingAccuracy(bad);
+  assert(badErrors.some(e => e.includes('footnote')));
+  assert(badErrors.some(e => e.includes('before the product pitch')));
+});

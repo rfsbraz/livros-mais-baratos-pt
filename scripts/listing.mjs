@@ -29,11 +29,27 @@ export function validateListingAccuracy({ config, locales }) {
   }
   for (const [id, locale] of Object.entries(locales)) {
     const description = locale.description?.join('\n') || '';
+    if (/AFILIADOS OPCIONAIS/i.test(description)) {
+      errors.push(`${id}: affiliate must be a footnote, not a dedicated section`);
+    }
     if (
       !/Afiliados Wook ativos por predefinição/i.test(description) ||
-      !/Podes desativar/i.test(description)
+      !/Podes desativar/i.test(description) ||
+      !/comiss[aã]o/i.test(description)
     ) {
       errors.push(`${id}: missing Wook affiliate default-on optional disclosure`);
+    }
+    const productMarker = description.indexOf('A TUA ESTANTE');
+    const affiliateMarker = description.search(/Afiliados Wook ativos por predefinição/i);
+    if (productMarker >= 0 && affiliateMarker >= 0 && affiliateMarker < productMarker) {
+      errors.push(`${id}: affiliate disclosure appears before the product pitch`);
+    }
+    const privacyIdx = description.indexOf('CONTROLO E PRIVACIDADE');
+    if (privacyIdx >= 0) {
+      const after = description.slice(privacyIdx).split(/\n\n/)[1] || '';
+      if (/Afiliados Wook|comiss[aã]o/i.test(after)) {
+        errors.push(`${id}: Controlo e privacidade repeats affiliate marketing copy`);
+      }
     }
     if (/Sem conta ou telemetria/i.test(description)) {
       errors.push(`${id}: absolute permanent zero-telemetry claim`);

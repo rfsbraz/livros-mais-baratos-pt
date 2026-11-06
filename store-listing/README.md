@@ -1,6 +1,6 @@
 # Pacote de submissão nas lojas de extensões
 
-Livros Mais Baratos PT · 0.1.5 · Gerado a partir do código do repositório.
+Livros Mais Baratos PT · 0.1.6 · Gerado a partir do código do repositório.
 
 Consulta [AUTOMATION.md](AUTOMATION.md) para configuração e publicação em Chrome, Firefox e Edge. `npm run store-listing:pack` gera o ZIP com uma pasta por loja.
 
@@ -23,7 +23,7 @@ Consulta [AUTOMATION.md](AUTOMATION.md) para configuração e publicação em Ch
 
 ## Antes da submissão
 
-Aloja os três ficheiros de `website/` no Worker `livros-mais-baratos-pt` (`npm run store-listing:deploy`; dry-run: `npm run store-listing:deploy:dry-run`) e mantém os URLs em `listing.json` apontados para `https://livros-mais-baratos-pt.rfsbraz.workers.dev/`. Não uses o repositório privado como página pública. Este repositório não publica nas lojas nem faz o deploy automaticamente.
+Aloja os três ficheiros de website/ num site HTTPS público e preenche os URLs em listing.json. Valores null significam que falta configuração. Não uses o repositório privado como página pública. Não foi efetuada publicação nas lojas ou alojamento de páginas.
 
 Confirma a verificação da conta/contacto, visibilidade e países nos painéis. A visibilidade do repositório não determina a visibilidade da extensão nas lojas. Não é incluído vídeo YouTube, que é opcional.
 

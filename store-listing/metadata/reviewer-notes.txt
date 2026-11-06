@@ -1,4 +1,4 @@
-Livros Mais Baratos PT 0.1.5
+Livros Mais Baratos PT 0.1.6
 
 Abre Definições para escolher lojas, avisos, afiliados e eliminação de dados. Voltar aos preços regressa aos resultados. O ecrã principal contém pesquisa, preços e estante.
 
