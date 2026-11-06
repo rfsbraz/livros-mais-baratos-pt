@@ -1,5 +1,6 @@
 import { initFeedback } from './feedback.js';
 import { comparisonValue } from './comparison-values.js';
+import { eligibleOffer } from './offers.js';
 import { promotionCard } from './promotion-view.js';
 import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
@@ -62,6 +63,7 @@ const status = text => {
 function applyData(data) {
   saved = data.saved || {};
   history = data.history || {};
+  priceCache = data.priceCache || priceCache;
 }
 async function persist() {
   const data = await changeData({ type: 'selection', ids: [...selected] });
@@ -189,6 +191,36 @@ function renderSaved() {
 function renderHistory() {
   renderHistoryChart($('history'), history[current?.isbn] || []);
 }
+function updateCheapestBanner(offers) {
+  const reference = current?.referencePrice;
+  const candidates = offers
+    .filter(eligibleOffer)
+    .map(offer => ({ offer, value: comparisonValue(offer, wookPromotionEnabled) }))
+    .filter(candidate => candidate.value.price !== null)
+    .sort((a, b) => a.value.price - b.value.price);
+  const candidate = candidates[0];
+  const banner = $('cheapest-banner');
+  if (!Number.isSafeInteger(reference) || !candidate || candidate.value.price >= reference) {
+    banner.hidden = true;
+    delete banner.dataset.price;
+    return;
+  }
+  const changed = Number(banner.dataset.price) !== candidate.value.price;
+  const improved =
+    Number.isSafeInteger(Number(banner.dataset.price)) &&
+    candidate.value.price < Number(banner.dataset.price);
+  banner.hidden = false;
+  banner.dataset.price = String(candidate.value.price);
+  $('cheapest-banner-text').textContent = `${
+    improved ? 'Novo preço mais baixo' : 'Preço mais baixo confirmado'
+  }: ${money(candidate.value.price)} na ${candidate.offer.name} (${money(reference - candidate.value.price)} de poupança).`;
+  const link = $('cheapest-banner-link');
+  if (changed) {
+    link.href = candidate.offer.url;
+    link.textContent = `Abrir oferta na ${candidate.offer.name}`;
+    bindAffiliateLink(link, () => affiliateEnabled);
+  }
+}
 function renderOffers(offers) {
   clearTimeout(promotionExpiryTimer);
   const expiry = Math.min(...offers.map(o => comparisonValue(o, wookPromotionEnabled).validUntil));
@@ -200,20 +232,14 @@ function renderOffers(offers) {
   }
   $('results').replaceChildren();
   $('unconfirmed-results').replaceChildren();
-  const available = offers.filter(
-    o =>
-      o.status === 'ok' &&
-      o.availability === 'InStock' &&
-      (o.currency || 'EUR') === 'EUR' &&
-      o.condition === 'NewCondition' &&
-      !o.marketplace
-  );
+  const available = offers.filter(eligibleOffer);
   const value = o => {
     const result = comparisonValue(o, wookPromotionEnabled);
     return result.price;
   };
   const known = available.filter(o => value(o) !== null);
   const best = known.length ? Math.min(...known.map(value)) : null;
+  updateCheapestBanner(offers);
   const ordered = [...offers].sort(
     (a, b) =>
       (a.currency || 'EUR').localeCompare(b.currency || 'EUR') ||
@@ -297,7 +323,8 @@ async function start(book) {
   const signal = controller.signal;
   const token = ++run;
   let knownTitle = book.title || saved[isbn]?.title || '';
-  showBook({ isbn, title: knownTitle });
+  const referencePrice = current?.isbn === isbn ? current.referencePrice : null;
+  showBook({ isbn, title: knownTitle, referencePrice });
   const offers = stores.map(s => ({ ...s, status: 'queued', url: s.search(isbn) }));
   activeOffers = offers;
   renderOffers(offers);
@@ -329,6 +356,19 @@ async function start(book) {
       }
       complete++;
       if (token === run) {
+        if (offers[index].status === 'ok') {
+          applyData(
+            await changeData({
+              type: 'observe-incremental',
+              isbn,
+              offer: offers[index],
+              source: 'manual'
+            })
+          );
+        }
+        if (token !== run) {
+          return;
+        }
         renderOffers(offers);
         status(`${complete} de ${stores.length} lojas consultadas.`);
       }
@@ -336,13 +376,8 @@ async function start(book) {
     if (token !== run) {
       return;
     }
-    const found = offers.filter(o => o.status === 'ok');
-    showBook({ isbn, title: knownTitle });
-    const observed = await changeData({ type: 'observe', isbn, offers: found, source: 'manual' });
-    if (token !== run) {
-      return;
-    }
-    applyData(observed);
+    const confirmed = offers.filter(o => o.status === 'ok');
+    showBook({ isbn, title: knownTitle, referencePrice });
     if (saved[isbn] && knownTitle) {
       const updated = await changeData({ type: 'save', book: { isbn, title: knownTitle } });
       if (token !== run) {
@@ -356,8 +391,8 @@ async function start(book) {
     renderSaved();
     renderHistory();
     status(
-      found.length
-        ? `${found.length} de ${stores.length} preços confirmados para esta edição. Confirma o preço final e as condições na loja.`
+      confirmed.length
+        ? `${confirmed.length} de ${stores.length} preços confirmados para esta edição. Confirma o preço final e as condições na loja.`
         : 'Não foi possível confirmar preços. Experimenta indicar também o título, ou abre as lojas para consultar.'
     );
   } catch {

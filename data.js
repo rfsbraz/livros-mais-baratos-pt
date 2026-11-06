@@ -63,6 +63,11 @@ export function reduceData(data, action, now = Date.now()) {
   } else if (action.type === 'observe' && isbn) {
     next.history = remember(next.history, isbn, action.offers, now, action.source || 'manual');
     next.priceCache = cachePrices(next.priceCache, isbn, action.offers, now, now);
+  } else if (action.type === 'observe-incremental' && isbn && action.offer?.status === 'ok') {
+    const cached = next.priceCache?.[isbn]?.offers || [];
+    const offers = [...cached.filter(offer => offer.id !== action.offer.id), action.offer];
+    next.history = remember(next.history, isbn, [action.offer], now, action.source || 'manual');
+    next.priceCache = cachePrices(next.priceCache, isbn, offers, now, now);
   } else if (action.type === 'selection') {
     next.selectedStores = action.ids.filter(id => STORES.some(s => s.id === id));
   } else if (action.type === 'clear') {

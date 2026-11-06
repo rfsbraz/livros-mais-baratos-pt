@@ -77,6 +77,43 @@ test('data mutations preserve targets and observations; clear invalidates in-fli
   assert.equal(cleared.watchJob, null);
 });
 
+test('incremental observations preserve confirmed prices when a comparison stops early', () => {
+  const first = reduceData({}, { type: 'observe-incremental', isbn, offer, source: 'manual' }, now);
+  const cheaper = { ...offer, price: 1400 };
+  const second = reduceData(
+    first,
+    { type: 'observe-incremental', isbn, offer: cheaper, source: 'manual' },
+    now + 1
+  );
+  assert.equal(second.history[isbn].length, 2);
+  assert.equal(second.priceCache[isbn].offers.length, 1);
+  assert.equal(second.priceCache[isbn].offers[0].price, 1400);
+  assert.deepEqual(
+    reduceData(second, {
+      type: 'observe-incremental',
+      isbn,
+      offer: { ...offer, status: 'loading' }
+    }),
+    second
+  );
+  const outOfStock = {
+    ...offer,
+    id: 'bookcover',
+    availability: 'OutOfStock',
+    url: 'https://bookcover.pt/product/test/'
+  };
+  const withStock = reduceData(
+    second,
+    { type: 'observe-incremental', isbn, offer: outOfStock, source: 'manual' },
+    now + 2
+  );
+  assert.equal(withStock.priceCache[isbn].offers.length, 2);
+  assert.equal(
+    withStock.priceCache[isbn].offers.find(o => o.id === 'bookcover').availability,
+    'OutOfStock'
+  );
+});
+
 test('concurrent manual and scheduled observations merge without losing shelf preferences', async () => {
   const { writeData } = await import('../../data.js');
   let stored = { saved: {}, history: {}, affiliateEnabled: false };

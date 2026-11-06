@@ -190,6 +190,9 @@ try {
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
   assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
+  await page.locator('#cheapest-banner').waitFor();
+  assert.match(await page.locator('#cheapest-banner').textContent(), /17,00/);
+  assert.match(await page.locator('#cheapest-banner').textContent(), /Bertrand/);
   assert.equal(await page.locator('.offer').count(), 4);
   assert.equal(await page.locator('#affiliate-toggle').isChecked(), true);
   await page.route('https://www.wook.pt/**', route =>
@@ -197,6 +200,8 @@ try {
   );
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
+  assert.match(await page.locator('#cheapest-banner').textContent(), /16,00/);
+  assert.match(await page.locator('#cheapest-banner').textContent(), /Wook/);
   async function captureWookClick() {
     await page
       .locator('#results a')

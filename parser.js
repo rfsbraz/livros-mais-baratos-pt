@@ -86,11 +86,13 @@ export function detectBook(doc, url = '') {
     (store?.skuIsbn && isbn13(doc.querySelector('.product_meta .sku')?.textContent)) ||
     (ids.length === 1 ? ids[0] : null);
   const book = books.find(n => nodeIdentity(n, store) === isbn);
+  const reference = book ? offerFrom(book, url) : null;
   return {
     isbn: isbn || null,
     title: String(book?.name || doc.querySelector('h1')?.textContent || doc.title || '')
       .trim()
-      .slice(0, 200)
+      .slice(0, 200),
+    referencePrice: reference?.currency === 'EUR' ? reference.price : null
   };
 }
 
