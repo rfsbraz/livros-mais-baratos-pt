@@ -33,7 +33,10 @@ assert(
     config.includes('metrics-livros.steamhardwarestock.com'),
   'metrics endpoint missing'
 );
-assert(!/api[_-]?key\s*[:=]|secret\s*[:=]|token\s*[:=]/i.test(config), 'metrics config must not hold secrets');
+assert(
+  !/api[_-]?key\s*[:=]|secret\s*[:=]|token\s*[:=]/i.test(config),
+  'metrics config must not hold secrets'
+);
 for (const group of manifest.web_accessible_resources) {
   assert.deepEqual([...group.matches].sort(), STORES.map(s => `${s.origin}/*`).sort());
   for (const file of group.resources) {

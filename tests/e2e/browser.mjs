@@ -14,8 +14,12 @@ const server = createServer(async (req, res) => {
     const content = await readFile(file);
     res.setHeader(
       'Content-Type',
-      { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' }[extname(file)] ||
-        'application/octet-stream'
+      {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json'
+      }[extname(file)] || 'application/octet-stream'
     );
     res.end(content);
   } catch {

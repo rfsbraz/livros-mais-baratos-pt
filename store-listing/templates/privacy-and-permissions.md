@@ -24,17 +24,17 @@ Selecionar a opção que declara não usar código remoto. Todo o JavaScript exe
 
 O processamento local também deve ser divulgado. A extensão não deve ser descrita como tratando zero dados.
 
-| Tipo no painel                      | Seleção          | Âmbito                                                                                                          |
-| ----------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------- |
-| Conteúdo de sites                   | Sim              | Página do livro, ISBN, título, preço e disponibilidade; HTML permanece local.                                   |
-| Histórico/atividade de navegação    | Sim              | URL atual de lojas suportadas para deteção e encaminhamento; sem registo geral de navegação.                    |
+| Tipo no painel                      | Seleção          | Âmbito                                                                                                                                    |
+| ----------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Conteúdo de sites                   | Sim              | Página do livro, ISBN, título, preço e disponibilidade; HTML permanece local.                                                             |
+| Histórico/atividade de navegação    | Sim              | URL atual de lojas suportadas para deteção e encaminhamento; sem registo geral de navegação.                                              |
 | Atividade do utilizador             | Sim              | Seleção de lojas, ações da estante e preferências locais; sem registo de rato ou teclado; contadores anónimos só com estatísticas ativas. |
-| Informação de identificação pessoal | Não, na extensão | Sem recolha de conta, nome ou email; contactos voluntários de apoio são tratados separadamente.                 |
-| Informação de saúde                 | Não              | Sem recolha para fins de saúde.                                                                                 |
-| Informação financeira/pagamento     | Não              | Só preços públicos de produtos; sem acesso a pagamentos.                                                        |
-| Autenticação                        | Não              | Sem palavras-passe ou cookies de autenticação; os pedidos omitem cookies de sessão.                             |
-| Comunicações pessoais               | Não, na extensão | Não lê emails ou mensagens; correspondência de apoio é externa.                                                 |
-| Localização                         | Não              | Sem geolocalização ou perfis; as lojas recebem o IP normal da ligação.                                          |
+| Informação de identificação pessoal | Não, na extensão | Sem recolha de conta, nome ou email; contactos voluntários de apoio são tratados separadamente.                                           |
+| Informação de saúde                 | Não              | Sem recolha para fins de saúde.                                                                                                           |
+| Informação financeira/pagamento     | Não              | Só preços públicos de produtos; sem acesso a pagamentos.                                                                                  |
+| Autenticação                        | Não              | Sem palavras-passe ou cookies de autenticação; os pedidos omitem cookies de sessão.                                                       |
+| Comunicações pessoais               | Não, na extensão | Não lê emails ou mensagens; correspondência de apoio é externa.                                                                           |
+| Localização                         | Não              | Sem geolocalização ou perfis; as lojas recebem o IP normal da ligação.                                                                    |
 
 ## Utilização de dados
 
