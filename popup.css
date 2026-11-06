@@ -140,6 +140,22 @@ h2 {
 #edition {
   margin: 6px 0 15px;
 }
+.cheapest-banner {
+  background: var(--mist);
+  border-left: 3px solid var(--good);
+  display: grid;
+  gap: 5px;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+}
+.cheapest-banner strong {
+  color: var(--good);
+  font-size: 13px;
+}
+.cheapest-banner a {
+  font-size: 13px;
+  font-weight: 650;
+}
 .offer {
   display: grid;
   grid-template-columns: 1fr auto;
