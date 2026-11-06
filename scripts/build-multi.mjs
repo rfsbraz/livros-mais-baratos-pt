@@ -1,4 +1,4 @@
-import { buildSync } from 'esbuild';
+import { buildSync, transformSync } from 'esbuild';
 import { readFileSync, readdirSync, mkdirSync, writeFileSync, cpSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { zipFiles } from './zip.mjs';
@@ -46,10 +46,20 @@ export function manifestFor(browser, source) {
         id: 'livros-mais-baratos-pt@rfsbraz.github.io',
         strict_min_version: '140.0',
         data_collection_permissions: { required: ['websiteContent', 'browsingActivity'] }
-      }
+      },
+      // data_collection_permissions só existe a partir do Firefox 142 para Android.
+      gecko_android: { strict_min_version: '142.0' }
     };
   }
   return manifest;
+}
+// Firefox não tem a API offscreen e o AMO assinala qualquer chamada no código, mesmo sem execução.
+export function firefoxBackground(source) {
+  return transformSync(source, {
+    define: { 'chrome.offscreen': 'undefined' },
+    minifySyntax: true,
+    target: 'firefox140'
+  }).code;
 }
 if (process.argv[1]?.endsWith('build-multi.mjs') || process.argv[1]?.endsWith('build.mjs')) {
   const arg = process.argv.indexOf('--browser');
@@ -69,6 +79,10 @@ if (process.argv[1]?.endsWith('build-multi.mjs') || process.argv[1]?.endsWith('b
       cpSync(file, dir + '/' + file);
     }
     if (browser === 'firefox') {
+      writeFileSync(
+        dir + '/background.js',
+        firefoxBackground(readFileSync('background.js', 'utf8'))
+      );
       buildSync({
         entryPoints: ['content-entry.js'],
         bundle: true,

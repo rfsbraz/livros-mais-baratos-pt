@@ -8,7 +8,7 @@ Módulos, manifesto, menu e ícones ficam na raiz. `tests/unit` contém testes d
 
 Executa `npm ci`, `npm run lint`, `npm run format:check`, `npm run test:coverage`, `npm run build:all` e `npm run test:e2e`. Instala os navegadores com `npx playwright install chromium firefox msedge`. Chrome e Edge usam um processo de serviço e um analisador oculto; Firefox usa uma página de segundo plano não persistente e uma moldura local, com as mesmas validações de mensagens. O registo dinâmico respeita as preferências de avisos e lojas. O código é partilhado e Firefox empacota o ponto de entrada de conteúdo com esbuild. Os ZIPs usam uma lista explícita de ficheiros, excluindo testes e ferramentas.
 
-Carrega `dist/chrome` ou `dist/edge` em modo de programador. Em Firefox, usa `about:debugging` e `dist/firefox/manifest.json`. Instalações permanentes Firefox exigem assinatura AMO. A versão mínima Firefox é 140; permissões e consentimento continuam sob controlo do navegador.
+Carrega `dist/chrome` ou `dist/edge` em modo de programador. Em Firefox, usa `about:debugging` e `dist/firefox/manifest.json`. Instalações permanentes Firefox exigem assinatura AMO. A versão mínima Firefox é 140 no computador e 142 em Android; permissões e consentimento continuam sob controlo do navegador.
 
 ## Automação
 

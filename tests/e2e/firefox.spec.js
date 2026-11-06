@@ -24,7 +24,7 @@ test('Firefox automatic comparison, persisted prices and scheduled targets', asy
   );
   await writeFile(
     root + '/extension/background.js',
-    (await readFile('background.js', 'utf8')) +
+    (await readFile('dist/firefox/background.js', 'utf8')) +
       `
 chrome.runtime.onMessage.addListener((m,s,reply)=>{if(m.type!=='fixture-state')return;chrome.storage.local.get(null).then(async d=>reply({cache:d.priceCache?.['${isbn}']?.offers.length || 0,notices:d.watchNotices?.length || 0,watch:d.saved?.['${isbn}']?.watch,job:d.watchJob,alarm:await chrome.alarms.get('saved-book-check')}));return true;});
 chrome.storage.local.set({selectedStores:['wook','bertrand']});
