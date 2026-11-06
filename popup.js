@@ -6,7 +6,7 @@ import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
 import { renderHistoryChart } from './history-view.js';
-import { bindAffiliateLink } from './affiliate.js';
+import { bindAffiliateLink, affiliateClickMetric } from './affiliate.js';
 import { isbn13 } from './core.js';
 import { STORES, CATALOGUE, searchUrl } from './stores.js';
 import { detectBook } from './parser.js';
@@ -25,12 +25,10 @@ const $ = id => document.getElementById(id);
 
 function trackAffiliate(surface) {
   return (href, enabled) => {
-    const added = enabled && /[?&]a_aid=/.test(href);
-    recordPoints([
-      added
-        ? { metric: 'affiliate_click', surface, count: 1 }
-        : { metric: 'wook_click_no_affiliate', surface, count: 1 }
-    ]).catch(() => {});
+    const metric = affiliateClickMetric(href, enabled);
+    if (metric) {
+      recordPoints([{ metric, surface, count: 1 }]).catch(() => {});
+    }
   };
 }
 

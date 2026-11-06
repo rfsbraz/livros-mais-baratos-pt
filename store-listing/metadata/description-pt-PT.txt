@@ -22,6 +22,6 @@ Sem conta. Podes partilhar estatísticas anónimas de desempenho e desativá-las
 
 O acesso às lojas é pedido na instalação. Os avisos começam ativos, mas podes desativá-los. Podes desativá-los, revogar permissões ou apagar os dados locais a qualquer momento.
 
-Afiliados Wook ativos por predefinição: ao abrires uma ligação para a Wook a partir da extensão podemos receber uma comissão. Podes desativar na extensão.
+Afiliados Wook e Bertrand ativos por predefinição: ao abrires uma ligação para a Wook ou a Bertrand a partir da extensão podemos receber uma comissão. Podes desativar na extensão.
 
 Interface em português de Portugal. Suporte: rfsbraz@gmail.com.

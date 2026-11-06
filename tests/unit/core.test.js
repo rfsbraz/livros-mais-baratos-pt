@@ -248,6 +248,20 @@ test('WooCommerce matches the ISBN SKU, currency and minor units without using p
   );
 });
 
+test('affiliate click metrics label Wook opt-out and partner clicks', async () => {
+  const { affiliateClickMetric, affiliateUrl } = await import('../../affiliate.js');
+  const wook = affiliateUrl('https://www.wook.pt/livro/x', true);
+  const bertrand = affiliateUrl('https://www.bertrand.pt/livro/x', true);
+  assert.equal(affiliateClickMetric(wook, true), 'affiliate_click');
+  assert.equal(affiliateClickMetric(bertrand, true), 'affiliate_click');
+  assert.equal(
+    affiliateClickMetric('https://www.wook.pt/livro/x', false),
+    'wook_click_no_affiliate'
+  );
+  assert.equal(affiliateClickMetric('https://www.bertrand.pt/livro/x', false), null);
+  assert.equal(affiliateClickMetric('https://www.almedina.net/livro/x', true), null);
+});
+
 test('affiliate destinations follow the preference, preserve attribution and exact HTTPS host', async () => {
   const { affiliateUrl } = await import('../../affiliate.js');
   const raw = 'https://www.wook.pt/livro/exemplo/123?x=1#details';
@@ -256,13 +270,24 @@ test('affiliate destinations follow the preference, preserve attribution and exa
     'https://www.wook.pt/livro/exemplo/123?x=1&a_aid=5d3ee4327c2fd#details'
   );
   assert.equal(affiliateUrl(raw, false), raw);
+  const bertrand = 'https://www.bertrand.pt/livro/exemplo/456?ref=1#stock';
+  assert.equal(
+    affiliateUrl(bertrand, true),
+    'https://www.bertrand.pt/livro/exemplo/456?ref=1&a_aid=5d3f094d9af11#stock'
+  );
+  assert.equal(affiliateUrl(bertrand, false), bertrand);
+  assert.equal(
+    affiliateUrl('https://www.bertrand.pt/livro/x?a_aid=existing', true),
+    'https://www.bertrand.pt/livro/x?a_aid=existing'
+  );
   for (const url of [
     'https://www.wook.pt/livro/x?a_aid=existing',
     'https://www.wook.pt.evil.test/x',
     'http://www.wook.pt/x',
     'https://user@www.wook.pt/x',
     'https://www.wook.pt:8443/x',
-    'https://www.bertrand.pt/livro/x',
+    'http://www.bertrand.pt/livro/x',
+    'https://www.bertrand.pt.evil.test/x',
     'javascript:alert(1)',
     'invalid'
   ]) {

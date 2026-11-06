@@ -184,7 +184,9 @@ test('listing keeps affiliate as a late footnote, not an early section', () => {
   const errors = validateListingAccuracy(listing);
   assert.deepEqual(errors, []);
   const productMarker = description.indexOf('A TUA ESTANTE');
-  const affiliateMarker = description.search(/Afiliados Wook ativos por predefinição/i);
+  const affiliateMarker = description.search(
+    /Afiliados Wook( e Bertrand)? ativos por predefinição/i
+  );
   assert.ok(productMarker >= 0);
   assert.ok(affiliateMarker > productMarker);
   const early = description.slice(0, productMarker);
@@ -194,7 +196,7 @@ test('listing keeps affiliate as a late footnote, not an early section', () => {
     'O mesmo livro. Um preço melhor.',
     '',
     'AFILIADOS OPCIONAIS',
-    'Afiliados Wook ativos por predefinição. Podemos receber uma comissão. Podes desativar na extensão.',
+    'Afiliados Wook e Bertrand ativos por predefinição. Podemos receber uma comissão. Podes desativar na extensão.',
     '',
     'A TUA ESTANTE',
     'Guarda um livro.',

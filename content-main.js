@@ -1,7 +1,7 @@
 import { validPromotion } from './promotions.js';
 import { promotionCard } from './promotion-view.js';
 import { selectedStoreIds } from './stores.js';
-import { bindAffiliateLink } from './affiliate.js';
+import { bindAffiliateLink, affiliateClickMetric } from './affiliate.js';
 import { recordPoints, latencyBucket } from './metrics.js';
 import { detectBook, parseOffer, structured } from './parser.js';
 import { storeForUrl } from './stores.js';
@@ -10,12 +10,10 @@ import { validCurrent } from './auto-rules.js';
 export function start() {
   const pageStarted = performance.now();
   const trackAffiliate = surface => (href, enabled) => {
-    const added = enabled && /[?&]a_aid=/.test(href);
-    recordPoints([
-      added
-        ? { metric: 'affiliate_click', surface, count: 1 }
-        : { metric: 'wook_click_no_affiliate', surface, count: 1 }
-    ]).catch(() => {});
+    const metric = affiliateClickMetric(href, enabled);
+    if (metric) {
+      recordPoints([{ metric, surface, count: 1 }]).catch(() => {});
+    }
   };
   let stopped = false,
     timer,

@@ -22,9 +22,9 @@ As lojas selecionadas e a preferência de avisos ficam guardadas localmente. **D
 
 O apoio por afiliados está ativo por predefinição, com a preferência local `affiliateEnabled`. Desativa **Apoiar através de ligações de afiliado** para deixar de o usar. A escolha mantém-se nas atualizações e ao apagar a estante/histórico.
 
-Enquanto a opção estiver ativa, todas as ligações para a Wook mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» e ligações copiadas, incluem `a_aid=5d3ee4327c2fd`. Identificadores já existentes são preservados. Pedidos de comparação, URL da página e resultados guardados não são reescritos. Não há outros parceiros configurados. A ordenação não depende de comissões.
+Enquanto a opção estiver ativa, as ligações para a Wook e a Bertrand mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» (Wook) e ligações copiadas, incluem o identificador do parceiro (`a_aid=5d3ee4327c2fd` na Wook; `a_aid=5d3f094d9af11` na Bertrand). Identificadores já existentes são preservados. Pedidos de comparação, URL da página e resultados guardados não são reescritos. A ordenação não depende de comissões.
 
-Após o clique, a Wook recebe o identificador e dados normais da navegação e pode usar cookies segundo a sua política. O responsável pode receber uma comissão. Desativar a opção impede futuras adições, mas não elimina cookies já definidos pela Wook.
+Após o clique, a loja de destino recebe o identificador e dados normais da navegação e pode usar cookies segundo a sua política. O responsável pode receber uma comissão. Desativar a opção impede futuras adições, mas não elimina cookies já definidos pelas lojas.
 
 ## Preços-alvo e gráficos
 
@@ -52,7 +52,7 @@ As ligações do rodapé só abrem após um clique. A avaliação abre a loja do
 
 Quando a opção **Partilhar estatísticas anónimas de desempenho** está ativa, a extensão envia periodicamente um lote agregado para um serviço próprio alojado na Cloudflare (Workers e Workers Analytics Engine), em `https://metrics-livros.steamhardwarestock.com/v1/batch`.
 
-**O que é recolhido:** contadores de abertura do menu e de comparações; tempos até ao primeiro e ao último resultado (em baldes fixos); latência e resultado por loja (`price`, `no_price`, `blocked`, `error`, `timeout`, `aborted`, `disabled`, `cached`); loja mais lenta por comparação; instantâneo das lojas ativas e das preferências de avisos, vales Wook e afiliados; contadores de avisos mostrados ou fechados; cliques em ligações Wook com ou sem parâmetro de afiliado. Cada lote inclui navegador (`chrome` | `edge` | `firefox`), versão da extensão, taxa de amostragem e o dia UTC.
+**O que é recolhido:** contadores de abertura do menu e de comparações; tempos até ao primeiro e ao último resultado (em baldes fixos); latência e resultado por loja (`price`, `no_price`, `blocked`, `error`, `timeout`, `aborted`, `disabled`, `cached`); loja mais lenta por comparação; instantâneo das lojas ativas e das preferências de avisos, vales Wook e afiliados; contadores de avisos mostrados ou fechados; cliques em ligações com parâmetro de afiliado e cliques Wook sem esse parâmetro. Cada lote inclui navegador (`chrome` | `edge` | `firefox`), versão da extensão, taxa de amostragem e o dia UTC.
 
 **O que nunca é recolhido:** ISBN, título, pesquisa, URL, preço, texto de página, nome de separador, identificador de instalação ou de sessão, endereço IP persistente, User-Agent completo ou país.
 
