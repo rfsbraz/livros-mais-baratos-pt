@@ -1,3 +1,4 @@
+import { installMetrics, ensureMetricsAlarm } from './metrics.js';
 import { selectedStoreIds } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { writeData } from './data.js';
@@ -203,3 +204,6 @@ writeData({ type: 'migrate' }).catch(error =>
   console.error('Falha ao atualizar preferências:', error)
 );
 installWatch(offscreen);
+
+installMetrics();
+ensureMetricsAlarm().catch(() => {});

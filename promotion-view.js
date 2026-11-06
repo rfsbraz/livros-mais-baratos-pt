@@ -1,7 +1,7 @@
 import { validPromotion, voucherExample, PROMOTION_TTL } from './promotions.js';
 import { bindAffiliateLink } from './affiliate.js';
 
-export function promotionCard(offer, enabled, now = Date.now()) {
+export function promotionCard(offer, enabled, now = Date.now(), onNavigate) {
   const p = offer?.promotion;
   if (
     offer?.id !== 'wook' ||
@@ -29,7 +29,7 @@ export function promotionCard(offer, enabled, now = Date.now()) {
   link.href = p.url;
   link.target = '_blank';
   link.rel = 'noopener noreferrer';
-  bindAffiliateLink(link, enabled);
+  bindAffiliateLink(link, enabled, onNavigate);
   box.append(title, explanation, terms, link);
   setTimeout(() => box.remove(), Math.min(p.endsAt, p.verifiedAt + PROMOTION_TTL) - now);
   return box;

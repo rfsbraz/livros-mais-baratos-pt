@@ -6,7 +6,7 @@ import { dataPoints, validBatch } from '../../worker/metrics-batch.js';
 import { estimate } from '../../scripts/metrics-p95-without-store.mjs';
 import { CATALOGUE } from '../../stores.js';
 
-const schema = JSON.parse(readFileSync('tests/fixtures/metrics-schema.json', 'utf8'));
+const schema = JSON.parse(readFileSync('metrics-schema.json', 'utf8'));
 const CHROME = 'chrome-extension://ongoinfbkmfffpmnkinhnoepdclbkenc';
 const ENDPOINT = 'https://metrics.example/v1/batch';
 const latency = {

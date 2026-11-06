@@ -11,8 +11,29 @@ import { isbn13 } from './core.js';
 import { STORES, CATALOGUE, searchUrl } from './stores.js';
 import { detectBook } from './parser.js';
 import { compareStore, pooled } from './compare.js';
+import {
+  recordPoints,
+  storeResultPoint,
+  latencyBucket,
+  setMetricsEnabled,
+  defaultMetricsEnabled,
+  clearPending,
+  ENABLED_KEY
+} from './metrics.js';
 
 const $ = id => document.getElementById(id);
+
+function trackAffiliate(surface) {
+  return (href, enabled) => {
+    const added = enabled && /[?&]a_aid=/.test(href);
+    recordPoints([
+      added
+        ? { metric: 'affiliate_click', surface, count: 1 }
+        : { metric: 'wook_click_no_affiliate', surface, count: 1 }
+    ]).catch(() => {});
+  };
+}
+
 const money = (cents, currency = 'EUR') =>
   new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(cents / 100);
 let priceCache = {},
@@ -26,7 +47,8 @@ let current = null,
 let selected = new Set(DEFAULT_STORE_IDS);
 let autoEnabled = true,
   affiliateEnabled = false,
-  wookPromotionEnabled = true;
+  wookPromotionEnabled = true,
+  metricsEnabled = defaultMetricsEnabled();
 let mainScroll = 0;
 let promotionExpiryTimer;
 function settingsView(open) {
@@ -91,6 +113,13 @@ function showCached() {
   }
   activeOffers = entry.offers;
   renderOffers(activeOffers);
+  recordPoints([
+    { metric: 'compare_run', surface: 'popup', outcome: 'cache_shown', count: 1 },
+    ...entry.offers.map(o => storeResultPoint('popup', o.id, 'cached', 0)),
+    ...[...selected]
+      .filter(id => !entry.offers.some(o => o.id === id))
+      .map(id => storeResultPoint('popup', id, 'disabled', 0))
+  ]).catch(() => {});
   status(
     'Preços guardados: ' +
       new Date(entry.at).toLocaleString('pt-PT') +
@@ -107,7 +136,7 @@ function link(text, url) {
   a.href = url;
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
-  bindAffiliateLink(a, () => affiliateEnabled);
+  bindAffiliateLink(a, () => affiliateEnabled, trackAffiliate('popup_offer'));
   return a;
 }
 function renderManual() {
@@ -218,7 +247,7 @@ function updateCheapestBanner(offers) {
   if (changed) {
     link.href = candidate.offer.url;
     link.textContent = `Abrir oferta na ${candidate.offer.name}`;
-    bindAffiliateLink(link, () => affiliateEnabled);
+    bindAffiliateLink(link, () => affiliateEnabled, trackAffiliate('popup_offer'));
   }
 }
 function renderOffers(offers) {
@@ -286,7 +315,12 @@ function renderOffers(offers) {
       detail.textContent += ` · A pagar agora: ${money(offer.price, offer.currency)}. Equivalente com uso integral do vale em compras futuras.`;
     }
     row.append(link(offer.name, offer.url), price, detail);
-    const promotion = promotionCard(offer, () => affiliateEnabled);
+    const promotion = promotionCard(
+      offer,
+      () => affiliateEnabled,
+      Date.now(),
+      trackAffiliate('promotion_more')
+    );
     if (promotion) {
       row.append(promotion);
     }
@@ -330,6 +364,14 @@ async function start(book) {
   renderOffers(offers);
   $('cancel').hidden = false;
   status(`A consultar ${stores.length} lojas, até quatro de cada vez. Mantém esta janela aberta.`);
+  const openedAt = performance.now();
+  const compareStartedAt = openedAt;
+  let firstResultAt = null;
+  const storeElapsed = {};
+  const trigger = book.fromPage ? 'page' : 'isbn_typed';
+  recordPoints([{ metric: 'compare_run', surface: 'popup', outcome: trigger, count: 1 }]).catch(
+    () => {}
+  );
   try {
     const granted = await permission;
     if (token !== run) {
@@ -338,7 +380,15 @@ async function start(book) {
     if (!granted) {
       renderOffers(offers.map(o => ({ ...o, status: 'denied' })));
       status('Acesso não autorizado. Podes consultar cada loja através das ligações.');
+      recordPoints(stores.map(s => storeResultPoint('popup', s.id, 'blocked', 0))).catch(() => {});
       return;
+    }
+    // Unselected stores count as disabled for this compare.
+    const disabled = STORES.filter(s => !selected.has(s.id)).map(s =>
+      storeResultPoint('popup', s.id, 'disabled', 0)
+    );
+    if (disabled.length) {
+      recordPoints(disabled).catch(() => {});
     }
     let complete = 0;
     await pooled(stores, async (store, index) => {
@@ -349,8 +399,13 @@ async function start(book) {
       if (token === run) {
         renderOffers(offers);
       }
+      const started = performance.now();
       const deadline = AbortSignal.any([signal, AbortSignal.timeout(35000)]);
       offers[index] = await compareStore(store, isbn, deadline, undefined, knownTitle);
+      storeElapsed[store.id] = performance.now() - started;
+      if (!firstResultAt && offers[index].status === 'ok') {
+        firstResultAt = performance.now();
+      }
       if (!knownTitle && offers[index].title) {
         knownTitle = offers[index].title;
       }
@@ -375,9 +430,64 @@ async function start(book) {
       }
     });
     if (token !== run) {
+      const elapsed = performance.now() - openedAt;
+      recordPoints([
+        ...stores.map(s =>
+          storeResultPoint(
+            'popup',
+            s.id,
+            offers[stores.indexOf(s)]?.status || 'cancelled',
+            storeElapsed[s.id] ?? elapsed
+          )
+        ),
+        {
+          metric: 't_compare_settled',
+          outcome: 'abandoned',
+          bucket: latencyBucket(elapsed),
+          count: 1
+        }
+      ]).catch(() => {});
       return;
     }
     const confirmed = offers.filter(o => o.status === 'ok');
+    const settledAt = performance.now();
+    const latencyPoints = stores.map(s => {
+      const offer = offers.find(o => o.id === s.id);
+      return storeResultPoint('popup', s.id, offer?.status || 'error', storeElapsed[s.id] ?? 0);
+    });
+    let slowest = null;
+    let slowestMs = -1;
+    for (const s of stores) {
+      const ms = storeElapsed[s.id] ?? 0;
+      if (ms >= slowestMs) {
+        slowest = s.id;
+        slowestMs = ms;
+      }
+    }
+    const totals = [
+      {
+        metric: 't_first_result',
+        outcome: 'settled',
+        bucket: latencyBucket((firstResultAt ?? settledAt) - openedAt),
+        count: 1
+      },
+      {
+        metric: 't_all_settled',
+        outcome: 'settled',
+        bucket: latencyBucket(settledAt - openedAt),
+        count: 1
+      },
+      {
+        metric: 't_compare_settled',
+        outcome: 'settled',
+        bucket: latencyBucket(settledAt - compareStartedAt),
+        count: 1
+      }
+    ];
+    if (slowest) {
+      totals.push({ metric: 'slowest_store', surface: 'popup', store: slowest, count: 1 });
+    }
+    recordPoints([...latencyPoints, ...totals]).catch(() => {});
     showBook({ isbn, title: knownTitle, referencePrice });
     if (saved[isbn] && knownTitle) {
       const updated = await changeData({ type: 'save', book: { isbn, title: knownTitle } });
@@ -409,7 +519,7 @@ async function start(book) {
 }
 $('search').onsubmit = event => {
   event.preventDefault();
-  start({ isbn: $('isbn').value, title: $('title-query').value.trim() });
+  start({ isbn: $('isbn').value, title: $('title-query').value.trim(), fromPage: false });
 };
 $('cancel').onclick = () => {
   ++run;
@@ -484,6 +594,22 @@ $('affiliate-toggle').onchange = async () => {
     status('Não foi possível guardar a preferência de afiliados.');
   }
 };
+$('metrics-toggle').onchange = async () => {
+  const next = $('metrics-toggle').checked;
+  try {
+    await setMetricsEnabled(next);
+    metricsEnabled = next;
+    status(
+      next
+        ? 'Estatísticas anónimas ativas. Podes desativá-las a qualquer momento.'
+        : 'Estatísticas anónimas desativadas. Os agregados pendentes foram apagados.'
+    );
+  } catch {
+    $('metrics-toggle').checked = metricsEnabled;
+    status('Não foi possível guardar a preferência de estatísticas.');
+  }
+};
+
 chrome.storage.onChanged?.addListener((changes, area) => {
   if (area === 'local' && changes.wookPromotionEnabled) {
     wookPromotionEnabled = changes.wookPromotionEnabled.newValue !== false;
@@ -529,6 +655,7 @@ $('clear').onclick = async () => {
   selected = new Set(DEFAULT_STORE_IDS);
   try {
     applyData(await changeData({ type: 'clear' }));
+    await clearPending();
     priceCache = {};
     activeOffers = [];
     renderOffers([]);
@@ -558,7 +685,8 @@ async function init() {
       'wookPromotionEnabled',
       'watchEnabled',
       'watchNotices',
-      'priceCache'
+      'priceCache',
+      ENABLED_KEY
     ]);
     autoEnabled = data.autoEnabled !== false;
     autoLabel();
@@ -566,6 +694,12 @@ async function init() {
     $('wook-promotion-toggle').checked = wookPromotionEnabled;
     affiliateEnabled = data.affiliateEnabled !== false;
     $('affiliate-toggle').checked = affiliateEnabled;
+    metricsEnabled =
+      data[ENABLED_KEY] === undefined ? defaultMetricsEnabled() : data[ENABLED_KEY] === true;
+    if ($('metrics-toggle')) {
+      $('metrics-toggle').checked = metricsEnabled;
+    }
+    recordPoints([{ metric: 'popup_open', count: 1 }]).catch(() => {});
     saved = data.saved || {};
     history = data.history || {};
     priceCache = data.priceCache || {};
@@ -602,6 +736,7 @@ async function init() {
     if (book.isbn) {
       $('isbn').value = book.isbn;
       $('title-query').value = book.title;
+      book.fromPage = true;
       showBook(book);
       if (!showCached()) {
         status('Livro detetado. Clica em Comparar para consultar as livrarias.');

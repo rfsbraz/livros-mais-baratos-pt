@@ -47,3 +47,7 @@ Valida os adaptadores e as condições das lojas antes de uma distribuição amp
 ## Aspeto visual
 
 Tinta `#172e59`, azul `#2458bb`, branco `#ffffff`, azul-claro `#eef3fc`, cinzento `#536278` e verde `#16624a`. O símbolo representa lombadas de livros. Segoe UI é usada nos controlos e preços; Georgia nos títulos. Preços à direita, lojas à esquerda, numa lista. O foco de teclado é visível e o texto dinâmico das lojas entra através de nós de texto.
+
+## Estatísticas anónimas
+
+A extensão pode enviar lotes agregados de desempenho para o Worker descrito em [metrics.md](metrics.md). A recolha é local (`metrics.js`), sem identificador persistente, e respeita a preferência `metricsEnabled`.

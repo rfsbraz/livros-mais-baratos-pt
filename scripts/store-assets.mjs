@@ -17,9 +17,13 @@ const server = createServer(async (req, res) => {
     }
     res.setHeader(
       'Content-Type',
-      { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png' }[
-        extname(file)
-      ] || 'text/plain'
+      {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png'
+      }[extname(file)] || 'text/plain'
     );
     res.end(await readFile(file));
   } catch {
@@ -161,6 +165,7 @@ try {
             }
           },
           permissions: { contains: async () => true },
+          alarms: { create: async () => {}, clear: async () => true, get: async () => null },
           tabs: { query: async () => [{ id: 1, url: 'https://www.wook.pt/livro/a-criada' }] },
           scripting: { executeScript: async () => [{ result: { html } }] }
         };
@@ -287,8 +292,9 @@ try {
   // Bundled local modules are fulfilled over the same HTTPS demo origin to avoid mixed-content restrictions.
   await page.route('https://www.wook.pt/modules/**', async route => {
     const file = new URL(route.request().url()).pathname.split('/').pop();
+    const type = file.endsWith('.json') ? 'application/json' : 'text/javascript';
     await route.fulfill({
-      contentType: 'text/javascript',
+      contentType: type,
       body: await readFile(`${root}/${file}`, 'utf8')
     });
   });

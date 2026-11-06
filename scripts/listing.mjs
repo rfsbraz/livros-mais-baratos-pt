@@ -54,16 +54,14 @@ export function validateListingAccuracy({ config, locales }) {
     if (/Sem conta ou telemetria/i.test(description)) {
       errors.push(`${id}: absolute permanent zero-telemetry claim`);
     }
-    if (
-      !/Nesta versão[^.\n]{0,120}não envia[^.\n]{0,80}(estatísticas|telemetria)/i.test(description)
-    ) {
-      errors.push(`${id}: missing current-state telemetry wording`);
+    if (/não envia (telemetria|estatísticas de utilização)|sem telemetria/i.test(description)) {
+      errors.push(`${id}: denies anonymous performance statistics`);
     }
     if (
-      /envia estatísticas de utilização\./i.test(description) &&
-      !/não envia estatísticas de utilização/i.test(description)
+      !/estatísticas anónimas de desempenho/i.test(description) ||
+      !/Desativa|desativ/i.test(description)
     ) {
-      errors.push(`${id}: claims metrics already exist`);
+      errors.push(`${id}: missing anonymous performance statistics disclosure`);
     }
     if (
       /26 (lojas|adaptadores)[^.\n]{0,60}verificad/i.test(description) ||

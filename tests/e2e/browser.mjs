@@ -14,8 +14,12 @@ const server = createServer(async (req, res) => {
     const content = await readFile(file);
     res.setHeader(
       'Content-Type',
-      { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' }[extname(file)] ||
-        'application/octet-stream'
+      {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json'
+      }[extname(file)] || 'application/octet-stream'
     );
     res.end(content);
   } catch {
@@ -60,6 +64,11 @@ try {
             window.__requested = request;
             return window.__permission;
           }
+        },
+        alarms: {
+          create: async () => {},
+          clear: async () => true,
+          get: async () => null
         },
         tabs: { query: async () => [{ id: 1, url: 'https://www.wook.pt/livro/example' }] },
         scripting: { executeScript: async () => [{ result: { html } }] }

@@ -8,10 +8,7 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "Comparar preços de livros",
-    "default_icon": {
-      "16": "icons/16.png",
-      "32": "icons/32.png"
-    }
+    "default_icon": { "16": "icons/16.png", "32": "icons/32.png" }
   },
   "icons": {
     "16": "icons/16.png",
@@ -22,10 +19,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'"
   },
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
+  "background": { "service_worker": "background.js", "type": "module" },
   "web_accessible_resources": [
     {
       "resources": [
@@ -36,7 +30,10 @@
         "auto-rules.js",
         "affiliate.js",
         "promotions.js",
-        "promotion-view.js"
+        "promotion-view.js",
+        "metrics.js",
+        "metrics-config.js",
+        "metrics-schema.json"
       ],
       "matches": [
         "https://www.wook.pt/*",
@@ -94,6 +91,7 @@
     "https://www.abebooks.com/*",
     "https://www.elcorteingles.pt/*",
     "https://mundofantasma.com/*",
-    "https://editoradevir.pt/*"
+    "https://editoradevir.pt/*",
+    "https://metrics-livros.steamhardwarestock.com/*"
   ]
 }

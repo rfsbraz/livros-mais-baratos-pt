@@ -4,7 +4,7 @@ Este documento descreve o endpoint que recebe os lotes anónimos da extensão, o
 
 ## Endpoint
 
-`POST https://<domínio a decidir>/v1/batch`, com `Content-Type: application/json`, corpo de até 32 KB e no máximo 249 pontos.
+`POST https://metrics-livros.steamhardwarestock.com/v1/batch`, com `Content-Type: application/json`, corpo de até 32 KB e no máximo 249 pontos.
 
 | Resposta | Quando                                                                 |
 | -------- | ---------------------------------------------------------------------- |
@@ -17,7 +17,7 @@ O Analytics Engine aceita 250 escritas por pedido, e o Worker usa uma delas para
 
 ## Lote
 
-O esquema está em `tests/fixtures/metrics-schema.json` e é o mesmo para a extensão e para o Worker. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado.
+O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado.
 
 ```json
 {
@@ -281,6 +281,6 @@ curl "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/analy
 
 ## Texto para a política de privacidade
 
-A secção da política é acrescentada em #31, junto com a recolha. O que diz sobre o destino:
+A secção correspondente está em `PRIVACY.md`. Resumo do destino:
 
 > As estatísticas são enviadas para um serviço próprio alojado na Cloudflare (Workers e Workers Analytics Engine). O endereço IP não é guardado: serve apenas para limitar o número de pedidos, em memória, e não fica em registos. Também não são guardados o navegador completo (User-Agent) nem o país. Os dados agregados são apagados ao fim de três meses.

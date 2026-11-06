@@ -2,11 +2,21 @@ import { validPromotion } from './promotions.js';
 import { promotionCard } from './promotion-view.js';
 import { selectedStoreIds } from './stores.js';
 import { bindAffiliateLink } from './affiliate.js';
+import { recordPoints, latencyBucket } from './metrics.js';
 import { detectBook, parseOffer, structured } from './parser.js';
 import { storeForUrl } from './stores.js';
 import { validCurrent } from './auto-rules.js';
 
 export function start() {
+  const pageStarted = performance.now();
+  const trackAffiliate = surface => (href, enabled) => {
+    const added = enabled && /[?&]a_aid=/.test(href);
+    recordPoints([
+      added
+        ? { metric: 'affiliate_click', surface, count: 1 }
+        : { metric: 'wook_click_no_affiliate', surface, count: 1 }
+    ]).catch(() => {});
+  };
   let stopped = false,
     timer,
     key = '',
@@ -40,6 +50,7 @@ export function start() {
     close.onclick = () => {
       dismissed.add(book.isbn);
       remove();
+      recordPoints([{ metric: 'banner_closed', count: 1 }]).catch(() => {});
     };
     const brand = document.createElement('div');
     brand.className = 'brand';
@@ -63,7 +74,7 @@ export function start() {
     link.href = result.url;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    bindAffiliateLink(link, () => affiliateEnabled);
+    bindAffiliateLink(link, () => affiliateEnabled, trackAffiliate('banner'));
     const note = document.createElement('small');
     note.textContent = `Preço do livro. Consulta às ${new Date(result.checkedAt).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}. Confirma o preço na loja.`;
     panel.append(close, brand, title);
@@ -73,12 +84,25 @@ export function start() {
     const promoOffer =
       result.sourceOffer ||
       (result.promotion ? { ...result, price: result.itemPrice, status: 'ok' } : null);
-    const promotion = promotionCard(promoOffer, () => affiliateEnabled);
+    const promotion = promotionCard(
+      promoOffer,
+      () => affiliateEnabled,
+      Date.now(),
+      trackAffiliate('promotion_more')
+    );
     if (promotion) {
       panel.append(promotion);
     }
     shadow.append(style, panel);
     document.documentElement.append(host);
+    recordPoints([
+      { metric: 'banner_shown', count: 1 },
+      {
+        metric: 't_banner_shown',
+        bucket: latencyBucket(performance.now() - pageStarted),
+        count: 1
+      }
+    ]).catch(() => {});
     if (result.estimated && Number.isFinite(result.validUntil)) {
       const shown = host;
       setTimeout(

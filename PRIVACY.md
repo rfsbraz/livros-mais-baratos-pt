@@ -12,7 +12,7 @@ As comparações automáticas reutilizam resultados na memória do documento ocu
 
 Os preços confirmados automáticos, agendados e manuais também ficam em cache local para o menu, até 50 ISBN. O menu oculta entradas com mais de 24 horas e assinala as que têm mais de dez minutos. As entradas expiradas são removidas na próxima escrita; apagar dados elimina toda esta cache. Abrir resultados em cache não contacta lojas nem cria histórico. Fechar um aviso só o suprime no documento atual.
 
-Não existe recolha do histórico geral de navegação nem sistema de contas. Nesta versão a extensão não envia análise de utilização. Não há código remoto. Livros com preços-alvo ativos são verificados aproximadamente todos os dias enquanto o navegador estiver aberto. Só observações manuais e agendadas entram no histórico; não são importados históricos externos ou anteriores à instalação.
+Não existe recolha do histórico geral de navegação nem sistema de contas. Podes partilhar estatísticas anónimas de desempenho (opt-out no Chrome/Edge; opt-in no Firefox); desativa em Definições. Não há código remoto. Livros com preços-alvo ativos são verificados aproximadamente todos os dias enquanto o navegador estiver aberto. Só observações manuais e agendadas entram no histórico; não são importados históricos externos ou anteriores à instalação.
 
 ## Controlo
 
@@ -47,3 +47,15 @@ A preferência local `wookPromotionEnabled`, ativa por predefinição, controla 
 ## Avaliação e comunicação de problemas
 
 As ligações do rodapé só abrem após um clique. A avaliação abre a loja do navegador. O formulário de problemas no GitHub recebe apenas o nome do navegador e a versão da extensão; não inclui o livro, a página visitada, a estante ou o histórico. O utilizador decide o conteúdo e confirma a publicação no GitHub.
+
+## Estatísticas anónimas de desempenho
+
+Quando a opção **Partilhar estatísticas anónimas de desempenho** está ativa, a extensão envia periodicamente um lote agregado para um serviço próprio alojado na Cloudflare (Workers e Workers Analytics Engine), em `https://metrics-livros.steamhardwarestock.com/v1/batch`.
+
+**O que é recolhido:** contadores de abertura do menu e de comparações; tempos até ao primeiro e ao último resultado (em baldes fixos); latência e resultado por loja (`price`, `no_price`, `blocked`, `error`, `timeout`, `aborted`, `disabled`, `cached`); loja mais lenta por comparação; instantâneo das lojas ativas e das preferências de avisos, vales Wook e afiliados; contadores de avisos mostrados ou fechados; cliques em ligações Wook com ou sem parâmetro de afiliado. Cada lote inclui navegador (`chrome` | `edge` | `firefox`), versão da extensão, taxa de amostragem e o dia UTC.
+
+**O que nunca é recolhido:** ISBN, título, pesquisa, URL, preço, texto de página, nome de separador, identificador de instalação ou de sessão, endereço IP persistente, User-Agent completo ou país.
+
+**Destino e conservação:** o endereço IP não é guardado — serve apenas para limitar pedidos em memória e não fica em registos. Os dados agregados no Analytics Engine são apagados ao fim de cerca de três meses. Não há SDK de terceiros.
+
+**Predefinição e controlo:** no Chrome e no Edge a opção está ativa por predefinição (opt-out). No Firefox fica desativada até aceitares a permissão opcional de dados técnicos e de interação e ativares a opção. Desativar apaga de imediato os agregados pendentes e impede novos envios. **Apagar dados** também limpa os agregados pendentes, mas mantém a escolha da opção.

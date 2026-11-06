@@ -12,13 +12,13 @@ A extensão compara preços da mesma edição de um livro por ISBN, mostra aviso
 
 Na comparação manual, a extensão lê a página atual após a abrires. Os avisos estão ativos por predefinição após a instalação, identificando páginas de livro nas lojas selecionadas com o acesso autorizado pelo navegador. Não é necessário abrir a extensão para iniciar estas consultas. O URL e o conteúdo da página são processados localmente para obter o ISBN, título, preço, moeda e disponibilidade. Não recolhe o histórico geral de navegação nem envia o HTML da página para um servidor do responsável.
 
-Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, preferências de lojas e estado dos avisos são guardados no armazenamento local da extensão, não no Chrome Sync. As ações de guardar/remover livros e escolher lojas servem apenas para executar estas funções. Não há registo de cliques, movimentos do rato ou outras interações para análise de utilização.
+Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, preferências de lojas e estado dos avisos são guardados no armazenamento local da extensão, não no Chrome Sync. As ações de guardar/remover livros e escolher lojas servem apenas para executar estas funções. Não há registo de movimentos do rato nem de texto digitado. Contadores anónimos de desempenho e de cliques em ligações Wook (com ou sem afiliado) só são enviados se as estatísticas estiverem ativas.
 
 ## Ligações às lojas
 
 Ao comparar, a extensão envia o ISBN e, quando necessário, o título diretamente às lojas selecionadas. Estas recebem também informações normais da ligação, incluindo o endereço IP. Os pedidos usam HTTPS e não enviam cookies de sessão. As lojas tratam os pedidos de acordo com as suas próprias políticas de privacidade. Abrir uma ligação de oferta usa o navegador normal, sujeito às permissões e cookies desse site. A extensão não efetua compras nem trata dados de pagamento.
 
-A extensão não tem conta de utilizador. Nesta versão não envia telemetria nem estatísticas de utilização para um servidor do responsável. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
+A extensão não tem conta de utilizador. Pode enviar estatísticas anónimas de desempenho para um serviço próprio na Cloudflare quando a opção correspondente está ativa. Não inclui ISBN, títulos, URLs, preços nem identificadores de instalação. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
 
 ## Afiliados opcionais
 

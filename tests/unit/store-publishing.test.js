@@ -169,10 +169,7 @@ test('listing accuracy covers support email, affiliates, telemetry and store cla
   bad.locales['pt-PT'].description = bad.locales['pt-PT'].description.map(line =>
     line
       .replaceAll(SUPPORT_EMAIL, 'rfsbraz@proton.me')
-      .replace(
-        'Sem conta. Nesta versão a extensão não envia estatísticas de utilização.',
-        'Sem conta ou telemetria.'
-      )
+      .replace(/Sem conta\..*estatísticas anónimas[^.]*/, 'Sem conta ou telemetria')
   );
   const errors = validateListingAccuracy(bad);
   assert(errors.some(e => e.includes('supportEmail')));
@@ -203,7 +200,7 @@ test('listing keeps affiliate as a late footnote, not an early section', () => {
     'Guarda um livro.',
     '',
     'CONTROLO E PRIVACIDADE',
-    'Sem conta. Nesta versão a extensão não envia estatísticas de utilização.',
+    'Sem conta. Podes partilhar estatísticas anónimas de desempenho (desativáveis em Definições).',
     '',
     `Interface em português de Portugal. Suporte: ${SUPPORT_EMAIL}.`
   ];
