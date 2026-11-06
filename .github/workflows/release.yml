@@ -96,6 +96,14 @@ jobs:
         with:
           name: browser-extensions
           path: dist
+      - name: Verificar o ID de publicador Chrome
+        env:
+          CHROME_PUBLISHER_ID: ${{ vars.CHROME_PUBLISHER_ID }}
+        run: |
+          if [ -z "$CHROME_PUBLISHER_ID" ]; then
+            echo "::error title=Chrome::A variável de repositório ou de ambiente CHROME_PUBLISHER_ID não está definida. Encontra o valor no Chrome Web Store Developer Dashboard, em Publisher > Settings."
+            exit 1
+          fi
       - uses: mnao305/chrome-extension-upload@v7.0.0
         with:
           file-path: dist/*-chrome.zip
