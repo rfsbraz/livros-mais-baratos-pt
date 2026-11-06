@@ -162,3 +162,14 @@ test('migration removes old delivery rules and resets only delivered targets', (
   assert.deepEqual(migrateData(result), result);
   assert.equal(old.saved[isbn].watch.basis, 'delivered');
 });
+
+test('new watch writes accept only the item price basis', () => {
+  const data = watched();
+  const action = { type: 'watch', isbn, target: 1700, enabled: true };
+  assert.throws(
+    () => reduceData(data, { ...action, basis: 'delivered' }),
+    /Tipo de preço inválido/
+  );
+  assert.throws(() => reduceData(data, action), /Tipo de preço inválido/);
+  assert.equal(reduceData(data, { ...action, basis: 'item' }).saved[isbn].watch.basis, 'item');
+});

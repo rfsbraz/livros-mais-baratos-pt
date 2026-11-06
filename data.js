@@ -50,7 +50,7 @@ export function reduceData(data, action, now = Date.now()) {
     if (!Number.isSafeInteger(action.target) || action.target <= 0 || action.target > 10000000) {
       throw new Error('Preço-alvo inválido.');
     }
-    if (!['item', 'delivered'].includes(action.basis)) {
+    if (action.basis !== 'item') {
       throw new Error('Tipo de preço inválido.');
     }
     next.saved[isbn].watch = {
