@@ -52,6 +52,8 @@ try {
     const { changeData } = await import('./data.js');
     await changeData({ type: 'save', book: { isbn, title: 'Livro observado' } });
   }, isbn);
+  assert.equal(await page.locator('.watch-details').evaluate(details => details.open), false);
+  await page.locator('.watch-details > summary').click();
   await page.locator('.watch-form').waitFor();
   await page.locator('.watch-form input[inputmode="decimal"]').fill('19');
   await page.getByRole('button', { name: 'Guardar alerta', exact: true }).click();

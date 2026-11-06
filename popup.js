@@ -175,7 +175,14 @@ function renderSaved() {
         status('Não foi possível guardar a alteração. Tenta novamente.');
       }
     };
-    li.append(open, remove, watchForm(book));
+    const watch = document.createElement('details');
+    watch.className = 'watch-details';
+    const summary = document.createElement('summary');
+    summary.textContent = book.watch?.target
+      ? `Preço-alvo: ${(book.watch.target / 100).toFixed(2).replace('.', ',')} €`
+      : 'Alerta de preço';
+    watch.append(summary, watchForm(book));
+    li.append(open, remove, watch);
     $('saved').append(li);
   }
 }
