@@ -1,6 +1,6 @@
 import { enrichPromotion } from './promotions.js';
 import { parseOffer, productLinks } from './parser.js';
-import { safeUrl, wooOffer, svelteProductLinks } from './core.js';
+import { safeUrl, wooOffer, svelteProductLinks, wortenProductLinks } from './core.js';
 import { searchUrl } from './stores.js';
 import { lookupWooProduct } from './woo-products.js';
 import { shopifyProductLinks, shopifySearchUrl } from './shopify-search.js';
@@ -72,7 +72,31 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
         throw new Error('Cancelado');
       }
       let links;
-      if (store.adapter === 'svelte-search') {
+      if (store.adapter === 'worten-search') {
+        const query = new URL(search).searchParams.get('query') || isbn;
+        const response = await fetch(`${store.origin}/worten-api/search-products`, {
+          method: 'POST',
+          credentials: 'omit',
+          redirect: 'follow',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ query, params: {} }),
+          signal: AbortSignal.any([signal, AbortSignal.timeout(12000)])
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        if (!safeUrl(response.url, store.origin)) {
+          throw new Error('Destino fora da loja');
+        }
+        const text = await response.text();
+        if (text.length > 4_000_000) {
+          throw new Error('Resposta demasiado grande');
+        }
+        links = wortenProductLinks(JSON.parse(text), store.origin, isbn);
+      } else if (store.adapter === 'svelte-search') {
         const endpoint = new URL(search);
         endpoint.pathname = '/search/__data.json';
         endpoint.searchParams.set('x-sveltekit-invalidated', '001');

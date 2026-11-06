@@ -110,6 +110,12 @@ function wookInStock(doc) {
   );
 }
 
+function marketplaceSeller(doc) {
+  const text = doc.querySelector('a[href*="marketplace-seller"]')?.textContent || '';
+  const seller = text.replace(/\s+/g, ' ').trim();
+  return seller.length && seller.length <= 100 ? seller : '';
+}
+
 export function parseOffer(doc, isbn, url) {
   const store = storeForUrl(url);
   const source = new URL(url);
@@ -178,6 +184,7 @@ export function parseOffer(doc, isbn, url) {
   }
   return {
     ...offer,
+    seller: offer.seller || (store?.marketplace && verifiedPage ? marketplaceSeller(doc) : ''),
     ...(verifiedPage && store?.id === 'wook' && offer.currency === 'EUR'
       ? { promotionUrl: discoverPromotion(doc, url) }
       : {}),

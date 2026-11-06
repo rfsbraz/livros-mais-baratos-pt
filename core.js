@@ -135,6 +135,36 @@ export function svelteProductLinks(payload, origin) {
   return [...new Set(links)].slice(0, 5);
 }
 
+export function wortenProductLinks(payload, origin, isbn) {
+  const details = payload?.detailsResponse;
+  const products = Array.isArray(details?.productsData?.products)
+    ? details.productsData.products
+    : [];
+  const webItems = Array.isArray(details?.productsCanonicalsData?.web_items)
+    ? details.productsCanonicalsData.web_items
+    : [];
+  const byId = new Map(
+    webItems.filter(item => item && typeof item.id === 'string').map(item => [item.id, item])
+  );
+  const links = [];
+  for (const product of products.slice(0, 8)) {
+    const refs = product?.meta?.refs || {};
+    const candidates = [
+      ...(Array.isArray(refs.ean) ? refs.ean : []),
+      product?.properties?.text?.isbn
+    ];
+    if (!candidates.map(isbn13).includes(isbn)) {
+      continue;
+    }
+    const path = byId.get(refs.webitem_id)?.url;
+    const url = typeof path === 'string' ? safeUrl(path, origin) : null;
+    if (url && /\/produtos\//.test(new URL(url).pathname)) {
+      links.push(url);
+    }
+  }
+  return [...new Set(links)].slice(0, 5);
+}
+
 export function wooOffer(products, isbn, origin) {
   if (!Array.isArray(products)) {
     return null;

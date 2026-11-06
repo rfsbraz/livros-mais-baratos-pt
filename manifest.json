@@ -61,7 +61,8 @@
         "https://www.abebooks.com/*",
         "https://www.elcorteingles.pt/*",
         "https://mundofantasma.com/*",
-        "https://editoradevir.pt/*"
+        "https://editoradevir.pt/*",
+        "https://www.worten.pt/*"
       ]
     }
   ],
@@ -92,6 +93,7 @@
     "https://www.elcorteingles.pt/*",
     "https://mundofantasma.com/*",
     "https://editoradevir.pt/*",
+    "https://www.worten.pt/*",
     "https://metrics-livros.steamhardwarestock.com/*"
   ]
 }

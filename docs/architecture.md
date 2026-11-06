@@ -4,7 +4,7 @@ Manifest V3, módulos ES, sem dependências npm em execução nem servidor. O me
 
 ## Avisos automáticos nas páginas
 
-O manifesto declara exatamente as 26 origens configuradas em `host_permissions`. Uma instalação nova usa `autoEnabled !== false` e seis lojas predefinidas, sem escrever preferências nem exigir abertura do menu. Um valor falso guardado mantém os avisos desativados após atualizações e reinícios. O menu verifica permissões existentes, em vez de pedir novo acesso durante a comparação.
+O manifesto declara exatamente as 27 origens configuradas em `host_permissions`. Uma instalação nova usa `autoEnabled !== false` e seis lojas predefinidas, sem escrever preferências nem exigir abertura do menu. Um valor falso guardado mantém os avisos desativados após atualizações e reinícios. O menu verifica permissões existentes, em vez de pedir novo acesso durante a comparação.
 
 O processo regista `content.js` apenas nos sites selecionados e autorizados, incluindo separadores já abertos. Instalação, arranque e alterações de permissões ou preferências atualizam os registos. Desativar ou mudar a configuração fecha o documento de análise, cancela pedidos, descarta a cache e manda remover avisos desatualizados.
 
@@ -28,7 +28,7 @@ Wook usa `/pesquisa?keyword={isbn}`, Bertrand `/pesquisa/{isbn}` e ambas usam pr
 
 Bookcover usa `/wp-json/wc/store/v1/products?sku={isbn}` e valida SKU, EUR e unidades monetárias; a pesquisa normal não corresponde ao ISBN. Mundo Fantasma usa dados públicos de pesquisa Svelte para descobrir SKU, cria ligações com leitura limitada dos índices e valida independentemente ISBN/preço no produto. Saída de Emergência usa o preço de venda apresentado quando os dados estruturados estão desatualizados. Outros adaptadores associam um ISBN rotulado a um único Product. Ligações de ações de carrinho/estante são rejeitadas. Corpos HTML/JSON têm limite de 4 MB e os scripts recebidos nunca são executados.
 
-Rotas e esquemas podem mudar. Bloqueios ou dados inválidos produzem resultados indisponíveis/não verificados, com ligação manual. Consulta a [cobertura](store-coverage.md). Os testes reais de 3 de novembro de 2026 confirmaram amostras em 18 dos 26 adaptadores; não garantem a totalidade dos catálogos.
+Rotas e esquemas podem mudar. Bloqueios ou dados inválidos produzem resultados indisponíveis/não verificados, com ligação manual. Consulta a [cobertura](store-coverage.md). Os testes reais de 3 de novembro de 2026 confirmaram amostras em 18 dos 27 adaptadores; não garantem a totalidade dos catálogos.
 
 ## Navegadores, testes e armazenamento
 

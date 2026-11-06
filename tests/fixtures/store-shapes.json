@@ -168,6 +168,14 @@
       "price": 1487,
       "currency": "EUR",
       "html": "<script type=\"application/ld+json\">{\"@type\":[\"Product\",\"Book\"],\"isbn\":\"1591163595\",\"sku\":\"056086\",\"offers\":{\"@type\":\"Offer\",\"price\":\"14.87\",\"priceCurrency\":\"EUR\",\"availability\":\"https://schema.org/InStock\",\"url\":\"https://mundofantasma.com/produto/056086\"}}</script>"
+    },
+    {
+      "store": "worten",
+      "url": "https://www.worten.pt/produtos/livro-moreninha-de-joaquim-manuel-de-macedo-portugues-mrkean-9788521000518",
+      "isbn": "9788521000518",
+      "price": 1333,
+      "currency": "EUR",
+      "html": "<h1>Livro Moreninha de Joaquim Manuel de Macedo (Português)</h1><script type=\"application/ld+json\">{\"@context\":\"http://schema.org/\",\"@type\":\"Product\",\"name\":\"Livro Moreninha de Joaquim Manuel de Macedo (Português)\",\"sku\":\"MRKEAN-9788521000518\",\"gtin13\":\"9788521000518\",\"url\":\"/produtos/livro-moreninha-de-joaquim-manuel-de-macedo-portugues-mrkean-9788521000518\",\"offers\":{\"@type\":\"Offer\",\"priceCurrency\":\"EUR\",\"price\":\"13.33\",\"availability\":\"http://schema.org/InStock\",\"itemCondition\":\"http://schema.org/NewCondition\"}}</script><meta itemprop=\"price\" content=\"13.33\"><meta itemprop=\"priceCurrency\" content=\"EUR\"><a class=\"seller-info__seller-link\" href=\"/marketplace-seller?seller_id=0177d53e-8c51-7ab5-eb67-9c2f53165449\"><span>PROMOBOOKS.NET</span></a><div><span>ISBN:</span><span>9788521000518</span></div>"
     }
   ]
 }

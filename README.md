@@ -12,7 +12,7 @@ _Imagem de demonstração com preços ilustrativos, não ofertas em tempo real._
 ## Funcionalidades
 
 - **Avisos automáticos** - Visita uma página de livro suportada. Se outra loja selecionada tiver a mesma edição nova em stock por menos, aparece um aviso. Depois de autorizares o acesso aos sites, não precisas de abrir o menu nem de configurar a função.
-- **Seis lojas por predefinição** - Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Em **Definições**, podes escolher entre 26 adaptadores automáticos. As escolhas guardadas mantêm-se nas atualizações.
+- **Seis lojas por predefinição** - Wook, Bertrand, Almedina, Continente, Porto Editora e Presença. Em **Definições**, podes escolher entre 27 adaptadores automáticos. As escolhas guardadas mantêm-se nas atualizações.
 - **A mesma edição** - Valida ISBN-10 e ISBN-13. Separa livros usados, outras moedas e disponibilidade desconhecida das ofertas novas confirmadas em EUR.
 - **Preços prontos ao abrir o menu** - Reutiliza resultados recentes de consultas em segundo plano, manuais e agendadas, indicando quando foram obtidos e se podem estar desatualizados.
 - **Estante e preços-alvo** - Guarda até 100 livros, define um preço-alvo para o livro e recebe notificações de verificações aproximadamente diárias enquanto o navegador estiver aberto.
@@ -58,7 +58,7 @@ A comparação exige a mesma edição. O saldo em cartão não é um desconto im
 
 Comparamos o preço do livro. Confirma sempre o preço final na loja.
 
-Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 26 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
+Os adaptadores são experimentais. Em 3 de novembro de 2026, testes locais confirmaram ofertas em 18 dos 27 adaptadores; oito não concluíram os pedidos nesse ambiente. Uma amostra bem-sucedida não garante todo o catálogo. As falhas mantêm uma ligação para consulta manual e nunca recebem preços inventados. Consulta o [relatório de cobertura](docs/store-coverage.md).
 
 A comparação utiliza APIs de produtos em seis lojas WooCommerce adicionais ao Bookcover e APIs de pesquisa e detalhe na Presença, Antígona e Kingpin. As associações verificadas permitem atualizar preços sem repetir as páginas durante a sessão, mantendo a alternativa por HTML quando necessário. Na Antígona, a página continua a confirmar inicialmente o ISBN quando este não consta da API. Consulta as [lojas abrangidas, funcionamento e limites das APIs](docs/product-apis.md).
 
@@ -123,7 +123,7 @@ npm run store-listing:check
 
 Os módulos da extensão ficam na raiz, os testes em `tests/unit` e `tests/e2e`, as ferramentas em `scripts` e os materiais de publicação em `store-listing`. Não há servidor nem dependências npm em execução na extensão. Consulta a [arquitetura](docs/architecture.md) e a [organização dos pacotes e publicação](docs/reference-alignment.md).
 
-A CI verifica estilo, formatação, testes, pacotes, navegadores, dependências e segredos no histórico Git obtido. A [monitorização das lojas](docs/store-monitoring.md) distribui as 26 lojas por 24 períodos horários com atrasos aleatórios e acompanha falhas em issues.
+A CI verifica estilo, formatação, testes, pacotes, navegadores, dependências e segredos no histórico Git obtido. A [monitorização das lojas](docs/store-monitoring.md) distribui as 27 lojas por 24 períodos horários com atrasos aleatórios e acompanha falhas em issues.
 
 ## Páginas nas lojas de extensões
 

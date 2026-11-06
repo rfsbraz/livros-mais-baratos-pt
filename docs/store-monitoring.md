@@ -1,6 +1,6 @@
 # Monitorização real das lojas
 
-O processo **Verificação das páginas das lojas** arranca de hora a hora, ao minuto 17 UTC. Cada um dos 26 adaptadores tem um período diário estável, ficando uma ou duas lojas por hora. Uma execução só consulta esse período, sequencialmente. Não há uma consulta completa a cada alteração: a CI de PRs e do ramo principal usa amostras guardadas.
+O processo **Verificação das páginas das lojas** arranca de hora a hora, ao minuto 17 UTC. Cada um dos 27 adaptadores tem um período diário estável, ficando uma ou duas lojas por hora. Uma execução só consulta esse período, sequencialmente. Não há uma consulta completa a cada alteração: a CI de PRs e do ramo principal usa amostras guardadas.
 
 Cada loja começa após um atraso aleatório de 0 a 120 segundos. Cada pedido tem mais um atraso de 1 a 3 segundos. Isto reduz rajadas; não contorna controlos de acesso nem garante que uma loja aceite tráfego do GitHub.
 

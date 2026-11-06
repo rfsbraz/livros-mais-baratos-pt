@@ -14,7 +14,7 @@ Comparar a mesma edição de um livro em lojas selecionadas, com avisos automát
 - `alarms`: agenda consultas espaçadas apenas para alvos ativos e restaura o agendamento após reinício.
 - `notifications`: avisa quando um alvo é atingido ou surge preço elegível inferior; o aviso também fica na extensão.
 - `offscreen`: em Chrome/Edge, fornece DOM oculto incluído no pacote para analisar HTML enquanto a comparação decorre sem o menu aberto. Firefox usa página/moldura local equivalente. Scripts descarregados não são executados.
-- `host_permissions`: consulta páginas de pesquisa/produto por HTTPS e deteta livros nas mesmas origens autorizadas. As 26 origens específicas são declaradas na instalação; os pedidos só usam lojas selecionadas. Não há acesso irrestrito.
+- `host_permissions`: consulta páginas de pesquisa/produto por HTTPS e deteta livros nas mesmas origens autorizadas. As 27 origens específicas são declaradas na instalação; os pedidos só usam lojas selecionadas. Não há acesso irrestrito.
 
 ## Código remoto
 
