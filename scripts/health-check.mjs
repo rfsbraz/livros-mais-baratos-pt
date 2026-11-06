@@ -33,8 +33,9 @@ export function failureCode(check, requests) {
   if (requests.some(r => r.status === 403)) {
     return 'access-forbidden';
   }
+  // Almedina runners return 405 as an anti-bot soft block (also seen as 403 residential).
   if (requests.some(r => r.status === 405)) {
-    return 'method-not-allowed';
+    return 'access-blocked';
   }
   if (requests.some(r => r.status >= 500)) {
     return 'shop-server-error';
