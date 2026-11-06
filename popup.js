@@ -356,7 +356,7 @@ async function start(book) {
       }
       complete++;
       if (token === run) {
-        if (eligibleOffer(offers[index])) {
+        if (offers[index].status === 'ok') {
           changeData({
             type: 'observe-incremental',
             isbn,
@@ -377,7 +377,7 @@ async function start(book) {
     if (token !== run) {
       return;
     }
-    const found = offers.filter(eligibleOffer);
+    const confirmed = offers.filter(o => o.status === 'ok');
     showBook({ isbn, title: knownTitle, referencePrice });
     if (saved[isbn] && knownTitle) {
       const updated = await changeData({ type: 'save', book: { isbn, title: knownTitle } });
@@ -392,8 +392,8 @@ async function start(book) {
     renderSaved();
     renderHistory();
     status(
-      found.length
-        ? `${found.length} de ${stores.length} preços confirmados para esta edição. Confirma o preço final e as condições na loja.`
+      confirmed.length
+        ? `${confirmed.length} de ${stores.length} preços confirmados para esta edição. Confirma o preço final e as condições na loja.`
         : 'Não foi possível confirmar preços. Experimenta indicar também o título, ou abre as lojas para consultar.'
     );
   } catch {
