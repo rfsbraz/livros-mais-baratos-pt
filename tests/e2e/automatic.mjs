@@ -70,6 +70,13 @@ try {
   await popup.waitForFunction(
     () => document.querySelector('#auto-toggle').getAttribute('aria-pressed') === 'true'
   );
+  await popup.waitForFunction(async () => {
+    const { metricsPending } = await chrome.storage.local.get('metricsPending');
+    return Object.values(metricsPending?.points || {}).some(
+      point =>
+        point.metric === 'store_latency' && point.surface === 'auto' && point.outcome === 'price'
+    );
+  });
   assert.equal(await popup.locator('#shop-list input:checked').count(), 6);
   assert.equal(
     await popup.evaluate(async () => (await chrome.storage.local.get('autoEnabled')).autoEnabled),

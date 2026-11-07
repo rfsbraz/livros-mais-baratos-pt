@@ -51,3 +51,15 @@ Tinta `#172e59`, azul `#2458bb`, branco `#ffffff`, azul-claro `#eef3fc`, cinzent
 ## Estatísticas anónimas
 
 A extensão pode enviar lotes agregados de desempenho para o Worker descrito em [metrics.md](metrics.md). A recolha é local (`metrics.js`), sem identificador persistente, e respeita a preferência `metricsEnabled`.
+
+### Consistência e consentimento das métricas
+
+O processo de background é o único escritor de `metricsPending`. O menu, as páginas e a moldura de análise enviam apenas pontos com dimensões fixas por mensagens internas. Uma fila serializa as alterações locais; durante um envio, os novos contadores ficam guardados para o lote seguinte. Desativar a opção ou apagar os dados cancela o pedido em curso e invalida operações antigas. O limite de 32 KiB inclui o objeto efetivamente persistido; cada pedido respeita também o limite de 249 pontos do recetor.
+
+`metrics-validation.js` valida a mesma lista branca no cliente e no Worker. A cópia de contrato em `tests/fixtures/metrics-schema.json` tem um teste que impede divergências do esquema distribuído. Não são aceites campos adicionais nem valores livres provenientes dos livros.
+
+No Firefox, `permissions.getAll().data_collection` tem de conter `technicalAndInteraction`, além da preferência local estar ativa. O gesto de ativação pede essa permissão com `permissions.request`; ausência da API, recusa ou erro impedem a recolha. A remoção da permissão apaga os agregados. Este contrato segue a [documentação de consentimento da Mozilla](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/).
+
+`comparison-metrics.js` recebe apenas ids de lojas e estados. Os relógios do menu começam na primeira linha do módulo e no clique em Comparar, respetivamente. Cada loja começa quando obtém um lugar na fila e termina depois de apresentar o resultado. A loja mais lenta é a última a concluir. As comparações automáticas e agendadas usam o mesmo coletor, sem gerar tempos do menu. Cancelar ou fechar o menu fecha a medição uma única vez.
+
+Os testes de navegador intercetam o endpoint e as respostas das lojas. Não fazem envios reais nem alteram práticas de privacidade nos portais das lojas. Os passos manuais em `store-listing/CHROME_UPDATE.md` e `store-listing/EDGE_UPDATE.md` continuam obrigatórios antes da submissão.
