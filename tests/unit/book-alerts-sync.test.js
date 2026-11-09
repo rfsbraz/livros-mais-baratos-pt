@@ -9,6 +9,7 @@ function mockChrome({ origins = [], registered = [] } = {}) {
     matches
   }));
   const alarms = [];
+  let closeParserCalls = 0;
   const tabs = [{ id: 1, url: 'https://www.wook.pt/livro/o-jantar-freida-mcfadden/33978897' }];
   globalThis.chrome = {
     storage: {
@@ -57,15 +58,19 @@ function mockChrome({ origins = [], registered = [] } = {}) {
   return {
     scripts: () => scripts,
     alarms: () => alarms,
+    closeParserCalls: () => closeParserCalls,
     setOrigins: next => {
       grantOrigins = next;
+    },
+    closeParser: async () => {
+      closeParserCalls++;
     }
   };
 }
 
 test('enabled with no grants yet stays pending without sticky empty registration', async () => {
   const api = mockChrome({ origins: [] });
-  const syncer = createBookAlertsSync({ closeParser: async () => {} });
+  const syncer = createBookAlertsSync({ closeParser: api.closeParser });
   const first = await syncer.sync();
   assert.equal(first.status, 'pending');
   assert.equal(syncer.configuration(), '');
@@ -79,7 +84,7 @@ test('enabled with no grants yet stays pending without sticky empty registration
 
 test('pending sync recovers and registers book-alerts once Wook origin appears', async () => {
   const api = mockChrome({ origins: [] });
-  const syncer = createBookAlertsSync({ closeParser: async () => {} });
+  const syncer = createBookAlertsSync({ closeParser: api.closeParser });
   assert.equal((await syncer.sync()).status, 'pending');
 
   api.setOrigins(['https://www.wook.pt/*', 'https://www.continente.pt/*']);
@@ -96,9 +101,38 @@ test('pending sync does not unregister an existing book-alerts registration', as
     origins: [],
     registered: [['https://www.wook.pt/*']]
   });
-  const syncer = createBookAlertsSync({ closeParser: async () => {} });
+  const syncer = createBookAlertsSync({ closeParser: api.closeParser });
   assert.equal((await syncer.sync()).status, 'pending');
   assert.equal(api.scripts().length, 1, 'must not tear down while grants are still pending');
+  assert.equal(api.closeParserCalls(), 0);
+});
+
+test('grants present but none match selected stores clears registration without retry', async () => {
+  const api = mockChrome({
+    origins: ['https://metrics-livros.steamhardwarestock.com/*'],
+    registered: [['https://www.wook.pt/*']]
+  });
+  const syncer = createBookAlertsSync({ closeParser: api.closeParser });
+  const result = await syncer.sync();
+  assert.equal(result.status, 'cleared');
+  assert.equal(api.scripts().length, 0);
+  assert.equal(api.alarms().length, 0);
+  assert.equal(api.closeParserCalls(), 1);
+});
+
+test('service worker restart reconciles matching registration without closing parser', async () => {
+  const matches = ['https://www.wook.pt/*', 'https://www.continente.pt/*'];
+  const api = mockChrome({
+    origins: matches,
+    registered: [matches]
+  });
+  const syncer = createBookAlertsSync({ closeParser: api.closeParser });
+  // configuration starts empty (as after SW restart)
+  const result = await syncer.sync();
+  assert.equal(result.status, 'reconciled');
+  assert.equal(api.scripts().length, 1);
+  assert.equal(api.closeParserCalls(), 0);
+  assert.equal(syncer.configuration(), JSON.stringify([true, ['wook', 'continente']]));
 });
 
 test('autoEnabled false unregisters book-alerts', async () => {
@@ -107,7 +141,7 @@ test('autoEnabled false unregisters book-alerts', async () => {
     registered: [['https://www.wook.pt/*']]
   });
   globalThis.chrome.storage.local.get = async () => ({ autoEnabled: false });
-  const syncer = createBookAlertsSync({ closeParser: async () => {} });
+  const syncer = createBookAlertsSync({ closeParser: api.closeParser });
   assert.equal((await syncer.sync()).status, 'disabled');
   assert.equal(api.scripts().length, 0);
 });

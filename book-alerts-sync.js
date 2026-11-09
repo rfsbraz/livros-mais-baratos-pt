@@ -20,14 +20,21 @@ export async function readAutoSettings() {
     cacheEpoch: data.cacheEpoch || 0,
     wookPromotionEnabled: data.wookPromotionEnabled !== false,
     enabled: data.autoEnabled !== false,
-    stores
+    stores,
+    grantCount: grants.origins?.length || 0
   };
+}
+
+function matchesKey(matches) {
+  return [...(matches || [])].sort().join('\0');
 }
 
 /**
  * Keep book-alerts registration aligned with autoEnabled + granted shop origins.
- * When alerts are on but no granted shop is ready yet, do not sticky-commit that
- * empty fingerprint and do not tear down an existing registration — retry later.
+ * Install races (no origins in getAll yet) stay pending without sticky teardown.
+ * Explicit empty results (grants present but none match selection, or alerts off)
+ * unregister. Service-worker restarts reconcile a matching persistAcrossSessions
+ * registration without closing the offscreen parser or poking open tabs.
  */
 export function createBookAlertsSync({ closeParser } = {}) {
   let configuration = '';
@@ -46,25 +53,7 @@ export function createBookAlertsSync({ closeParser } = {}) {
     await chrome.alarms.create(RETRY_ALARM, { when: Date.now() + 5000 });
   }
 
-  async function sync() {
-    const { enabled, stores } = await readAutoSettings();
-    const next = JSON.stringify([enabled, stores.map(s => s.id)]);
-    if (next === configuration) {
-      return { status: 'unchanged' };
-    }
-
-    // Grants or selection not ready yet: avoid the old sticky empty fingerprint
-    // (configuration = "[true,[]]" + unregister + return) that left pages without
-    // book-alerts until a later permission/storage event that might never fire.
-    if (enabled && !stores.length) {
-      configuration = '';
-      await scheduleRetry();
-      return { status: 'pending' };
-    }
-
-    configuration = next;
-    await clearRetry();
-
+  async function teardownAndNotify() {
     const scripts = await chrome.scripting.getRegisteredContentScripts({ ids: [SCRIPT_ID] });
     if (scripts.length) {
       await chrome.scripting.unregisterContentScripts({ ids: [SCRIPT_ID] });
@@ -77,27 +66,60 @@ export function createBookAlertsSync({ closeParser } = {}) {
         chrome.tabs.sendMessage(tab.id, { type: 'auto-config-changed' }).catch(() => {});
       }
     }
-    if (!enabled) {
-      return { status: 'disabled' };
+  }
+
+  async function sync() {
+    const { enabled, stores, grantCount } = await readAutoSettings();
+    const next = JSON.stringify([enabled, stores.map(s => s.id)]);
+    if (next === configuration) {
+      return { status: 'unchanged' };
     }
-    const matches = stores.map(s => `${s.origin}/*`);
+
+    // Install race: getAll has no origins yet. Do not sticky-commit or tear down.
+    if (enabled && !stores.length && grantCount === 0) {
+      configuration = '';
+      await scheduleRetry();
+      return { status: 'pending' };
+    }
+
+    const desiredMatches = stores.map(s => `${s.origin}/*`);
+
+    // SW restart: configuration is empty but persistAcrossSessions already matches.
+    // Adopt without closing the parser or refreshing every tab.
+    if (!configuration && enabled && stores.length) {
+      const existing = await chrome.scripting.getRegisteredContentScripts({ ids: [SCRIPT_ID] });
+      if (matchesKey(existing[0]?.matches) === matchesKey(desiredMatches)) {
+        configuration = next;
+        await clearRetry();
+        return { status: 'reconciled', matches: desiredMatches };
+      }
+    }
+
+    configuration = next;
+    await clearRetry();
+    await teardownAndNotify();
+
+    if (!enabled || !stores.length) {
+      return { status: enabled ? 'cleared' : 'disabled' };
+    }
+
     await chrome.scripting.registerContentScripts([
       {
         id: SCRIPT_ID,
-        matches,
+        matches: desiredMatches,
         js: ['content.js'],
         runAt: 'document_idle',
         persistAcrossSessions: true
       }
     ]);
-    for (const tab of await chrome.tabs.query({ url: matches })) {
+    for (const tab of await chrome.tabs.query({ url: desiredMatches })) {
       if (tab.id) {
         await chrome.scripting
           .executeScript({ target: { tabId: tab.id }, files: ['content.js'] })
           .catch(() => {});
       }
     }
-    return { status: 'registered', matches };
+    return { status: 'registered', matches: desiredMatches };
   }
 
   function scheduleSync() {
