@@ -10,3 +10,7 @@ store-listing/metadata/
 store-listing/website/
 store-listing/README.md
 store-listing/asset-manifest.json
+# Saída do Release Please: o bot gera JSON compacto e o CHANGELOG com *;
+# o Prettier pediria espaços e listas com -, e falhava a CI em main após cada publicação.
+.release-please-manifest.json
+CHANGELOG.md
