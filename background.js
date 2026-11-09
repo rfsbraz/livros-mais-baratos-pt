@@ -1,13 +1,12 @@
 import { installMetrics, ensureMetricsAlarm } from './metrics.js';
-import { selectedStoreIds } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { writeData } from './data.js';
 import { installWatch } from './watch.js';
-import { STORES, storeForUrl } from './stores.js';
+import { storeForUrl } from './stores.js';
 import { validCurrent } from './auto-rules.js';
-let creating,
-  syncing = Promise.resolve(),
-  configuration = '';
+import { createBookAlertsSync, readAutoSettings } from './book-alerts-sync.js';
+
+let creating;
 async function offscreen() {
   if (!chrome.offscreen) {
     if (!creating) {
@@ -40,38 +39,8 @@ async function offscreen() {
   }
   await creating;
 }
-async function settings() {
-  const data = await chrome.storage.local.get([
-    'autoEnabled',
-    'selectedStores',
-    'cacheEpoch',
-    'wookPromotionEnabled'
-  ]);
-  const grants = await chrome.permissions.getAll();
-  const stores = STORES.filter(
-    s =>
-      selectedStoreIds(data.selectedStores).includes(s.id) &&
-      grants.origins?.includes(`${s.origin}/*`)
-  );
-  return {
-    cacheEpoch: data.cacheEpoch || 0,
-    wookPromotionEnabled: data.wookPromotionEnabled !== false,
-    enabled: data.autoEnabled !== false,
-    stores
-  };
-}
-async function sync() {
-  const { enabled, stores } = await settings();
-  const next = JSON.stringify([enabled, stores.map(s => s.id)]);
-  if (next === configuration) {
-    return;
-  }
-  configuration = next;
-  const scripts = await chrome.scripting.getRegisteredContentScripts({ ids: ['book-alerts'] });
-  if (scripts.length) {
-    await chrome.scripting.unregisterContentScripts({ ids: ['book-alerts'] });
-  }
-  // Close the parser to cancel pending requests and discard cached comparisons after settings changes.
+
+async function closeParser() {
   if (chrome.offscreen) {
     if ((await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] })).length) {
       await chrome.offscreen.closeDocument();
@@ -80,41 +49,11 @@ async function sync() {
     document.getElementById('parser-frame')?.remove();
     creating = null;
   }
-  for (const tab of await chrome.tabs.query({})) {
-    if (tab.id) {
-      chrome.tabs.sendMessage(tab.id, { type: 'auto-config-changed' }).catch(() => {});
-    }
-  }
-  if (!enabled || !stores.length) {
-    return;
-  }
-  const matches = stores.map(s => `${s.origin}/*`);
-  await chrome.scripting.registerContentScripts([
-    {
-      id: 'book-alerts',
-      matches,
-      js: ['content.js'],
-      runAt: 'document_idle',
-      persistAcrossSessions: true
-    }
-  ]);
-  for (const tab of await chrome.tabs.query({ url: matches })) {
-    if (tab.id) {
-      await chrome.scripting
-        .executeScript({ target: { tabId: tab.id }, files: ['content.js'] })
-        .catch(() => {});
-    }
-  }
 }
-function scheduleSync() {
-  syncing = syncing
-    .catch(() => {})
-    .then(sync)
-    .catch(() => {
-      configuration = '';
-    });
-  return syncing;
-}
+
+const bookAlerts = createBookAlertsSync({ closeParser });
+const { scheduleSync } = bookAlerts;
+
 chrome.runtime.onInstalled.addListener(scheduleSync);
 chrome.runtime.onStartup.addListener(scheduleSync);
 chrome.permissions.onAdded.addListener(scheduleSync);
@@ -124,6 +63,14 @@ chrome.storage.onChanged.addListener((changes, area) => {
     scheduleSync();
   }
 });
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name === bookAlerts.retryAlarmName) {
+    scheduleSync();
+  }
+});
+// SW restarts and install races: register as soon as this module loads, not only on events.
+scheduleSync();
+
 chrome.runtime.onMessage.addListener((message, sender, reply) => {
   if (message?.target !== 'background' || message.type !== 'compare-page') {
     return;
@@ -138,7 +85,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     ) {
       return null;
     }
-    const { enabled, stores, cacheEpoch, wookPromotionEnabled } = await settings();
+    const { enabled, stores, cacheEpoch, wookPromotionEnabled } = await readAutoSettings();
     const source = storeForUrl(sender.url);
     if (!enabled || !stores.some(s => s.id === source.id)) {
       return null;
@@ -152,7 +99,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       storeIds: stores.map(s => s.id),
       wookPromotionEnabled
     });
-    const latest = await settings();
+    const latest = await readAutoSettings();
     if (
       !latest.enabled ||
       latest.cacheEpoch !== cacheEpoch ||

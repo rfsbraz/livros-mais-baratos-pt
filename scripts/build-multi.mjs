@@ -11,6 +11,7 @@ export const runtimeFiles = () => [
   'auto-rules.js',
   'background.html',
   'background.js',
+  'book-alerts-sync.js',
   'compare.js',
   'comparison-values.js',
   'comparison-metrics.js',

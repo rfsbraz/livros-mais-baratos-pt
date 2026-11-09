@@ -61,6 +61,21 @@ try {
         e => e.name === 'Livros Mais Baratos PT'
       ).id
   );
+  // book-alerts must be registered for Wook before any page visit (sync on SW load).
+  const sw =
+    context.serviceWorkers().find(worker => worker.url().includes(id)) ||
+    (await context.waitForEvent('serviceworker', { timeout: 15000 }));
+  await sw.evaluate(async () => {
+    const deadline = Date.now() + 10000;
+    while (Date.now() < deadline) {
+      const scripts = await chrome.scripting.getRegisteredContentScripts({ ids: ['book-alerts'] });
+      if (scripts[0]?.matches?.includes('https://www.wook.pt/*')) {
+        return true;
+      }
+      await new Promise(r => setTimeout(r, 100));
+    }
+    throw new Error('book-alerts was not registered for https://www.wook.pt/*');
+  });
   // Fresh installation: visit a book without opening the popup or writing any preferences.
   const shop = await context.newPage();
   await shop.goto('https://www.wook.pt/livro/teste');
