@@ -27,6 +27,16 @@
 - Tratar campos ISBN de editoras, hífenes Unicode, preços de venda apresentados e pesquisa Mundo Fantasma.
 - Documentar testes reais, falhas de acesso e limitações por loja, com amostras reconstruídas e testes de regressão no navegador.
 
+## [0.1.8](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.7...v0.1.8) (2026-11-09)
+
+
+### Correções
+
+* **alerts:** registo book-alerts quando as permissões ainda não estão prontas ([#83](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/83)) ([8e60eb5](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/8e60eb56fbbec0917a44494e59b2b167987d984c))
+* **ci:** stop Release Please bumps failing Prettier on main ([#77](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/77)) ([4925d96](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/4925d96db713be79af29c199e7ce037e8f0827c6))
+* **popup:** iniciar comparação ao detetar o ISBN ([#80](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/80)) ([0731cd7](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0731cd7dcd4256f70942c2f828647852dc909253))
+* **release:** drop stale version.txt parallel version file ([#85](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/85)) ([9cfe20a](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9cfe20a16d166e70d1187ff1f5f1a5042e4c7145))
+
 ## [0.1.7](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.6...v0.1.7) (2026-11-09)
 
 
