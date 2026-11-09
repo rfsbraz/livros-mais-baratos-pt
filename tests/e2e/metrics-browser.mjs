@@ -153,16 +153,29 @@ try {
     });
   }
 
-  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  // #79: detection starts the compare; metrics trigger must be page, without Comparar.
   await page
     .getByRole('status')
     .filter({ hasText: 'preços confirmados' })
     .waitFor({ timeout: 60000 });
+  assert.equal(
+    await page.getByRole('status').filter({ hasText: 'Clica em Comparar para consultar' }).count(),
+    0
+  );
 
   const pending = await page.evaluate(() => window.__data.metricsPending);
   assert.ok(pending?.points);
   const points = Object.values(pending.points);
   const byMetric = name => points.filter(p => p.metric === name);
+  assert.ok(
+    byMetric('compare_run').some(p => p.surface === 'popup' && p.outcome === 'page'),
+    'detection must emit compare_run with trigger page'
+  );
+  assert.equal(
+    byMetric('compare_run').filter(p => p.outcome === 'page').length,
+    1,
+    'detection must not start the compare twice'
+  );
 
   assert.ok(byMetric('store_latency').some(p => p.store === 'wook' && p.outcome === 'price'));
   assert.ok(
