@@ -705,7 +705,7 @@ async function init() {
       book.fromPage = true;
       showBook(book);
       if (!showCached()) {
-        status('Livro detetado. Clica em Comparar para consultar as livrarias.');
+        start(book);
       }
     } else {
       status('Não encontrei um ISBN único nesta página. Introduz o ISBN da edição que procuras.');

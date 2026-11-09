@@ -76,15 +76,18 @@ try {
     },
     { html: product('20.00') }
   );
+  const storeHits = { wook: 0, bertrand: 0, almedina: 0, bookcover: 0 };
   await page.route('https://**/*', route =>
     route.fulfill({ status: 403, body: 'Unconfigured test store' })
   );
-  await page.route('https://www.wook.pt/**', route =>
-    route.fulfill({ contentType: 'text/html', body: product('18.00') })
-  );
-  await page.route('https://www.bertrand.pt/**', route =>
-    route.fulfill({ contentType: 'text/html', body: product('17.00') })
-  );
+  await page.route('https://www.wook.pt/**', route => {
+    storeHits.wook++;
+    return route.fulfill({ contentType: 'text/html', body: product('18.00') });
+  });
+  await page.route('https://www.bertrand.pt/**', route => {
+    storeHits.bertrand++;
+    return route.fulfill({ contentType: 'text/html', body: product('17.00') });
+  });
   await page.route('https://www.almedina.net/**', route =>
     route.fulfill({ status: 403, body: 'Blocked' })
   );
@@ -105,6 +108,30 @@ try {
   );
   await page.goto(`http://127.0.0.1:${server.address().port}/popup.html`);
   await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
+  // #79: detection must start the scan without clicking Comparar.
+  await page
+    .getByRole('status')
+    .filter({ hasText: /A consultar|lojas consultadas|preços confirmados/ })
+    .waitFor();
+  assert.equal(
+    await page.getByRole('status').filter({ hasText: 'Clica em Comparar para consultar' }).count(),
+    0
+  );
+  await page
+    .getByRole('status')
+    .filter({ hasText: /preços confirmados|3 de 4/ })
+    .waitFor();
+  assert.equal(await page.locator('.offer').count(), 4);
+  assert.equal(storeHits.wook, 1, 'detection must start exactly one compare wave');
+  assert.equal(storeHits.bertrand, 1);
+  await mkdir('work', { recursive: true });
+  await mkdir('docs/proof', { recursive: true });
+  await page.screenshot({
+    path: 'docs/proof/popup-autoscan-on-detect.png',
+    fullPage: true
+  });
+  const hitsAfterDetection = { ...storeHits };
+
   const promoCheck = await page.evaluate(async () => {
     const { parseOffer } = await import('./parser.js');
     const { enrichPromotion, parseVoucherTerms } = await import('./promotions.js');
@@ -196,8 +223,13 @@ try {
   assert(!(await page.evaluate(() => window.__promotionClicked)).includes('a_aid'));
   await page.locator('#promotion-fixture').evaluate(e => e.remove());
 
+  // Manual Comparar still re-scans (detection already finished once).
+  const hitsBeforeRescan = { ...storeHits };
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: '3 de 4' }).waitFor();
+  assert.equal(storeHits.wook, hitsBeforeRescan.wook + 1);
+  assert.equal(storeHits.bertrand, hitsBeforeRescan.bertrand + 1);
+  assert.equal(hitsAfterDetection.wook, 1, 'detection must not have started a second wave');
   assert.equal(await page.locator('.best a').textContent(), 'Bertrand');
   await page.locator('#cheapest-banner').waitFor();
   assert.match(await page.locator('#cheapest-banner').textContent(), /17,00/);
@@ -272,7 +304,8 @@ try {
   await page.getByRole('status').filter({ hasText: 'Livro guardado' }).waitFor();
   await page.reload();
   await page.waitForFunction(() => document.querySelector('#count').textContent === '1');
-  assert.equal(await page.evaluate(() => window.__data.history['9780306406157'].length), 9);
+  // One extra compare wave from detection auto-start (3 confirmed stores each).
+  assert.equal(await page.evaluate(() => window.__data.history['9780306406157'].length), 12);
   // The dearest offer in the list still carries the id.
   await page.locator('#open-settings').click();
   await page.locator('#affiliate-toggle').check();
@@ -619,6 +652,57 @@ try {
     assert.equal(result.pages, 0, result.id);
     assert.deepEqual(result.requests, ['/products/details.js', '/cart.js'], result.id);
   }
+  // Cache hit on open: show cache, do not start a network compare.
+  await page.evaluate(() => {
+    const now = Date.now();
+    window.__data.priceCache = {
+      9780306406157: {
+        at: now,
+        offers: [
+          {
+            id: 'wook',
+            status: 'ok',
+            price: 1850,
+            currency: 'EUR',
+            url: 'https://www.wook.pt/livro/cache',
+            availability: 'InStock',
+            condition: 'NewCondition'
+          },
+          {
+            id: 'bertrand',
+            status: 'ok',
+            price: 1750,
+            currency: 'EUR',
+            url: 'https://www.bertrand.pt/livro/cache',
+            availability: 'InStock',
+            condition: 'NewCondition'
+          },
+          {
+            id: 'bookcover',
+            status: 'ok',
+            price: 1200,
+            currency: 'EUR',
+            url: 'https://bookcover.pt/product/test/',
+            availability: 'OutOfStock',
+            condition: 'NewCondition'
+          }
+        ]
+      }
+    };
+    localStorage.setItem('testData', JSON.stringify(window.__data));
+  });
+  const hitsBeforeCacheOpen = { ...storeHits };
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector('#isbn').value === '9780306406157');
+  await page.getByRole('status').filter({ hasText: 'Preços guardados' }).waitFor();
+  assert.equal(storeHits.wook, hitsBeforeCacheOpen.wook);
+  assert.equal(storeHits.bertrand, hitsBeforeCacheOpen.bertrand);
+  assert.equal(
+    await page.getByRole('status').filter({ hasText: 'Clica em Comparar para consultar' }).count(),
+    0
+  );
+
+  // Edited ISBN + Comparar re-scans with the typed value (fromPage false path).
   await page.locator('#isbn').fill('9780306406158');
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
   await page.getByRole('status').filter({ hasText: 'válido' }).waitFor();

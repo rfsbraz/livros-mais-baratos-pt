@@ -51,11 +51,14 @@ try {
     ({ html, kind }) => {
       const timeout = AbortSignal.timeout.bind(AbortSignal);
       AbortSignal.timeout = ms => timeout(ms === 35000 || ms === 12000 ? 150 : ms);
-      window.__collectionGranted = kind !== 'firefox';
-      window.__allowConsent = false;
+      // Firefox opt-in: hold the book tab until consent is granted, then reload so
+      // detection auto-starts with metrics able to record compare_run (trigger page).
+      const fxReady = kind !== 'firefox' || sessionStorage.getItem('fxMetricsReady') === '1';
+      window.__collectionGranted = kind !== 'firefox' || fxReady;
+      window.__allowConsent = fxReady;
       window.__data = {
         selectedStores: ['wook', 'bertrand', 'almedina', 'bookcover', 'continente'],
-        metricsEnabled: true,
+        metricsEnabled: kind !== 'firefox' || fxReady,
         affiliateEnabled: true
       };
       window.__permission = true;
@@ -89,7 +92,9 @@ try {
           clear: async () => true,
           get: async () => null
         },
-        tabs: { query: async () => [{ id: 1, url: 'https://www.wook.pt/livro/example' }] },
+        tabs: {
+          query: async () => (fxReady ? [{ id: 1, url: 'https://www.wook.pt/livro/example' }] : [])
+        },
         scripting: { executeScript: async () => [{ result: { html } }] }
       };
     },
@@ -129,8 +134,12 @@ try {
   });
 
   await page.goto(`http://127.0.0.1:${server.address().port}/popup.html`);
-  await page.waitForFunction(value => document.querySelector('#isbn').value === value, isbn);
   if (kind === 'firefox') {
+    // No book tab yet: prove opt-in refusal before auto-start can emit metrics.
+    await page
+      .getByRole('status')
+      .filter({ hasText: 'Introduz um ISBN ou abre uma página de livro' })
+      .waitFor();
     const refused = await page.evaluate(async () => {
       const { setMetricsEnabled, recordPoints, flushMetrics } = await import('./metrics.js');
       await recordPoints([{ metric: 'popup_open', count: 1 }]);
@@ -143,26 +152,36 @@ try {
     });
     assert.deepEqual(refused, { enabled: false, sent: false, pending: undefined });
     assert.equal(metricsPosts.length, 0);
-    await page.evaluate(async () => {
-      window.__allowConsent = true;
-      const { setMetricsEnabled, recordPoints } = await import('./metrics.js');
-      if (!(await setMetricsEnabled(true))) {
-        throw new Error('fixture consent not granted');
-      }
-      await recordPoints([{ metric: 'popup_open', count: 1 }]);
+    await page.evaluate(() => {
+      sessionStorage.setItem('fxMetricsReady', '1');
     });
+    await page.reload();
   }
+  await page.waitForFunction(value => document.querySelector('#isbn').value === value, isbn);
 
-  await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+  // #79: detection starts the compare; metrics trigger must be page, without Comparar.
   await page
     .getByRole('status')
     .filter({ hasText: 'preços confirmados' })
     .waitFor({ timeout: 60000 });
+  assert.equal(
+    await page.getByRole('status').filter({ hasText: 'Clica em Comparar para consultar' }).count(),
+    0
+  );
 
   const pending = await page.evaluate(() => window.__data.metricsPending);
   assert.ok(pending?.points);
   const points = Object.values(pending.points);
   const byMetric = name => points.filter(p => p.metric === name);
+  assert.ok(
+    byMetric('compare_run').some(p => p.surface === 'popup' && p.outcome === 'page'),
+    'detection must emit compare_run with trigger page'
+  );
+  assert.equal(
+    byMetric('compare_run').filter(p => p.outcome === 'page').length,
+    1,
+    'detection must not start the compare twice'
+  );
 
   assert.ok(byMetric('store_latency').some(p => p.store === 'wook' && p.outcome === 'price'));
   assert.ok(
