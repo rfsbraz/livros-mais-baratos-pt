@@ -27,6 +27,29 @@
 - Tratar campos ISBN de editoras, hífenes Unicode, preços de venda apresentados e pesquisa Mundo Fantasma.
 - Documentar testes reais, falhas de acesso e limitações por loja, com amostras reconstruídas e testes de regressão no navegador.
 
+## [0.1.7](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.6...v0.1.7) (2026-11-09)
+
+
+### Funcionalidades
+
+* **affiliate:** identificador Bertrand nas ligações ([#70](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/70)) ([be11686](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/be1168669d46f8a03be83054ca781cf9ee543be1))
+* **metrics:** estatísticas anónimas de desempenho ([#68](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/68)) ([acc56f2](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/acc56f29c88ebc121c5050389b5d20c4f259ffdf))
+* **popup:** destacar oferta mais barata ([#64](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/64)) ([d62574b](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/d62574ba559b6eb3d88d5bbb03355a6191822fdb))
+* **popup:** recolher alertas na estante ([#63](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/63)) ([9a19c61](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/9a19c61aabfd5f582b55ef75c4220d11948b1d8d))
+* Worten automatic ISBN discovery with marketplace limits ([#72](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/72)) ([4841e8b](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/4841e8b4b6528b7aeabe4418d438b9b1fc5c5797)), closes [#71](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/71)
+
+
+### Correções
+
+* **ci:** require checkout and probe artifact before store-health sync ([#54](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/54)) ([6e61535](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/6e61535a11f70d198e3b6f71154648a7b11791f8))
+* **data:** accept only item watch prices ([#62](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/62)) ([f69eb38](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/f69eb380ed3c67b6c307a6eb565456011b45b07b))
+* **firefox:** clear AMO warnings for Android minimum and offscreen calls ([#57](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/57)) ([f21935e](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/f21935e17146e360a55b63238aada23231174f15))
+* **listing:** demote affiliate to an end footnote ([#49](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/49)) ([6ea0ed5](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/6ea0ed5b4707e680b3d2dcbb61db2e12019d4861))
+* **metrics:** preserve anonymous counts and enforce consent ([#73](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/73)) ([9150320](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/915032018ff4de8e9192b376640776fe06f4db59))
+* **popup:** count confirmed prices in compare status after cheapest banner ([#66](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/66)) ([de5f366](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/de5f366c79195bebca52c630ddc5056f7aef06a3))
+* **popup:** manter progresso durante persistência ([#67](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/67)) ([0ecb36c](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0ecb36ca6099b74f8f7ea451c3b3f4973c07bc72))
+* **stores:** map HTTP 405 anti-bot responses to access-blocked ([#55](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/55)) ([eaf1a58](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/eaf1a581ff07f642d1a3e956f8f51708005f9577))
+
 ## [0.1.6](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.5...v0.1.6) (2026-11-05)
 
 ### Funcionalidades
