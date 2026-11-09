@@ -10,7 +10,6 @@ writeFileSync(
     parser: 'json'
   })
 );
-writeFileSync('version.txt', version + '\n');
 const listing = JSON.parse(readFileSync('store-listing/listing.json'));
 writeFileSync(
   'store-links.js',
