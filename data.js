@@ -2,6 +2,7 @@ import { DEFAULT_STORE_IDS } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { isbn13, remember } from './core.js';
 import { STORES } from './stores.js';
+import { migrateMetricsChoice } from './metrics.js';
 let queue = Promise.resolve();
 export function migrateData(data) {
   const next = structuredClone(data);
@@ -21,11 +22,6 @@ export function migrateData(data) {
   }
   if (next.watchNotices) {
     next.watchNotices = next.watchNotices.filter(n => n.basis !== 'delivered');
-  }
-  // Until the explicit marker existed, only the settings toggle wrote metricsEnabled, so a stored boolean is an
-  // explicit choice. Record it once; without a value the user never chose and the default applies.
-  if (next.metricsChoice === undefined && typeof next.metricsEnabled === 'boolean') {
-    next.metricsChoice = next.metricsEnabled ? 'on' : 'off';
   }
   return next;
 }
@@ -115,6 +111,9 @@ export function writeData(action) {
         if (Object.keys(patch).length) {
           await chrome.storage.local.set(patch);
         }
+      }
+      if (action && typeof action === 'object' && action.type === 'migrate') {
+        await migrateMetricsChoice();
       }
       return next || data;
     });

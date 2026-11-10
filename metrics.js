@@ -260,6 +260,19 @@ export async function firefoxCollectionAllowed() {
   }
 }
 
+/**
+ * Until metricsChoice existed only the toggle wrote metricsEnabled, so a stored boolean is an
+ * explicit choice. Record it once, on the same queue as the toggle so a newer choice always wins.
+ */
+export function migrateMetricsChoice() {
+  return serialWrite(async () => {
+    const data = await chrome.storage.local.get([ENABLED_KEY, CHOICE_KEY]);
+    if (data[CHOICE_KEY] === undefined && typeof data[ENABLED_KEY] === 'boolean') {
+      await chrome.storage.local.set({ [CHOICE_KEY]: data[ENABLED_KEY] ? 'on' : 'off' });
+    }
+  });
+}
+
 /** What the settings toggle shows: the stored choice, gated by the Firefox grant. */
 export async function metricsCollectionActive() {
   const data = await chrome.storage.local.get([ENABLED_KEY, CHOICE_KEY]);

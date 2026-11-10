@@ -74,34 +74,37 @@ test('fresh Firefox install without the native grant still collects nothing', as
   assert.equal(pendingCount(storage), 0);
 });
 
-test('migration: never touched stays unmarked and resolves to on', () => {
-  const next = migrateData({ saved: {} });
-  assert.equal(next.metricsChoice, undefined);
-  assert.equal(metrics.metricsEnabledFrom?.(next), true);
+test('migration: never touched stays unmarked and resolves to on', async () => {
+  const { storage } = environment({ saved: {} });
+  await writeData({ type: 'migrate' });
+  assert.equal(storage.metricsChoice, undefined);
+  assert.equal(metrics.metricsEnabledFrom(storage), true);
+  assert.equal((await metrics.readMetricsState()).enabled, true);
 });
 
-test('migration: an explicit opt-out is marked and stays off', () => {
-  const next = migrateData({ metricsEnabled: false });
-  assert.equal(next.metricsChoice, 'off');
-  assert.equal(next.metricsEnabled, false);
-  assert.equal(metrics.metricsEnabledFrom?.(next), false);
-  assert.equal(migrateData({ metricsEnabled: true }).metricsChoice, 'on');
+test('migration: an explicit opt-out is marked and stays off', async () => {
+  const { storage } = environment({ metricsEnabled: false });
+  await writeData({ type: 'migrate' });
+  assert.equal(storage.metricsChoice, 'off');
+  assert.equal(storage.metricsEnabled, false);
+  assert.equal((await metrics.readMetricsState()).enabled, false);
+  const on = environment({ metricsEnabled: true });
+  await writeData({ type: 'migrate' });
+  assert.equal(on.storage.metricsChoice, 'on');
 });
 
 test('migration: a recorded choice is never overwritten and re-running is a no-op', async () => {
-  assert.equal(migrateData({ metricsChoice: 'on', metricsEnabled: false }).metricsChoice, 'on');
-  const once = migrateData({ metricsEnabled: false, saved: {} });
-  assert.deepEqual(migrateData(once), once);
+  const kept = environment({ metricsChoice: 'on', metricsEnabled: false });
+  await writeData({ type: 'migrate' });
+  assert.equal(kept.storage.metricsChoice, 'on');
+  assert.equal(migrateData({ metricsEnabled: false }).metricsChoice, undefined);
 
   const { storage, writes } = environment({ metricsEnabled: false });
   await writeData({ type: 'migrate' });
   assert.equal(storage.metricsChoice, 'off');
   const before = writes.length;
   await writeData({ type: 'migrate' });
-  assert.equal(
-    writes.some((w, i) => i >= before && 'metricsChoice' in w),
-    false
-  );
+  assert.equal(writes.length, before);
   assert.equal(storage.metricsChoice, 'off');
 });
 
@@ -137,4 +140,18 @@ test('the popup toggle reflects the stored choice and the Firefox grant', async 
   assert.equal(await metrics.metricsCollectionActive(), false);
   environment({}, { browser: 'firefox', granted: true });
   assert.equal(await metrics.metricsCollectionActive(), true);
+});
+
+test('a migration racing an opt-out never re-enables collection', async () => {
+  for (const order of ['migrate-first', 'toggle-first']) {
+    const { storage } = environment({ metricsEnabled: true });
+    const jobs =
+      order === 'migrate-first'
+        ? [writeData({ type: 'migrate' }), metrics.setMetricsEnabled(false)]
+        : [metrics.setMetricsEnabled(false), writeData({ type: 'migrate' })];
+    await Promise.all(jobs);
+    assert.equal(storage.metricsEnabled, false, order);
+    assert.equal(storage.metricsChoice, 'off', order);
+    assert.equal(metrics.metricsEnabledFrom(storage), false, order);
+  }
 });

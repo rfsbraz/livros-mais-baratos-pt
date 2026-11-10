@@ -50,7 +50,7 @@ Tinta `#172e59`, azul `#2458bb`, branco `#ffffff`, azul-claro `#eef3fc`, cinzent
 
 ## Estatísticas anónimas
 
-A extensão pode enviar lotes agregados de desempenho para o Worker descrito em [metrics.md](metrics.md). A recolha é local (`metrics.js`), sem identificador persistente, e está ativa por predefinição. A escolha explícita fica em `metricsChoice` (`on` | `off`); `metricsEnabled` mantém o valor booleano. Sem escolha guardada aplica-se a predefinição. A migração de `data.js` regista como escolha explícita qualquer `metricsEnabled` já guardado, porque só o interruptor o escrevia.
+A extensão pode enviar lotes agregados de desempenho para o Worker descrito em [metrics.md](metrics.md). A recolha é local (`metrics.js`), sem identificador persistente, e está ativa por predefinição. A escolha explícita fica em `metricsChoice` (`on` | `off`); `metricsEnabled` mantém o valor booleano. Sem escolha guardada aplica-se a predefinição. A migração `{ type: 'migrate' }` de `data.js` regista como escolha explícita qualquer `metricsEnabled` já guardado, porque só o interruptor o escrevia. Corre na mesma fila de escrita do interruptor, para que uma escolha mais recente nunca seja sobreposta.
 
 ### Consistência e consentimento das métricas
 
