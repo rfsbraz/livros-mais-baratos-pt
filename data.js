@@ -22,6 +22,11 @@ export function migrateData(data) {
   if (next.watchNotices) {
     next.watchNotices = next.watchNotices.filter(n => n.basis !== 'delivered');
   }
+  // Until the explicit marker existed, only the settings toggle wrote metricsEnabled, so a stored boolean is an
+  // explicit choice. Record it once; without a value the user never chose and the default applies.
+  if (next.metricsChoice === undefined && typeof next.metricsEnabled === 'boolean') {
+    next.metricsChoice = next.metricsEnabled ? 'on' : 'off';
+  }
   return next;
 }
 export function reduceData(data, action, now = Date.now()) {

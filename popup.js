@@ -20,7 +20,7 @@ import {
   setMetricsEnabled,
   defaultMetricsEnabled,
   clearPending,
-  ENABLED_KEY
+  metricsCollectionActive
 } from './metrics.js';
 
 const $ = id => document.getElementById(id);
@@ -651,8 +651,7 @@ async function init() {
       'wookPromotionEnabled',
       'watchEnabled',
       'watchNotices',
-      'priceCache',
-      ENABLED_KEY
+      'priceCache'
     ]);
     autoEnabled = data.autoEnabled !== false;
     autoLabel();
@@ -660,8 +659,7 @@ async function init() {
     $('wook-promotion-toggle').checked = wookPromotionEnabled;
     affiliateEnabled = data.affiliateEnabled !== false;
     $('affiliate-toggle').checked = affiliateEnabled;
-    metricsEnabled =
-      data[ENABLED_KEY] === undefined ? defaultMetricsEnabled() : data[ENABLED_KEY] === true;
+    metricsEnabled = await metricsCollectionActive();
     if ($('metrics-toggle')) {
       $('metrics-toggle').checked = metricsEnabled;
     }
