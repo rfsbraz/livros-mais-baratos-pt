@@ -24,6 +24,7 @@ import {
 } from './metrics.js';
 
 const $ = id => document.getElementById(id);
+const MIGRATE_TIMEOUT_MS = 5000;
 
 function trackAffiliate(surface) {
   return (href, enabled) => {
@@ -641,7 +642,11 @@ $('clear').onclick = async () => {
 async function init() {
   try {
     initFeedback();
-    await changeData({ type: 'migrate' });
+    // Sem resposta do service worker em 5 s, segue com os dados guardados para não ficar parado.
+    await Promise.race([
+      changeData({ type: 'migrate' }),
+      new Promise(resolve => setTimeout(resolve, MIGRATE_TIMEOUT_MS))
+    ]).catch(() => {});
     const data = await chrome.storage.local.get([
       'saved',
       'history',
