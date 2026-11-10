@@ -6,7 +6,7 @@ export const runtimeFiles = () => [
   'affiliate.js',
   'metrics.js',
   'metrics-config.js',
-  'metrics-schema.json',
+  'metrics-schema.js',
   'metrics-validation.js',
   'auto-rules.js',
   'background.html',

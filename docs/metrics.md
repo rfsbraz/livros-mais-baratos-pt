@@ -17,7 +17,7 @@ O Analytics Engine aceita 250 escritas por pedido, e o Worker usa uma delas para
 
 ## Lote
 
-O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado.
+O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. A extensão usa a cópia `metrics-schema.js`, porque o service worker do Chrome não volta a arrancar depois de parar quando importa JSON como módulo; um teste unitário garante que as duas cópias são iguais. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado.
 
 ```json
 {

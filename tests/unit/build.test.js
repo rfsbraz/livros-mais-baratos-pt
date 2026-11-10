@@ -23,7 +23,7 @@ test('browser packages preserve hosts and isolate platform-specific background A
   assert(runtimeFiles().includes('popup.js'));
   assert(runtimeFiles().includes('metrics.js'));
   assert(runtimeFiles().includes('metrics-config.js'));
-  assert(runtimeFiles().includes('metrics-schema.json'));
+  assert(runtimeFiles().includes('metrics-schema.js'));
   assert(!runtimeFiles().some(f => /(^|\/)(tests?|package|store-listing)/.test(f)));
   const firefox = manifestFor('firefox', source);
   assert.deepEqual(firefox.browser_specific_settings.gecko.data_collection_permissions.optional, [
