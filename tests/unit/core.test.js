@@ -309,15 +309,20 @@ test('refreshAffiliateLinks updates links already on screen when the preference 
       listeners.push([type, handler]);
     }
   };
+  const root = { querySelectorAll: () => [link] };
   bindAffiliateLink(link, () => enabled);
   assert.equal(link.href, raw);
   enabled = true;
-  refreshAffiliateLinks(true);
+  refreshAffiliateLinks(true, root);
   assert.equal(link.href, affiliateUrl(raw, true));
-  refreshAffiliateLinks(false);
+  refreshAffiliateLinks(false, root);
   assert.equal(link.href, raw);
   enabled = true;
-  refreshAffiliateLinks(true);
+  refreshAffiliateLinks(true, root);
+  const detached = { querySelectorAll: () => [] };
+  link.href = raw;
+  refreshAffiliateLinks(true, detached);
+  assert.equal(link.href, raw);
   link.href = raw;
   const click = listeners.find(([type]) => type === 'click')?.[1];
   assert.equal(typeof click, 'function');

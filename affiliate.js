@@ -41,15 +41,11 @@ export function affiliateClickMetric(href, enabled) {
 }
 
 const originals = new WeakMap();
-const bound = new Set();
 const listening = new WeakSet();
 
-export function refreshAffiliateLinks(enabled) {
-  for (const link of [...bound]) {
-    if (!link.isConnected) {
-      bound.delete(link);
-      continue;
-    }
+export function refreshAffiliateLinks(enabled, root = globalThis.document) {
+  const links = root?.querySelectorAll?.('a') || [];
+  for (const link of links) {
     const original = originals.get(link);
     if (original) {
       link.href = affiliateUrl(original, enabled);
@@ -59,7 +55,6 @@ export function refreshAffiliateLinks(enabled) {
 
 export function bindAffiliateLink(link, enabled, onNavigate) {
   originals.set(link, link.href);
-  bound.add(link);
   const sync = () => {
     const original = originals.get(link);
     if (original) {
