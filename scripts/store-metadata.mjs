@@ -54,7 +54,7 @@ await writeFile(
 );
 const privacy = `# Política de privacidade
 
-Livros Mais Baratos PT · Versão ${version} · Atualizada em 3 de novembro de 2026
+Livros Mais Baratos PT · Versão ${version} · Atualizada em 10 de novembro de 2026
 
 Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@gmail.com.
 
@@ -72,7 +72,7 @@ Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, p
 
 Ao comparar, a extensão envia o ISBN e, quando necessário, o título diretamente às lojas selecionadas. Estas recebem também informações normais da ligação, incluindo o endereço IP. Os pedidos usam HTTPS e não enviam cookies de sessão. As lojas tratam os pedidos de acordo com as suas próprias políticas de privacidade. Abrir uma ligação de oferta usa o navegador normal, sujeito às permissões e cookies desse site. A extensão não efetua compras nem trata dados de pagamento.
 
-A extensão não tem conta de utilizador. Pode enviar estatísticas anónimas de desempenho para um serviço próprio na Cloudflare quando a opção correspondente está ativa. Não inclui ISBN, títulos, URLs, preços nem identificadores de instalação. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
+A extensão não tem conta de utilizador. Envia estatísticas anónimas de desempenho para um serviço próprio na Cloudflare enquanto a opção correspondente estiver ativa, o que acontece por predefinição. Podes desativá-la em Definições; no Firefox a recolha depende também da permissão de dados técnicos e de interação. Não inclui ISBN, títulos, URLs, preços nem identificadores de instalação. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
 
 ## Afiliados opcionais
 
@@ -166,7 +166,7 @@ await writeFile(
 await writeFile(`${out}/metadata/reviewer-notes.txt`, await template('reviewer-notes.txt'));
 await writeFile(
   `${out}/metadata/release-notes-pt-PT.txt`,
-  'Estatísticas anónimas de desempenho e utilização, sem ISBN, títulos, URLs, preços ou identificador persistente. Ativas por predefinição no Chrome e no Edge; no Firefox apenas após autorização. Podes desativar em Definições, em Partilhar estatísticas anónimas de desempenho. Preços-alvo com verificações agendadas, gráficos apenas com observações locais. Afiliados Wook opcionais, ativos por predefinição, com divulgação e opção de desativar. Deteção automática por predefinição de páginas de livros, com acesso às lojas solicitado na instalação e avisos de ofertas mais baratas da mesma edição. Seleção de lojas, comparação por ISBN, estante e histórico local de consultas. A cobertura e a disponibilidade dos preços dependem de cada loja.\n'
+  'Estatísticas anónimas de desempenho e utilização, sem ISBN, títulos, URLs, preços ou identificador persistente. Ativas por predefinição; no Firefox dependem também da permissão de dados técnicos e de interação. Podes desativar em Definições, em Partilhar estatísticas anónimas de desempenho. Preços-alvo com verificações agendadas, gráficos apenas com observações locais. Afiliados Wook opcionais, ativos por predefinição, com divulgação e opção de desativar. Deteção automática por predefinição de páginas de livros, com acesso às lojas solicitado na instalação e avisos de ofertas mais baratas da mesma edição. Seleção de lojas, comparação por ISBN, estante e histórico local de consultas. A cobertura e a disponibilidade dos preços dependem de cada loja.\n'
 );
 await writeFile(`${out}/README.md`, await template('README.md'));
 await cp('scripts/store-assets.mjs', `${out}/source/generate-assets.mjs`);

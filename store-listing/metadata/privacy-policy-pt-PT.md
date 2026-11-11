@@ -1,6 +1,6 @@
 # Política de privacidade
 
-Livros Mais Baratos PT · Versão 0.1.6 · Atualizada em 3 de novembro de 2026
+Livros Mais Baratos PT · Versão 0.1.6 · Atualizada em 10 de novembro de 2026
 
 Responsável pela extensão: Rodrigo Braz. Contacto: rfsbraz@gmail.com.
 
@@ -18,7 +18,7 @@ Os ISBN, títulos guardados, preços-alvo, notificações, preços observados, p
 
 Ao comparar, a extensão envia o ISBN e, quando necessário, o título diretamente às lojas selecionadas. Estas recebem também informações normais da ligação, incluindo o endereço IP. Os pedidos usam HTTPS e não enviam cookies de sessão. As lojas tratam os pedidos de acordo com as suas próprias políticas de privacidade. Abrir uma ligação de oferta usa o navegador normal, sujeito às permissões e cookies desse site. A extensão não efetua compras nem trata dados de pagamento.
 
-A extensão não tem conta de utilizador. Pode enviar estatísticas anónimas de desempenho para um serviço próprio na Cloudflare quando a opção correspondente está ativa. Não inclui ISBN, títulos, URLs, preços nem identificadores de instalação. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
+A extensão não tem conta de utilizador. Envia estatísticas anónimas de desempenho para um serviço próprio na Cloudflare enquanto a opção correspondente estiver ativa, o que acontece por predefinição. Podes desativá-la em Definições; no Firefox a recolha depende também da permissão de dados técnicos e de interação. Não inclui ISBN, títulos, URLs, preços nem identificadores de instalação. Não vendemos dados, não os usamos para publicidade ou avaliação de crédito e não os transferimos para fins alheios à comparação de preços solicitada pelo utilizador.
 
 ## Afiliados opcionais
 

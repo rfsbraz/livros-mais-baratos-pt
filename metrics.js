@@ -7,6 +7,8 @@ export { METRICS_ENDPOINT };
 export const METRICS_ALARM = 'metrics-flush';
 export const PENDING_KEY = 'metricsPending';
 export const ENABLED_KEY = 'metricsEnabled';
+/** Explicit user choice ('on' | 'off'); absent means the user never chose. */
+export const CHOICE_KEY = 'metricsChoice';
 export const RETRY_KEY = 'metricsRetry';
 export const LAST_SENT_KEY = 'metricsLastSentAt';
 export const MAX_PENDING_BYTES = schema.limits.maxBodyBytes;
@@ -53,8 +55,20 @@ export function detectBrowser(ua = globalThis.navigator?.userAgent || '') {
   return 'chrome';
 }
 
-export function defaultMetricsEnabled(browser = detectBrowser()) {
-  return browser !== 'firefox';
+/** On by default everywhere; Firefox still needs its native technicalAndInteraction grant. */
+export function defaultMetricsEnabled() {
+  return true;
+}
+
+/** Explicit choice first, then a legacy stored boolean (only ever written by the toggle). */
+export function metricsEnabledFrom(data = {}) {
+  if (data[CHOICE_KEY] === 'on' || data[CHOICE_KEY] === 'off') {
+    return data[CHOICE_KEY] === 'on';
+  }
+  if (typeof data[ENABLED_KEY] === 'boolean') {
+    return data[ENABLED_KEY];
+  }
+  return defaultMetricsEnabled();
 }
 
 export function latencyBucket(ms) {
@@ -208,6 +222,7 @@ export async function readMetricsState() {
   const data = await chrome.storage.local.get([
     PENDING_KEY,
     ENABLED_KEY,
+    CHOICE_KEY,
     RETRY_KEY,
     LAST_SENT_KEY,
     'selectedStores',
@@ -216,8 +231,7 @@ export async function readMetricsState() {
     'affiliateEnabled'
   ]);
   const browser = detectBrowser();
-  const enabled =
-    data[ENABLED_KEY] === undefined ? defaultMetricsEnabled(browser) : data[ENABLED_KEY] === true;
+  const enabled = metricsEnabledFrom(data);
   return {
     browser,
     enabled,
@@ -244,6 +258,25 @@ export async function firefoxCollectionAllowed() {
   } catch {
     return false;
   }
+}
+
+/**
+ * Until metricsChoice existed only the toggle wrote metricsEnabled, so a stored boolean is an
+ * explicit choice. Record it once, on the same queue as the toggle so a newer choice always wins.
+ */
+export function migrateMetricsChoice() {
+  return serialWrite(async () => {
+    const data = await chrome.storage.local.get([ENABLED_KEY, CHOICE_KEY]);
+    if (data[CHOICE_KEY] === undefined && typeof data[ENABLED_KEY] === 'boolean') {
+      await chrome.storage.local.set({ [CHOICE_KEY]: data[ENABLED_KEY] ? 'on' : 'off' });
+    }
+  });
+}
+
+/** What the settings toggle shows: the stored choice, gated by the Firefox grant. */
+export async function metricsCollectionActive() {
+  const data = await chrome.storage.local.get([ENABLED_KEY, CHOICE_KEY]);
+  return metricsEnabledFrom(data) && (await firefoxCollectionAllowed());
 }
 
 export async function clearPending() {
@@ -280,7 +313,10 @@ async function setEnabledLocally(enabled) {
   }
   return serialWrite(async () => {
     enabled = enabled === true && (await firefoxCollectionAllowed());
-    await chrome.storage.local.set({ [ENABLED_KEY]: enabled });
+    await chrome.storage.local.set({
+      [ENABLED_KEY]: enabled,
+      [CHOICE_KEY]: enabled ? 'on' : 'off'
+    });
     if (!enabled) {
       await chrome.storage.local.remove([PENDING_KEY, RETRY_KEY]);
       await chrome.alarms.clear(METRICS_ALARM);

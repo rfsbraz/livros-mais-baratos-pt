@@ -165,10 +165,10 @@ test('pending storage respects the 32 KB cap by dropping oldest points', () => {
   assert.ok(pendingBytes(trimmed) <= MAX_PENDING_BYTES);
 });
 
-test('chrome and edge default metrics on; firefox defaults off', () => {
+test('metrics default on in every browser (Firefox is still gated by its native grant)', () => {
   assert.equal(defaultMetricsEnabled('chrome'), true);
   assert.equal(defaultMetricsEnabled('edge'), true);
-  assert.equal(defaultMetricsEnabled('firefox'), false);
+  assert.equal(defaultMetricsEnabled('firefox'), true);
 });
 
 test('flush retries three times then drops (offline)', async () => {

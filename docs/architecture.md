@@ -50,7 +50,7 @@ Tinta `#172e59`, azul `#2458bb`, branco `#ffffff`, azul-claro `#eef3fc`, cinzent
 
 ## Estatísticas anónimas
 
-A extensão pode enviar lotes agregados de desempenho para o Worker descrito em [metrics.md](metrics.md). A recolha é local (`metrics.js`), sem identificador persistente, e respeita a preferência `metricsEnabled`.
+A extensão pode enviar lotes agregados de desempenho para o Worker descrito em [metrics.md](metrics.md). A recolha é local (`metrics.js`), sem identificador persistente, e está ativa por predefinição. A escolha explícita fica em `metricsChoice` (`on` | `off`); `metricsEnabled` mantém o valor booleano. Sem escolha guardada aplica-se a predefinição. A migração `{ type: 'migrate' }` de `data.js` regista como escolha explícita qualquer `metricsEnabled` já guardado, porque só o interruptor o escrevia. Corre na mesma fila de escrita do interruptor, para que uma escolha mais recente nunca seja sobreposta.
 
 ### Consistência e consentimento das métricas
 
@@ -58,7 +58,7 @@ O processo de background é o único escritor de `metricsPending`. O menu, as p�
 
 `metrics-validation.js` valida a mesma lista branca no cliente e no Worker. A extensão lê o esquema de `metrics-schema.js`, uma cópia de `metrics-schema.json` sem importações JSON no service worker. A cópia de contrato em `tests/fixtures/metrics-schema.json` e a cópia da extensão têm testes que impedem divergências do esquema distribuído. Não são aceites campos adicionais nem valores livres provenientes dos livros.
 
-No Firefox, `permissions.getAll().data_collection` tem de conter `technicalAndInteraction`, além da preferência local estar ativa. O gesto de ativação pede essa permissão com `permissions.request`; ausência da API, recusa ou erro impedem a recolha. A remoção da permissão apaga os agregados. Este contrato segue a [documentação de consentimento da Mozilla](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/).
+No Firefox, `permissions.getAll().data_collection` tem de conter `technicalAndInteraction`, além da preferência local estar ativa. O Firefox mostra esta permissão opcional marcada na instalação, pelo que a predefinição local também é ativa. O gesto de ativação pede essa permissão com `permissions.request`; ausência da API, recusa ou erro impedem a recolha. A remoção da permissão apaga os agregados. Este contrato segue a [documentação de consentimento da Mozilla](https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/).
 
 `comparison-metrics.js` recebe apenas ids de lojas e estados. Os relógios do menu começam na primeira linha do módulo e no clique em Comparar, respetivamente. Cada loja começa quando obtém um lugar na fila e termina depois de apresentar o resultado. A loja mais lenta é a última a concluir. As comparações automáticas e agendadas usam o mesmo coletor, sem gerar tempos do menu. Cancelar ou fechar o menu fecha a medição uma única vez.
 

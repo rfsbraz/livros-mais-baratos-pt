@@ -320,7 +320,7 @@ try {
   assert.ok(impact <= 5, `first rendered result impact ${impact}ms (${kind})`);
   console.log(`First-result median impact (${kind}): ${impact.toFixed(3)}ms`);
 
-  // Firefox-style opt-in: disabled by default means no pending growth after clear.
+  // An explicit opt-out means no pending growth after clear.
   await page.evaluate(async () => {
     const { setMetricsEnabled, recordPoints } = await import('./metrics.js');
     await setMetricsEnabled(false);

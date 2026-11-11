@@ -2,6 +2,7 @@ import { DEFAULT_STORE_IDS } from './stores.js';
 import { cachePrices } from './price-cache.js';
 import { isbn13, remember } from './core.js';
 import { STORES } from './stores.js';
+import { migrateMetricsChoice } from './metrics.js';
 let queue = Promise.resolve();
 export function migrateData(data) {
   const next = structuredClone(data);
@@ -110,6 +111,9 @@ export function writeData(action) {
         if (Object.keys(patch).length) {
           await chrome.storage.local.set(patch);
         }
+      }
+      if (action && typeof action === 'object' && action.type === 'migrate') {
+        await migrateMetricsChoice();
       }
       return next || data;
     });

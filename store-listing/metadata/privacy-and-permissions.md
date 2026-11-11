@@ -10,7 +10,7 @@ Comparar a mesma edição de um livro em lojas selecionadas, com avisos automát
 
 - `activeTab`: lê o separador atual quando o utilizador abre a extensão, para identificar ISBN e título na comparação manual.
 - `scripting`: lê a página ativa e regista o script incluído de deteção apenas em lojas selecionadas/autorizadas. Ativo por predefinição salvo desativação guardada; também inicializa separadores já abertos.
-- `storage`: guarda ISBN, títulos, histórico próprio, alvos, estado de notificações, lojas e preferências em chrome.storage.local. Sem sincronização. Estatísticas anónimas de desempenho são opcionais e descritas na política.
+- `storage`: guarda ISBN, títulos, histórico próprio, alvos, estado de notificações, lojas e preferências em chrome.storage.local. Sem sincronização. Estatísticas anónimas de desempenho estão ativas por predefinição, podem ser desativadas e estão descritas na política.
 - `alarms`: agenda consultas espaçadas apenas para alvos ativos e restaura o agendamento após reinício.
 - `notifications`: avisa quando um alvo é atingido ou surge preço elegível inferior; o aviso também fica na extensão.
 - `offscreen`: em Chrome/Edge, fornece DOM oculto incluído no pacote para analisar HTML enquanto a comparação decorre sem o menu aberto. Firefox usa página/moldura local equivalente. Scripts descarregados não são executados.
