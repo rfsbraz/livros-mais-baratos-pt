@@ -253,13 +253,16 @@ test('affiliate click metrics label Wook opt-out and partner clicks', async () =
   const { affiliateClickMetric, affiliateUrl } = await import('../../affiliate.js');
   const wook = affiliateUrl('https://www.wook.pt/livro/x', true);
   const bertrand = affiliateUrl('https://www.bertrand.pt/livro/x', true);
+  const mbooks = affiliateUrl('https://mbooks.pt/produto/x', true);
   assert.equal(affiliateClickMetric(wook, true), 'affiliate_click');
   assert.equal(affiliateClickMetric(bertrand, true), 'affiliate_click');
+  assert.equal(affiliateClickMetric(mbooks, true), 'affiliate_click');
   assert.equal(
     affiliateClickMetric('https://www.wook.pt/livro/x', false),
     'wook_click_no_affiliate'
   );
   assert.equal(affiliateClickMetric('https://www.bertrand.pt/livro/x', false), null);
+  assert.equal(affiliateClickMetric('https://mbooks.pt/produto/x', false), null);
   assert.equal(affiliateClickMetric('https://www.almedina.net/livro/x', true), null);
 });
 
@@ -281,6 +284,20 @@ test('affiliate destinations follow the preference, preserve attribution and exa
     affiliateUrl('https://www.bertrand.pt/livro/x?a_aid=existing', true),
     'https://www.bertrand.pt/livro/x?a_aid=existing'
   );
+  const mbooks = 'https://mbooks.pt/produto/exemplo/789?ref=1#stock';
+  assert.equal(
+    affiliateUrl(mbooks, true),
+    'https://mbooks.pt/produto/exemplo/789?ref=1&wpam_id=163#stock'
+  );
+  assert.equal(affiliateUrl(mbooks, false), mbooks);
+  assert.equal(
+    affiliateUrl('https://mbooks.pt/produto/x?wpam_id=existing', true),
+    'https://mbooks.pt/produto/x?wpam_id=existing'
+  );
+  assert.equal(
+    affiliateUrl('https://mbooks.pt/produto/x?wpam_id=163', true),
+    'https://mbooks.pt/produto/x?wpam_id=163'
+  );
   for (const url of [
     'https://www.wook.pt/livro/x?a_aid=existing',
     'https://www.wook.pt.evil.test/x',
@@ -289,6 +306,9 @@ test('affiliate destinations follow the preference, preserve attribution and exa
     'https://www.wook.pt:8443/x',
     'http://www.bertrand.pt/livro/x',
     'https://www.bertrand.pt.evil.test/x',
+    'http://mbooks.pt/produto/x',
+    'https://mbooks.pt.evil.test/x',
+    'https://www.mbooks.pt/produto/x',
     'javascript:alert(1)',
     'invalid'
   ]) {
