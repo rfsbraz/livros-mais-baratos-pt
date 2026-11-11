@@ -5,6 +5,12 @@ import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 const isbn = '9780306406157';
 const uuid = '497d41cb-12cc-4e58-81aa-93ab18677e01';
+test('popup store links use the available referral', () => {
+  execFileSync(process.execPath, ['tests/e2e/popup-affiliate.mjs', 'firefox'], {
+    stdio: 'inherit',
+    timeout: 90000
+  });
+});
 test('Firefox metrics require optional consent and keep the anonymous wire contract', () => {
   execFileSync(process.execPath, ['tests/e2e/metrics-browser.mjs', 'firefox'], {
     stdio: 'inherit',
