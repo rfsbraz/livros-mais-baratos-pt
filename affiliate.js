@@ -1,7 +1,8 @@
 // Add future partners here; comparison requests and stored offers stay unchanged.
 const PARTNERS = {
   'www.wook.pt': { parameter: 'a_aid', value: '5d3ee4327c2fd' },
-  'www.bertrand.pt': { parameter: 'a_aid', value: '5d3f094d9af11' }
+  'www.bertrand.pt': { parameter: 'a_aid', value: '5d3f094d9af11' },
+  'mbooks.pt': { parameter: 'wpam_id', value: '163' }
 };
 
 export function affiliateUrl(raw, enabled) {
@@ -27,7 +28,7 @@ export function affiliateUrl(raw, enabled) {
 
 /** Metric name for an outbound click, or null when the click is not counted. */
 export function affiliateClickMetric(href, enabled) {
-  if (enabled && /[?&]a_aid=/.test(href)) {
+  if (enabled && /[?&](?:a_aid|wpam_id)=/.test(href)) {
     return 'affiliate_click';
   }
   try {

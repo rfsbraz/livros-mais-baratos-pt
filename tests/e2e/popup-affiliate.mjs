@@ -19,10 +19,12 @@ const product = price =>
   `<html><head><title>Livro de teste</title><script type="application/ld+json">${JSON.stringify({ '@type': 'Book', isbn, name: 'Livro de teste', offers: { price, priceCurrency: 'EUR', availability: 'https://schema.org/InStock' } })}</script></head><body><h1>Livro de teste</h1><div class="sale-container"><div class="wook-container"><a href="${termsUrl}">Leitura em festa</a></div></div></body></html>`;
 const wookProduct = 'https://www.wook.pt/livro/teste';
 const bertrandSearch = `https://www.bertrand.pt/pesquisa/${isbn}`;
+const mbooksSearch = `https://mbooks.pt/?s=${isbn}&post_type=product`;
 const almedinaSearch = `https://www.almedina.net/catalogsearch/result/?q=${isbn}`;
 const hasAid = url => {
   try {
-    return new URL(url).searchParams.has('a_aid');
+    const params = new URL(url).searchParams;
+    return params.has('a_aid') || params.has('wpam_id');
   } catch {
     return false;
   }
@@ -164,7 +166,7 @@ try {
   if (kind === 'firefox') {
     await page.addInitScript(() => {
       window.__data = {
-        selectedStores: ['wook', 'bertrand', 'almedina'],
+        selectedStores: ['wook', 'bertrand', 'mbooks', 'almedina'],
         autoEnabled: false
       };
       const listeners = [];
@@ -215,7 +217,7 @@ try {
       (await context.waitForEvent('serviceworker', { timeout: 15000 }));
     await sw.evaluate(async () => {
       await chrome.storage.local.set({
-        selectedStores: ['wook', 'bertrand', 'almedina'],
+        selectedStores: ['wook', 'bertrand', 'mbooks', 'almedina'],
         autoEnabled: false
       });
     });
@@ -250,6 +252,7 @@ try {
       bannerHidden: document.querySelector('#cheapest-banner')?.hidden ?? null,
       promotion: document.querySelector('.voucher-promotion a')?.href || null,
       bertrand: href('#unconfirmed-results a', 'Bertrand'),
+      mbooks: href('#unconfirmed-results a', 'mbooks'),
       almedina: href('#unconfirmed-results a', 'Almedina'),
       fnac: document.querySelector('#manual-results a')?.href || null
     };
@@ -259,6 +262,7 @@ try {
     assert.ok(url, `${label} should already be on screen`);
     const bare = new URL(url);
     bare.searchParams.delete('a_aid');
+    bare.searchParams.delete('wpam_id');
     assert.equal(url, affiliateUrl(bare.href, true), label);
   };
   withReferral(snapshot.wook, 'AC3: Wook row carries the referral once the preference is on');
@@ -289,6 +293,32 @@ try {
       timeout: 20000
     });
   }
+  if ((await page.locator('#unconfirmed-results a').filter({ hasText: 'mbooks' }).count()) === 0) {
+    await page.getByRole('button', { name: 'Comparar', exact: true }).click();
+    await page.locator('#unconfirmed-results a').filter({ hasText: 'mbooks' }).waitFor({
+      timeout: 20000
+    });
+  }
+  const mbooksHref = await page
+    .locator('#unconfirmed-results a')
+    .filter({ hasText: 'mbooks' })
+    .getAttribute('href');
+  withReferral(mbooksHref, 'AC3: unconfirmed mbooks href');
+  assert.equal(
+    new URL(mbooksHref).searchParams.get('wpam_id'),
+    '163',
+    'AC3: mbooks href carries wpam_id=163 once the preference is on'
+  );
+  assert.equal(
+    new URL(mbooksHref).searchParams.get('s'),
+    isbn,
+    'AC3: mbooks keeps the existing search query'
+  );
+  assert.equal(
+    new URL(mbooksHref).searchParams.get('post_type'),
+    'product',
+    'AC3: mbooks keeps the existing post_type query'
+  );
   const hrefs = {
     fnac: snapshot.fnac
   };
@@ -332,6 +362,11 @@ try {
     affiliateUrl(bertrandSearch, true)
   );
   await assertOpen(
+    'unconfirmed-mbooks',
+    page.locator('#unconfirmed-results a').filter({ hasText: 'mbooks' }),
+    affiliateUrl(mbooksSearch, true)
+  );
+  await assertOpen(
     'unconfirmed-almedina',
     page.locator('#unconfirmed-results a').filter({ hasText: 'Almedina' }),
     almedinaSearch
@@ -353,6 +388,11 @@ try {
     'unconfirmed-bertrand-off',
     page.locator('#unconfirmed-results a').filter({ hasText: 'Bertrand' }),
     bertrandSearch
+  );
+  await assertOpen(
+    'unconfirmed-mbooks-off',
+    page.locator('#unconfirmed-results a').filter({ hasText: 'mbooks' }),
+    mbooksSearch
   );
   await assertOpen(
     'unconfirmed-almedina-off',
