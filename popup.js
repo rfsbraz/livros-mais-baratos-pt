@@ -8,7 +8,7 @@ import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
 import { renderHistoryChart } from './history-view.js';
-import { bindAffiliateLink, affiliateClickMetric } from './affiliate.js';
+import { bindAffiliateLink, affiliateClickMetric, refreshAffiliateLinks } from './affiliate.js';
 import { isbn13 } from './core.js';
 import { STORES, CATALOGUE, searchUrl } from './stores.js';
 import { detectBook } from './parser.js';
@@ -553,6 +553,7 @@ $('affiliate-toggle').onchange = async () => {
   try {
     await chrome.storage.local.set({ affiliateEnabled: next });
     affiliateEnabled = next;
+    refreshAffiliateLinks(affiliateEnabled);
   } catch {
     $('affiliate-toggle').checked = affiliateEnabled;
     status('Não foi possível guardar a preferência de afiliados.');
@@ -585,6 +586,7 @@ chrome.storage.onChanged?.addListener((changes, area) => {
   if (area === 'local' && changes.affiliateEnabled) {
     affiliateEnabled = changes.affiliateEnabled.newValue !== false;
     $('affiliate-toggle').checked = affiliateEnabled;
+    refreshAffiliateLinks(affiliateEnabled);
   }
 });
 $('save').onclick = async () => {
@@ -664,6 +666,7 @@ async function init() {
     $('wook-promotion-toggle').checked = wookPromotionEnabled;
     affiliateEnabled = data.affiliateEnabled !== false;
     $('affiliate-toggle').checked = affiliateEnabled;
+    refreshAffiliateLinks(affiliateEnabled);
     metricsEnabled = await metricsCollectionActive();
     if ($('metrics-toggle')) {
       $('metrics-toggle').checked = metricsEnabled;

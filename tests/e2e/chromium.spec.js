@@ -16,3 +16,10 @@ test('native Chromium regression suite', () => {
     });
   }
 });
+
+test('popup store links use the available referral', () => {
+  execFileSync(process.execPath, ['tests/e2e/popup-affiliate.mjs'], {
+    stdio: 'inherit',
+    timeout: 90000
+  });
+});

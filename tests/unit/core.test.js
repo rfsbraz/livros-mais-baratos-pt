@@ -296,6 +296,35 @@ test('affiliate destinations follow the preference, preserve attribution and exa
   }
 });
 
+test('refreshAffiliateLinks updates links already on screen when the preference arrives', async () => {
+  const { affiliateUrl, bindAffiliateLink, refreshAffiliateLinks } =
+    await import('../../affiliate.js');
+  const raw = 'https://www.wook.pt/livro/exemplo';
+  let enabled = false;
+  const listeners = [];
+  const link = {
+    href: raw,
+    isConnected: true,
+    addEventListener(type, handler) {
+      listeners.push([type, handler]);
+    }
+  };
+  bindAffiliateLink(link, () => enabled);
+  assert.equal(link.href, raw);
+  enabled = true;
+  refreshAffiliateLinks(true);
+  assert.equal(link.href, affiliateUrl(raw, true));
+  refreshAffiliateLinks(false);
+  assert.equal(link.href, raw);
+  enabled = true;
+  refreshAffiliateLinks(true);
+  link.href = raw;
+  const click = listeners.find(([type]) => type === 'click')?.[1];
+  assert.equal(typeof click, 'function');
+  click();
+  assert.equal(link.href, affiliateUrl(raw, true));
+});
+
 test('Worten search keeps only ISBN-matched product paths and ignores wrong editions', () => {
   const payload = {
     detailsResponse: {

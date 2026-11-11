@@ -40,15 +40,45 @@ export function affiliateClickMetric(href, enabled) {
   return null;
 }
 
+const originals = new WeakMap();
+const bound = new Set();
+const listening = new WeakSet();
+
+export function refreshAffiliateLinks(enabled) {
+  for (const link of [...bound]) {
+    if (!link.isConnected) {
+      bound.delete(link);
+      continue;
+    }
+    const original = originals.get(link);
+    if (original) {
+      link.href = affiliateUrl(original, enabled);
+    }
+  }
+}
+
 export function bindAffiliateLink(link, enabled, onNavigate) {
-  const original = link.href;
+  originals.set(link, link.href);
+  bound.add(link);
   const sync = () => {
-    link.href = affiliateUrl(original, enabled());
+    const original = originals.get(link);
+    if (original) {
+      link.href = affiliateUrl(original, enabled());
+    }
   };
   sync();
+  if (listening.has(link)) {
+    return;
+  }
+  listening.add(link);
   // The preference can change while the link is on screen, so follow it before it is opened or copied.
-  for (const type of ['click', 'auxclick', 'contextmenu']) {
-    link.addEventListener(type, sync);
+  for (const type of ['pointerdown', 'click', 'auxclick', 'contextmenu', 'keydown']) {
+    link.addEventListener(type, event => {
+      if (type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+      sync();
+    });
   }
   if (onNavigate) {
     link.addEventListener('click', event => {
