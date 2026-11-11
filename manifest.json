@@ -46,7 +46,7 @@
         "promotion-view.js",
         "metrics.js",
         "metrics-config.js",
-        "metrics-schema.json",
+        "metrics-schema.js",
         "metrics-validation.js",
         "comparison-metrics.js"
       ],

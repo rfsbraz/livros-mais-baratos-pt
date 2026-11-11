@@ -1,6 +1,6 @@
 import { METRICS_ENDPOINT } from './metrics-config.js';
 import { selectedStoreIds } from './stores.js';
-import schema from './metrics-schema.json' with { type: 'json' };
+import schema from './metrics-schema.js';
 import { validBatch, validPoint } from './metrics-validation.js';
 
 export { METRICS_ENDPOINT };
