@@ -64,6 +64,7 @@ try {
     }
     await new Promise(resolve => setTimeout(resolve, 150));
   });
+  assert.deepEqual(cspErrors, [], 'reading ISBN text must not activate page event handlers');
   // Chromium 158 reports the shop's inline handlers as CSP violations when DOMParser parses them,
   // without running them. Parse first, so the check below covers only reading the ISBN.
   await popup.evaluate(() => {
