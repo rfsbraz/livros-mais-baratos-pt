@@ -1,5 +1,5 @@
 import { validPromotion, voucherExample, PROMOTION_TTL } from './promotions.js';
-import { eligibleOffer } from './offers.js';
+import { eligibleOffer, compareByPriceThenReferral } from './offers.js';
 import { safeUrl } from './core.js';
 
 export function comparisonValue(offer, enabled = true, now = Date.now()) {
@@ -34,7 +34,14 @@ export function comparisonAlert(book, offers, sourceId, enabled = true, now = Da
     .map(offer => ({ offer, value: comparisonValue(offer, enabled, now) }));
   const selected = candidates
     .filter(c => c.value.price < current.price)
-    .sort((a, b) => a.value.price - b.value.price)[0];
+    .sort((a, b) =>
+      compareByPriceThenReferral(
+        a,
+        b,
+        item => item.value.price,
+        item => item.offer
+      )
+    )[0];
   if (!selected) {
     return null;
   }

@@ -1,3 +1,5 @@
+import { hasActiveReferral } from './stores.js';
+
 export function eligibleOffer(o) {
   return (
     o.status === 'ok' &&
@@ -10,12 +12,17 @@ export function eligibleOffer(o) {
   );
 }
 
-export function compareByPriceThenReferral(a, b, priceOf = offer => offer.price) {
+export function compareByPriceThenReferral(
+  a,
+  b,
+  priceOf = offer => offer.price,
+  storeOf = offer => offer
+) {
   const left = priceOf(a);
   const right = priceOf(b);
   const da = Number.isFinite(left) ? left : Infinity;
   const db = Number.isFinite(right) ? right : Infinity;
-  return da - db;
+  return da - db || Number(hasActiveReferral(storeOf(b))) - Number(hasActiveReferral(storeOf(a)));
 }
 
 export function rankOffers(offers, priceOf = offer => offer.price) {
@@ -50,14 +57,15 @@ export function showsCheapestBadge(offer, offers, priceOf = o => o.price) {
   if (!Number.isFinite(price)) {
     return false;
   }
-  const prices = offers.map(priceOf).filter(Number.isFinite);
-  return prices.length > 0 && price === Math.min(...prices);
+  const priced = offers.filter(o => Number.isFinite(priceOf(o)));
+  if (!priced.length || price !== Math.min(...priced.map(priceOf))) {
+    return false;
+  }
+  const tied = priced.filter(o => priceOf(o) === price);
+  return !tied.some(hasActiveReferral) || hasActiveReferral(offer);
 }
 
 export function targetOffer(offers, watch) {
-  const best = offers
-    .filter(eligibleOffer)
-    .filter(o => o.price <= watch.target)
-    .sort((a, b) => a.price - b.price)[0];
+  const best = cheapestOffer(offers.filter(eligibleOffer).filter(o => o.price <= watch.target));
   return best ? { ...best, targetPrice: best.price } : null;
 }

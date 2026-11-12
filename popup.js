@@ -2,7 +2,12 @@ const popupOpenedAt = performance.now();
 import { comparisonMetrics } from './comparison-metrics.js';
 import { initFeedback } from './feedback.js';
 import { comparisonValue } from './comparison-values.js';
-import { eligibleOffer } from './offers.js';
+import {
+  eligibleOffer,
+  rankPopupOffers,
+  cheapestBannerOffer,
+  showsCheapestBadge
+} from './offers.js';
 import { promotionCard } from './promotion-view.js';
 import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
@@ -245,12 +250,12 @@ function renderHistory() {
 }
 function updateCheapestBanner(offers) {
   const reference = current?.referencePrice;
-  const candidates = offers
-    .filter(eligibleOffer)
-    .map(offer => ({ offer, value: comparisonValue(offer, wookPromotionEnabled) }))
-    .filter(candidate => candidate.value.price !== null)
-    .sort((a, b) => a.value.price - b.value.price);
-  const candidate = candidates[0];
+  const priceOf = offer => comparisonValue(offer, wookPromotionEnabled).price;
+  const candidateOffer = cheapestBannerOffer(offers, priceOf);
+  const candidate = candidateOffer && {
+    offer: candidateOffer,
+    value: comparisonValue(candidateOffer, wookPromotionEnabled)
+  };
   const banner = $('cheapest-banner');
   if (!Number.isSafeInteger(reference) || !candidate || candidate.value.price >= reference) {
     banner.hidden = true;
@@ -290,14 +295,8 @@ function renderOffers(offers) {
     return result.price;
   };
   const known = available.filter(o => value(o) !== null);
-  const best = known.length ? Math.min(...known.map(value)) : null;
   updateCheapestBanner(offers);
-  const ordered = [...offers].sort(
-    (a, b) =>
-      (a.currency || 'EUR').localeCompare(b.currency || 'EUR') ||
-      (value(a) ?? Infinity) - (value(b) ?? Infinity) ||
-      (a.price || Infinity) - (b.price || Infinity)
-  );
+  const ordered = rankPopupOffers(offers, value);
   const missing = offers.filter(o => o.status !== 'ok').length;
   $('unconfirmed-count').textContent = `${missing} lojas sem preço confirmado`;
   $('unconfirmed').hidden = missing === 0;
@@ -347,7 +346,7 @@ function renderOffers(offers) {
     if (promotion) {
       row.append(promotion);
     }
-    if (best !== null && value(offer) === best && available.includes(offer)) {
+    if (available.includes(offer) && showsCheapestBadge(offer, known, value)) {
       row.classList.add('best');
       const badge = document.createElement('span');
       badge.className = 'badge';
