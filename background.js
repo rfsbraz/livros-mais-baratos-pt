@@ -85,7 +85,8 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     ) {
       return null;
     }
-    const { enabled, stores, cacheEpoch, wookPromotionEnabled } = await readAutoSettings();
+    const { enabled, stores, cacheEpoch, wookPromotionEnabled, affiliateEnabled } =
+      await readAutoSettings();
     const source = storeForUrl(sender.url);
     if (!enabled || !stores.some(s => s.id === source.id)) {
       return null;
@@ -97,13 +98,15 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
       book: message.book,
       sourceId: source.id,
       storeIds: stores.map(s => s.id),
-      wookPromotionEnabled
+      wookPromotionEnabled,
+      affiliateEnabled
     });
     const latest = await readAutoSettings();
     if (
       !latest.enabled ||
       latest.cacheEpoch !== cacheEpoch ||
       latest.wookPromotionEnabled !== wookPromotionEnabled ||
+      latest.affiliateEnabled !== affiliateEnabled ||
       latest.stores.map(s => s.id).join() !== stores.map(s => s.id).join()
     ) {
       return null;

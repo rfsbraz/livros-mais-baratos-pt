@@ -7,6 +7,7 @@ import {
   rankPopupOffers,
   cheapestOffer,
   cheapestBannerOffer,
+  cheapestBannerLinkChanged,
   showsCheapestBadge,
   targetOffer
 } from '../../offers.js';
@@ -173,4 +174,20 @@ test('with affiliate links off, an exact tie keeps the stable order', () => {
   assert.equal(cheaperOffer(book, [continente, bertrand], 'porto').id, 'continente', 'auto-rules');
   assert.equal(targetOffer([continente, bertrand], { target: 1500 }).id, 'continente');
   assert.equal(comparisonAlert(book, [continente, bertrand], 'porto', false, now).id, 'continente');
+});
+
+test('the cheapest banner updates the link when the chosen store changes at the same price', () => {
+  const bertrand = offer('bertrand', 1500);
+  const banner = { dataset: { price: '1500', offer: 'continente' } };
+  assert.equal(
+    cheapestBannerLinkChanged(banner, { offer: bertrand, value: { price: 1500 } }),
+    true
+  );
+  assert.equal(
+    cheapestBannerLinkChanged(
+      { dataset: { price: '1500', offer: 'bertrand' } },
+      { offer: bertrand, value: { price: 1500 } }
+    ),
+    false
+  );
 });

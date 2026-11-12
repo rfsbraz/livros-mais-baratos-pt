@@ -1,4 +1,4 @@
-import { referralPartner } from './affiliate.js';
+import { affiliateLinksEnabled, referralPartner } from './affiliate.js';
 
 // Research provenance and limitations: docs/store-coverage.md.
 const html = (id, name, origin, query, pattern, extra = {}) => ({
@@ -453,6 +453,9 @@ export function selectedStoreIds(value) {
 }
 
 export function hasActiveReferral(storeOrId) {
+  if (!affiliateLinksEnabled()) {
+    return false;
+  }
   const listed =
     typeof storeOrId === 'string'
       ? CATALOGUE.find(s => s.id === storeOrId)

@@ -1,4 +1,5 @@
 import { comparisonAlert } from './comparison-values.js';
+import { setAffiliateLinksEnabled } from './affiliate.js';
 import { STORES } from './stores.js';
 import { compareStore, pooled } from './compare.js';
 import { comparisonMetrics } from './comparison-metrics.js';
@@ -74,6 +75,7 @@ async function compare(message) {
       ...entry.offers.map(offer => storeResultPoint('auto', offer.id, 'cached', 0))
     ]).catch(() => {});
   }
+  setAffiliateLinksEnabled(message.affiliateEnabled);
   const alert = comparisonAlert(
     book,
     entry.offers,

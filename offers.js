@@ -45,6 +45,13 @@ export function cheapestOffer(offers, priceOf = offer => offer.price) {
   return rankOffers(offers, priceOf)[0];
 }
 
+export function cheapestBannerLinkChanged(banner, candidate) {
+  return (
+    Number(banner.dataset.price) !== candidate.value.price ||
+    banner.dataset.offer !== candidate.offer.id
+  );
+}
+
 export function cheapestBannerOffer(offers, priceOf = offer => offer.price) {
   return cheapestOffer(
     offers.filter(eligibleOffer).filter(o => Number.isFinite(priceOf(o))),
