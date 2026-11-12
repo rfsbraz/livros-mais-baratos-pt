@@ -324,6 +324,7 @@ try {
   const parsed = await page.evaluate(
     async ({ good, wrong }) => {
       const { parseOffer, detectBook, productLinks } = await import('./parser.js');
+      const { eligibleOffer } = await import('./offers.js');
       const { STORES } = await import('./core.js');
       const parse = s => new DOMParser().parseFromString(s, 'text/html');
       return {
@@ -357,12 +358,110 @@ try {
               isbn,
               wook
             ).availability,
+            // Wook's label is not Bertrand's: a Bertrand page without its purchase box stays unconfirmed.
             otherStore: parseOffer(
               page('EM STOCK', '{"price":"19.46","priceCurrency":"EUR"}'),
               isbn,
               'https://www.bertrand.pt/livro/a-criada/28535345'
             ).availability,
             otherEdition: parseOffer(page('EM STOCK'), '9780306406157', wook)
+          };
+        })(),
+        // Bertrand's real shape (12 Nov 2026): no availability in JSON-LD, the label in the purchase box.
+        bertrandStock: (() => {
+          const isbn = '9789899292345';
+          const url = 'https://www.bertrand.pt/livro/o-ladrao-de-aboboras-alice-hemming/33799729';
+          const offers = '{"@type":"Offer","priceCurrency":"EUR","price":"11.12"}';
+          const label = text => `<span class="text-green font-regular availability">${text}</span>`;
+          const notify =
+            '<button type="button" class="unstyle-btn text-black font-bold availability not-available-trigger" id="productPageRightSectionTop-salesInfo-notAvailable-btn" aria-haspopup="dialog">Notifiquem-me quando disponível</button>';
+          // Always on the page: the availability glossary and the notify-me modal.
+          const help =
+            '<div class="modal"><strong>Disponibilidade do artigo</strong><div><strong>EM STOCK ONLINE</strong></div><div><strong>PRÉ-LANÇAMENTO</strong></div></div><div class="availability-alert-description">Disponível em breve</div>';
+          const card =
+            '<div class="pc pc--unavailable"><span class="pc__badge pc__badge--state">Esgotado</span><a href="/livro/the-illegals-shaun-walker/25367248">The Illegals</a></div>';
+          const page = (box, o = offers, extra = '', id = isbn, path = url) =>
+            parse(
+              `<script type="application/ld+json">{"@type":"Book","name":"Livro","url":"${new URL(path).pathname}","offers":${o},"isbn":"${id}"}</script><h1>Livro</h1><div class="purchase-box-logistics"><div class="logistics-primary"><div class="logistic-item">${box}</div><div class="logistic-item delivery-estimated-row"><span class="delivery-date-text"></span></div></div></div>${help}${extra}`
+            );
+          const ilegais = 'https://www.bertrand.pt/livro/os-ilegais-shaun-walker/33808431';
+          return {
+            ac1: parseOffer(page(label('Em Stock Online')), isbn, url).availability,
+            ac1Affiliate: parseOffer(
+              page(label('Em Stock Online')),
+              isbn,
+              `${url}?a_aid=5d3f094d9af11`
+            ).availability,
+            immediate: parseOffer(page(label('Disponibilidade imediata')), isbn, url).availability,
+            prelaunch: parseOffer(page(label('Pré-lançamento')), isbn, url).availability,
+            ac3: parseOffer(
+              page(notify, offers, card, '9789899216532', ilegais),
+              '9789899216532',
+              ilegais
+            ).availability,
+            ac3CardOnly: parseOffer(page(label(''), offers, card), isbn, url).availability,
+            ac4: parseOffer(page(label('Disponível')), isbn, url).availability,
+            ac7: parseOffer(
+              page(
+                label('Em Stock Online'),
+                '{"@type":"Offer","priceCurrency":"EUR","price":"11.12","availability":"https://schema.org/OutOfStock"}'
+              ),
+              isbn,
+              url
+            ).availability,
+            ac8: parseOffer(page(label('')), isbn, url).availability,
+            ac10: eligibleOffer({
+              ...parseOffer(page(label('Em Stock Online')), isbn, url),
+              status: 'ok'
+            }),
+            ac10Unconfirmed: eligibleOffer({
+              ...parseOffer(page(label('Disponível')), isbn, url),
+              status: 'ok'
+            })
+          };
+        })(),
+        // Almedina's real shape (12 Nov 2026): no availability in JSON-LD, #availability in the product slot.
+        almedinaStock: (() => {
+          const isbn = '9789899292345';
+          const url = 'https://www.almedina.net/o-ladr-o-de-ab-boras-1790647240.html';
+          const offers = `{"@type":"Offer","url":"${url}","priceCurrency":"EUR","price":"12.51"}`;
+          const status = (id, text) =>
+            `<div class="availability"><a href="https://www.almedina.net/disponibilidade"><span id="availability" data-dispon-id="${id}"> ${text} </span></a></div>`;
+          const release =
+            '<div class="release-date ">Produto em Pré-Venda – Data de lançamento 19-11-2026</div>';
+          const page = (slot, o = offers, extra = '') =>
+            parse(
+              `<script type="application/ld+json">{"@type":"Product","additionalType":"https://schema.org/Book","name":"O Ladrão de Abóboras","sku":"${isbn}","isbn":"${isbn}","offers":${o}}</script><div class="product-info-main"><h1><span class="base">O Ladrão de Abóboras</span></h1>${slot}</div>${extra}`
+            );
+          // The help page text, and another product's status, are outside the product slot.
+          const glossary =
+            '<div class="cms-content"><strong>STOCK ONLINE</strong> O artigo encontra-se no stock da livraria online.</div><div class="product-item"><span class="availability" data-dispon-id="1">Stock Online Disponível</span></div>';
+          return {
+            ac2: parseOffer(page(status(1, 'Stock Online Disponível')), isbn, url).availability,
+            ac5: parseOffer(page(status(12, 'Disponível')), isbn, url).availability,
+            available5: parseOffer(page(status(5, 'Disponível')), isbn, url).availability,
+            publisher: parseOffer(
+              page(status(2, 'Sujeito a confirmação por parte da editora')),
+              isbn,
+              url
+            ).availability,
+            ac6: parseOffer(page(release), isbn, url).availability,
+            temporarily: parseOffer(page(status(8, 'Temporariamente Indisponível')), isbn, url)
+              .availability,
+            unavailable: parseOffer(page(status(3, 'Indisponível')), isbn, url).availability,
+            ac7: parseOffer(
+              page(
+                status(1, 'Stock Online Disponível'),
+                `{"@type":"Offer","url":"${url}","priceCurrency":"EUR","price":"12.51","availability":"https://schema.org/OutOfStock"}`
+              ),
+              isbn,
+              url
+            ).availability,
+            ac8: parseOffer(page('', offers, glossary), isbn, url).availability,
+            ac10: eligibleOffer({
+              ...parseOffer(page(status(1, 'Stock Online Disponível')), isbn, url),
+              status: 'ok'
+            })
           };
         })(),
         wrong: parseOffer(parse(wrong), '9780306406157', 'https://www.wook.pt/livro/example'),
@@ -378,6 +477,31 @@ try {
   );
   assert.equal(parsed.good, 1800);
   assert.equal(parsed.wook, 1946);
+  assert.deepEqual(parsed.bertrandStock, {
+    ac1: 'InStock',
+    ac1Affiliate: 'InStock',
+    immediate: 'InStock',
+    prelaunch: 'PreOrder',
+    ac3: 'OutOfStock',
+    ac3CardOnly: '',
+    ac4: '',
+    ac7: 'OutOfStock',
+    ac8: '',
+    ac10: true,
+    ac10Unconfirmed: false
+  });
+  assert.deepEqual(parsed.almedinaStock, {
+    ac2: 'InStock',
+    ac5: 'InStock',
+    available5: 'InStock',
+    publisher: '',
+    ac6: 'PreOrder',
+    temporarily: 'OutOfStock',
+    unavailable: 'OutOfStock',
+    ac7: 'OutOfStock',
+    ac8: '',
+    ac10: true
+  });
   assert.deepEqual(parsed.wookStock, {
     label: 'InStock',
     empty: '',

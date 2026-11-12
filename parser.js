@@ -110,6 +110,52 @@ function wookInStock(doc) {
   );
 }
 
+// Bertrand has no availability in its structured data either. Read the purchase box only: the
+// notify-me modal and the glossary are on every page, and other books' cards say «Esgotado».
+function bertrandAvailability(doc) {
+  const box = doc.querySelector('.purchase-box-logistics');
+  if (
+    box?.querySelector(
+      '#productPageRightSectionTop-salesInfo-notAvailable-btn, button.availability.not-available-trigger'
+    )
+  ) {
+    return 'OutOfStock';
+  }
+  const label = box?.querySelector('.logistic-item span.availability')?.textContent.trim();
+  return /^(em stock online|disponibilidade imediata)$/i.test(label)
+    ? 'InStock'
+    : /^pré-lançamento$/i.test(label)
+      ? 'PreOrder'
+      : '';
+}
+
+// Almedina's dispon-ids that can be ordered now (see almedina.net/disponibilidade).
+const ALMEDINA_ORDERABLE = new Set(['1', '2', '4', '5', '6', '12', '13', '15', '16']);
+
+// Almedina likewise: read the status in the product slot, not the cart button or is_salable.
+function almedinaAvailability(doc) {
+  const slot = doc.querySelector('.product-info-main');
+  if (/^produto em pré-venda/i.test(slot?.querySelector('.release-date')?.textContent.trim())) {
+    return 'PreOrder';
+  }
+  const status = slot?.querySelector('#availability');
+  const label = status?.textContent.trim() || '';
+  const id = status?.dataset.disponId;
+  if (id === '1' || /^stock online disponível$/i.test(label)) {
+    return 'InStock';
+  }
+  if (/^disponível$/i.test(label) && ALMEDINA_ORDERABLE.has(id)) {
+    return 'InStock';
+  }
+  return /^(temporariamente )?indisponível$/i.test(label) ? 'OutOfStock' : '';
+}
+
+const PAGE_AVAILABILITY = {
+  wook: doc => (wookInStock(doc) ? 'InStock' : ''),
+  bertrand: bertrandAvailability,
+  almedina: almedinaAvailability
+};
+
 function marketplaceSeller(doc) {
   const text = doc.querySelector('a[href*="marketplace-seller"]')?.textContent || '';
   const seller = text.replace(/\s+/g, ' ').trim();
@@ -191,7 +237,7 @@ export function parseOffer(doc, isbn, url) {
     availability: store?.uncertainStock
       ? ''
       : offer.availability ||
-        (verifiedPage && store?.id === 'wook' && wookInStock(doc) ? 'InStock' : ''),
+        (verifiedPage && PAGE_AVAILABILITY[store?.id] ? PAGE_AVAILABILITY[store.id](doc) : ''),
     condition: offer.condition || (store?.marketplace ? 'UnknownCondition' : 'NewCondition')
   };
 }
