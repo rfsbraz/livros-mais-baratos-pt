@@ -1,3 +1,5 @@
+import { referralPartner } from './affiliate.js';
+
 // Research provenance and limitations: docs/store-coverage.md.
 const html = (id, name, origin, query, pattern, extra = {}) => ({
   id,
@@ -448,4 +450,15 @@ export function selectedStoreIds(value) {
   return Array.isArray(value)
     ? value.filter(id => STORES.some(s => s.id === id))
     : [...DEFAULT_STORE_IDS];
+}
+
+export function hasActiveReferral(storeOrId) {
+  const listed =
+    typeof storeOrId === 'string'
+      ? CATALOGUE.find(s => s.id === storeOrId)
+      : storeOrId?.id
+        ? CATALOGUE.find(s => s.id === storeOrId.id)
+        : undefined;
+  const store = listed || (typeof storeOrId === 'object' && storeOrId) || undefined;
+  return Boolean(store?.origin && referralPartner(store.origin));
 }

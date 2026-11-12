@@ -89,3 +89,11 @@ export function bindAffiliateLink(link, enabled, onNavigate) {
     });
   }
 }
+
+export function referralPartner(originOrUrl) {
+  try {
+    return PARTNERS[new URL(originOrUrl).hostname] || null;
+  } catch {
+    return null;
+  }
+}
