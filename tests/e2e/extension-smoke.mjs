@@ -64,12 +64,19 @@ try {
     }
     await new Promise(resolve => setTimeout(resolve, 150));
   });
-  const extracted = await popup.evaluate(async () => {
-    const { pageIsbn } = await import('./parser.js');
-    const doc = new DOMParser().parseFromString(
+  // Chromium 158 reports the shop's inline handlers as CSP violations when DOMParser parses them,
+  // without running them. Parse first, so the check below covers only reading the ISBN.
+  await popup.evaluate(() => {
+    window.__shopDoc = new DOMParser().parseFromString(
       '<html><body><svg onload="window.__shopHandlerExecuted = true"></svg><img src="https://example.invalid/tracker" onerror="window.__shopHandlerExecuted = true"><nav>ISBN 9780804429573</nav><p>ISBN: <em>9780306406157</em></p></body></html>',
       'text/html'
     );
+  });
+  await popup.waitForTimeout(150);
+  cspErrors.length = 0;
+  const extracted = await popup.evaluate(async () => {
+    const { pageIsbn } = await import('./parser.js');
+    const doc = window.__shopDoc;
     const isbn = pageIsbn(doc);
     await new Promise(resolve => setTimeout(resolve, 150));
     return {
