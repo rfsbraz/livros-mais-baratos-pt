@@ -8,7 +8,8 @@ test('native Chromium regression suite', () => {
     'watch-browser',
     'voucher',
     'metrics-browser',
-    'worker-restart'
+    'worker-restart',
+    'store-availability'
   ]) {
     execFileSync(process.execPath, ['tests/e2e/' + file + '.mjs'], {
       stdio: 'inherit',
