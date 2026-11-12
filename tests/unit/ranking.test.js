@@ -1,6 +1,7 @@
-import { test } from 'node:test';
+import { afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { hasActiveReferral } from '../../stores.js';
+import { setAffiliateLinksEnabled } from '../../affiliate.js';
 import {
   rankOffers,
   rankPopupOffers,
@@ -151,4 +152,25 @@ test('the referral flag comes from store config, not a hardcoded list in the sor
   assert.equal(targetOffer([other, referral], { target: 1500 }).id, 'partner-shop');
   assert.equal(cheaperOffer(book, [other, referral], 'porto').id, 'partner-shop');
   assert.equal(comparisonAlert(book, [other, referral], 'porto', false, now).id, 'partner-shop');
+});
+
+afterEach(() => setAffiliateLinksEnabled(true));
+
+test('with affiliate links off, an exact tie keeps the stable order', () => {
+  const continente = offer('continente', 1500);
+  const bertrand = offer('bertrand', 1500);
+  setAffiliateLinksEnabled(false);
+  assert.equal(hasActiveReferral('bertrand'), false);
+  assert.equal(hasActiveReferral('wook'), false);
+  assert.deepEqual(
+    rankPopupOffers([continente, bertrand]).map(o => o.id),
+    ['continente', 'bertrand']
+  );
+  assert.equal(showsCheapestBadge(continente, [continente, bertrand]), true);
+  assert.equal(showsCheapestBadge(bertrand, [continente, bertrand]), true);
+  assert.equal(cheapestBannerOffer([continente, bertrand]).id, 'continente');
+  assert.equal(rankOffers([continente, bertrand])[0].id, 'continente', 'shared comparator');
+  assert.equal(cheaperOffer(book, [continente, bertrand], 'porto').id, 'continente', 'auto-rules');
+  assert.equal(targetOffer([continente, bertrand], { target: 1500 }).id, 'continente');
+  assert.equal(comparisonAlert(book, [continente, bertrand], 'porto', false, now).id, 'continente');
 });
