@@ -5,6 +5,17 @@ const PARTNERS = {
   'mbooks.pt': { parameter: 'wpam_id', value: '163' }
 };
 
+let linksEnabled = true;
+
+export function affiliateLinksEnabled(value = linksEnabled) {
+  return value !== false;
+}
+
+export function setAffiliateLinksEnabled(value) {
+  linksEnabled = value !== false;
+  return linksEnabled;
+}
+
 export function affiliateUrl(raw, enabled) {
   if (!enabled) {
     return raw;
@@ -87,5 +98,13 @@ export function bindAffiliateLink(link, enabled, onNavigate) {
         /* Metrics must never block navigation. */
       }
     });
+  }
+}
+
+export function referralPartner(originOrUrl) {
+  try {
+    return PARTNERS[new URL(originOrUrl).hostname] || null;
+  } catch {
+    return null;
   }
 }

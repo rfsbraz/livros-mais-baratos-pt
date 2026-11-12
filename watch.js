@@ -3,6 +3,7 @@ import { cachePrices } from './price-cache.js';
 import { STORES } from './stores.js';
 import { remember, safeUrl } from './core.js';
 import { targetOffer } from './offers.js';
+import { setAffiliateLinksEnabled } from './affiliate.js';
 import { writeData } from './data.js';
 export const WATCH_ALARM = 'saved-book-check';
 export function nextDue(data, now = Date.now()) {
@@ -50,6 +51,7 @@ export function completeWatch(data, message, now = Date.now()) {
   watch.lastStatus = offers.some(o => o.status === 'ok') ? 'ok' : 'unavailable';
   next.priceCache = cachePrices(next.priceCache, book.isbn, offers, now, now);
   next.history = remember(next.history || {}, book.isbn, offers, now, 'scheduled');
+  setAffiliateLinksEnabled(data.affiliateEnabled);
   const best = targetOffer(offers, watch);
   if (
     best &&

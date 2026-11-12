@@ -1,4 +1,5 @@
 import { selectedStoreIds, STORES } from './stores.js';
+import { affiliateLinksEnabled } from './affiliate.js';
 
 const SCRIPT_ID = 'book-alerts';
 const RETRY_ALARM = 'book-alerts-sync-retry';
@@ -8,7 +9,8 @@ export async function readAutoSettings() {
     'autoEnabled',
     'selectedStores',
     'cacheEpoch',
-    'wookPromotionEnabled'
+    'wookPromotionEnabled',
+    'affiliateEnabled'
   ]);
   const grants = await chrome.permissions.getAll();
   const stores = STORES.filter(
@@ -19,6 +21,7 @@ export async function readAutoSettings() {
   return {
     cacheEpoch: data.cacheEpoch || 0,
     wookPromotionEnabled: data.wookPromotionEnabled !== false,
+    affiliateEnabled: affiliateLinksEnabled(data.affiliateEnabled),
     enabled: data.autoEnabled !== false,
     stores,
     grantCount: grants.origins?.length || 0

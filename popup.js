@@ -2,13 +2,24 @@ const popupOpenedAt = performance.now();
 import { comparisonMetrics } from './comparison-metrics.js';
 import { initFeedback } from './feedback.js';
 import { comparisonValue } from './comparison-values.js';
-import { eligibleOffer } from './offers.js';
+import {
+  eligibleOffer,
+  rankPopupOffers,
+  cheapestBannerOffer,
+  cheapestBannerLinkChanged,
+  showsCheapestBadge
+} from './offers.js';
 import { promotionCard } from './promotion-view.js';
 import { DEFAULT_STORE_IDS, selectedStoreIds } from './stores.js';
 import { cachedPrices } from './price-cache.js';
 import { changeData } from './data.js';
 import { renderHistoryChart } from './history-view.js';
-import { bindAffiliateLink, affiliateClickMetric, refreshAffiliateLinks } from './affiliate.js';
+import {
+  bindAffiliateLink,
+  affiliateClickMetric,
+  refreshAffiliateLinks,
+  setAffiliateLinksEnabled
+} from './affiliate.js';
 import { isbn13 } from './core.js';
 import { STORES, CATALOGUE, searchUrl } from './stores.js';
 import { detectBook } from './parser.js';
@@ -245,24 +256,26 @@ function renderHistory() {
 }
 function updateCheapestBanner(offers) {
   const reference = current?.referencePrice;
-  const candidates = offers
-    .filter(eligibleOffer)
-    .map(offer => ({ offer, value: comparisonValue(offer, wookPromotionEnabled) }))
-    .filter(candidate => candidate.value.price !== null)
-    .sort((a, b) => a.value.price - b.value.price);
-  const candidate = candidates[0];
+  const priceOf = offer => comparisonValue(offer, wookPromotionEnabled).price;
+  const candidateOffer = cheapestBannerOffer(offers, priceOf);
+  const candidate = candidateOffer && {
+    offer: candidateOffer,
+    value: comparisonValue(candidateOffer, wookPromotionEnabled)
+  };
   const banner = $('cheapest-banner');
   if (!Number.isSafeInteger(reference) || !candidate || candidate.value.price >= reference) {
     banner.hidden = true;
     delete banner.dataset.price;
+    delete banner.dataset.offer;
     return;
   }
-  const changed = Number(banner.dataset.price) !== candidate.value.price;
+  const changed = cheapestBannerLinkChanged(banner, candidate);
   const improved =
     Number.isSafeInteger(Number(banner.dataset.price)) &&
     candidate.value.price < Number(banner.dataset.price);
   banner.hidden = false;
   banner.dataset.price = String(candidate.value.price);
+  banner.dataset.offer = candidate.offer.id;
   $('cheapest-banner-text').textContent = `${
     improved ? 'Novo preço mais baixo' : 'Preço mais baixo confirmado'
   }: ${money(candidate.value.price)} na ${candidate.offer.name} (${money(reference - candidate.value.price)} de poupança).`;
@@ -290,14 +303,8 @@ function renderOffers(offers) {
     return result.price;
   };
   const known = available.filter(o => value(o) !== null);
-  const best = known.length ? Math.min(...known.map(value)) : null;
   updateCheapestBanner(offers);
-  const ordered = [...offers].sort(
-    (a, b) =>
-      (a.currency || 'EUR').localeCompare(b.currency || 'EUR') ||
-      (value(a) ?? Infinity) - (value(b) ?? Infinity) ||
-      (a.price || Infinity) - (b.price || Infinity)
-  );
+  const ordered = rankPopupOffers(offers, value);
   const missing = offers.filter(o => o.status !== 'ok').length;
   $('unconfirmed-count').textContent = `${missing} lojas sem preço confirmado`;
   $('unconfirmed').hidden = missing === 0;
@@ -347,7 +354,7 @@ function renderOffers(offers) {
     if (promotion) {
       row.append(promotion);
     }
-    if (best !== null && value(offer) === best && available.includes(offer)) {
+    if (available.includes(offer) && showsCheapestBadge(offer, known, value)) {
       row.classList.add('best');
       const badge = document.createElement('span');
       badge.className = 'badge';
@@ -552,8 +559,9 @@ $('affiliate-toggle').onchange = async () => {
   const next = $('affiliate-toggle').checked;
   try {
     await chrome.storage.local.set({ affiliateEnabled: next });
-    affiliateEnabled = next;
+    affiliateEnabled = setAffiliateLinksEnabled(next);
     refreshAffiliateLinks(affiliateEnabled);
+    renderOffers(activeOffers);
   } catch {
     $('affiliate-toggle').checked = affiliateEnabled;
     status('Não foi possível guardar a preferência de afiliados.');
@@ -584,9 +592,10 @@ chrome.storage.onChanged?.addListener((changes, area) => {
     renderOffers(activeOffers);
   }
   if (area === 'local' && changes.affiliateEnabled) {
-    affiliateEnabled = changes.affiliateEnabled.newValue !== false;
+    affiliateEnabled = setAffiliateLinksEnabled(changes.affiliateEnabled.newValue);
     $('affiliate-toggle').checked = affiliateEnabled;
     refreshAffiliateLinks(affiliateEnabled);
+    renderOffers(activeOffers);
   }
 });
 $('save').onclick = async () => {
@@ -664,7 +673,7 @@ async function init() {
     autoLabel();
     wookPromotionEnabled = data.wookPromotionEnabled !== false;
     $('wook-promotion-toggle').checked = wookPromotionEnabled;
-    affiliateEnabled = data.affiliateEnabled !== false;
+    affiliateEnabled = setAffiliateLinksEnabled(data.affiliateEnabled);
     $('affiliate-toggle').checked = affiliateEnabled;
     refreshAffiliateLinks(affiliateEnabled);
     metricsEnabled = await metricsCollectionActive();

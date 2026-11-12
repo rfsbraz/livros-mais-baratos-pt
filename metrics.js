@@ -1,5 +1,6 @@
 import { METRICS_ENDPOINT } from './metrics-config.js';
 import { selectedStoreIds } from './stores.js';
+import { affiliateLinksEnabled } from './affiliate.js';
 import schema from './metrics-schema.js';
 import { validBatch, validPoint } from './metrics-validation.js';
 
@@ -244,7 +245,7 @@ export async function readMetricsState() {
     selectedStores: data.selectedStores,
     autoEnabled: data.autoEnabled !== false,
     wookPromotionEnabled: data.wookPromotionEnabled !== false,
-    affiliateEnabled: data.affiliateEnabled !== false
+    affiliateEnabled: affiliateLinksEnabled(data.affiliateEnabled)
   };
 }
 

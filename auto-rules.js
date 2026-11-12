@@ -1,5 +1,5 @@
 import { safeUrl, isbn13 } from './core.js';
-import { storeForUrl } from './stores.js';
+import { storeForUrl, hasActiveReferral } from './stores.js';
 
 export function validCurrent(book, url) {
   const store = storeForUrl(url);
@@ -37,6 +37,8 @@ export function cheaperOffer(current, offers, sourceId) {
           o.price < current.price &&
           safeUrl(o.url, o.origin)
       )
-      .sort((a, b) => a.price - b.price)[0] || null
+      .sort(
+        (a, b) => a.price - b.price || Number(hasActiveReferral(b)) - Number(hasActiveReferral(a))
+      )[0] || null
   );
 }

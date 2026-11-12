@@ -1,7 +1,7 @@
 import { validPromotion } from './promotions.js';
 import { promotionCard } from './promotion-view.js';
 import { selectedStoreIds } from './stores.js';
-import { bindAffiliateLink, affiliateClickMetric } from './affiliate.js';
+import { bindAffiliateLink, affiliateClickMetric, setAffiliateLinksEnabled } from './affiliate.js';
 import { recordPoints, latencyBucket } from './metrics.js';
 import { detectBook, parseOffer, structured } from './parser.js';
 import { storeForUrl } from './stores.js';
@@ -127,7 +127,7 @@ export function start() {
     if (stopped || location.href !== url) {
       return;
     }
-    affiliateEnabled = data.affiliateEnabled !== false;
+    affiliateEnabled = setAffiliateLinksEnabled(data.affiliateEnabled);
     if (data.autoEnabled === false || !selectedStoreIds(data.selectedStores).includes(store?.id)) {
       remove();
       key = '';
@@ -225,7 +225,7 @@ export function start() {
       return;
     }
     if (changes.affiliateEnabled) {
-      affiliateEnabled = changes.affiliateEnabled.newValue !== false;
+      affiliateEnabled = setAffiliateLinksEnabled(changes.affiliateEnabled.newValue);
     }
     generation++;
     key = '';
