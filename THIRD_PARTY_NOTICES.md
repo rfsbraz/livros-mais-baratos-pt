@@ -20,4 +20,4 @@ Ao adicionar dependências ou código de terceiros, regista a licença, preserva
 
 ## Afiliados
 
-O identificador público Wook em `affiliate.js` é um identificador de atribuição, não uma credencial. As ligações opcionais estão ativas por predefinição e podem ser desativadas nas definições. Não alteram os pedidos de comparação. Em empate de preço, ao cêntimo, a loja com ligação de afiliado na configuração fica à frente. Quem distribuir uma versão derivada deve rever o identificador e as divulgações correspondentes.
+O identificador público Wook em `affiliate.js` é um identificador de atribuição, não uma credencial. As ligações opcionais estão ativas por predefinição e podem ser desativadas nas definições. Não alteram os pedidos de comparação. Com as ligações de afiliado ativas, em empate de preço, ao cêntimo, a loja com ligação de afiliado na configuração fica à frente. Com a opção desativada, o empate mantém a ordem anterior. Quem distribuir uma versão derivada deve rever o identificador e as divulgações correspondentes.
