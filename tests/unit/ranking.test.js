@@ -35,8 +35,6 @@ function offer(id, price, extra = {}) {
   return {
     id,
     name: names[id] || id,
-    origin,
-    url: `${origin}/livro/teste`,
     status: 'ok',
     price,
     currency: 'EUR',
