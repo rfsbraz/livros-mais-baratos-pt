@@ -5,7 +5,7 @@ Abre Definições para escolher lojas, avisos, afiliados e eliminação de dados
 Não exige início de sessão, subscrição, chave de API ou pagamento. A interface está em português de Portugal.
 
 Afiliados:
-Ativos por predefinição, com opção Apoiar através de ligações de afiliado. Enquanto a opção estiver ativa, todas as ligações para a Wook mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» e ligações copiadas, incluem a_aid=5d3ee4327c2fd. Pedidos de segundo plano e ordenação não mudam. Atribuição existente é preservada. Desativar impede novas adições. A Wook pode usar cookies depois da navegação.
+Ativos por predefinição, com opção Apoiar através de ligações de afiliado. Enquanto a opção estiver ativa, todas as ligações para a Wook mostradas pela extensão, incluindo ofertas mais caras, «Saber mais» e ligações copiadas, incluem a_aid=5d3ee4327c2fd. Pedidos de segundo plano não mudam. A ordenação só prefere uma loja com afiliado quando o preço empata ao cêntimo. Atribuição existente é preservada. Desativar impede novas adições. A Wook pode usar cookies depois da navegação.
 
 Alvos e histórico:
 Guarda um livro, define um alvo para o livro e mantém o navegador aberto. A primeira consulta começa após alguns minutos, respeitando o intervalo de dez minutos. Desativa em Verificar preços-alvo da estante. Os gráficos só usam observações locais. As permissões alarms e notifications são declaradas na instalação/atualização.
