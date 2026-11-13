@@ -43,15 +43,15 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.56.1",
-    "esbuild": "^0.25.12",
+    "@playwright/test": "^1.65.0",
+    "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "globals": "^17.14.0",
-    "playwright": "1.56.1",
+    "playwright": "1.65.0",
     "playwright-webextext": "^0.0.5",
     "prettier": "^3.9.10",
     "tslib": "^2.9.1",
-    "wrangler": "^4.157.0"
+    "wrangler": "^4.159.0"
   },
   "engines": {
     "node": ">=22.13.0"
