@@ -27,6 +27,21 @@
 - Tratar campos ISBN de editoras, hífenes Unicode, preços de venda apresentados e pesquisa Mundo Fantasma.
 - Documentar testes reais, falhas de acesso e limitações por loja, com amostras reconstruídas e testes de regressão no navegador.
 
+## [0.1.10](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.9...v0.1.10) (2026-11-14)
+
+
+### Funcionalidades
+
+* **affiliate:** identificador mbooks nas ligações ([#93](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/93)) ([0d4dfff](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/0d4dfffe787d097c653942664fe50a21a1e8241b))
+* **ranking:** preferir lojas com referência quando os preços empatam ([#96](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/96)) ([8287ce5](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/8287ce513e830befe84ed92187b16b1ce43f4d8c))
+
+
+### Correções
+
+* **parser:** ler a disponibilidade da Bertrand e da Almedina na página do produto ([#94](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/94)) ([3ff327d](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/3ff327d86e59cf864f877fa4e6ae42aa6d8647c8))
+* **popup:** aplicar a referência nas ligações já mostradas ([#90](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/90)) ([e417fa3](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/e417fa3d53b9cdb10c760674dc35879b722f4478)), closes [#89](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/89)
+* **popup:** libertar ligações de afiliado já removidas ([#92](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/92)) ([a2f8e78](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/a2f8e78ed60239cb04270a4298960ba12aa17707))
+
 ## [0.1.9](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.8...v0.1.9) (2026-11-11)
 
 
