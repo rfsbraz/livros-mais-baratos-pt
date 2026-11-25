@@ -17,7 +17,7 @@ O Analytics Engine aceita 250 escritas por pedido, e o Worker usa uma delas para
 
 ## Lote
 
-O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. A extensão usa a cópia `metrics-schema.js`, porque o service worker do Chrome não volta a arrancar depois de parar quando importa JSON como módulo; um teste unitário garante que as duas cópias são iguais. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado. Nos pontos `store_latency` com resultado `no_price` podem aparecer dois campos opcionais: `page` (`search` ou `product`), com o tipo do documento já depois de redirecionamentos, e `http_status`, um código HTTP entre 100 e 599. Os pontos antigos, sem estes campos, continuam válidos. Os outros resultados não os enviam.
+O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. A extensão usa a cópia `metrics-schema.js`, porque o service worker do Chrome não volta a arrancar depois de parar quando importa JSON como módulo; um teste unitário garante que as duas cópias são iguais. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado. Nos pontos `store_latency` com resultado `no_price` podem aparecer dois campos opcionais: `page` (`search` ou `product`), com o tipo do documento já depois de redirecionamentos, e `http_status`, um código HTTP entre 100 e 599. O campo `page` só é enviado quando o destino resolvido é uma página de pesquisa ou de produto; respostas de API e outros destinos omitem-no. Os pontos antigos, sem estes campos, continuam válidos. Os outros resultados não os enviam.
 
 ```json
 {

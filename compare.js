@@ -13,7 +13,12 @@ async function loadText(url, signal) {
     signal: AbortSignal.any([signal, AbortSignal.timeout(12000)])
   });
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+    const error = new Error(`HTTP ${response.status}`);
+    error.status = response.status;
+    if (safeUrl(response.url, url)) {
+      error.url = response.url;
+    }
+    throw error;
   }
   if (!safeUrl(response.url, url)) {
     throw new Error('Destino fora da loja');
@@ -36,12 +41,39 @@ export async function loadPage(url, signal) {
   return doc;
 }
 
+function searchTemplate(store, template, url) {
+  if (!template) {
+    return false;
+  }
+  const resolved = new URL(url);
+  const sample = new URL(template.replace('{q}', 'QUERY'), store.origin);
+  if (resolved.origin !== sample.origin) {
+    return false;
+  }
+  const normalize = path => path.replace(/QUERY|[0-9]{10,13}/g, '{q}');
+  if (normalize(resolved.pathname) !== normalize(sample.pathname)) {
+    return false;
+  }
+  const keys = [...sample.searchParams.keys()];
+  if (keys.length && !keys.every(key => resolved.searchParams.has(key))) {
+    return false;
+  }
+  return sample.pathname !== '/' || keys.length > 0;
+}
+
 function resolvedPage(store, url) {
   try {
-    return store.product.test(new URL(url).pathname) ? 'product' : 'search';
+    const path = new URL(url).pathname;
+    if (store.product.test(path)) {
+      return 'product';
+    }
+    if ([store.query, store.titleQuery].some(template => searchTemplate(store, template, url))) {
+      return 'search';
+    }
   } catch {
     return undefined;
   }
+  return undefined;
 }
 
 function httpStatusCode(value) {
@@ -75,12 +107,26 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
     }
     return resource;
   };
-  const load = async (target, abort) => {
-    const doc = await loader(target, abort);
-    observe({ url: doc.shopUrl || target, status: doc.httpStatus });
-    return doc;
+  const recall = error => {
+    observe({ url: error.url, status: error.status });
+    throw error;
   };
-  const read = async (target, abort) => observe(await loadText(target, abort));
+  const load = async (target, abort) => {
+    try {
+      const doc = await loader(target, abort);
+      observe({ url: doc.shopUrl || target, status: doc.httpStatus });
+      return doc;
+    } catch (error) {
+      return recall(error);
+    }
+  };
+  const read = async (target, abort) => {
+    try {
+      return observe(await loadText(target, abort));
+    } catch (error) {
+      return recall(error);
+    }
+  };
   const json = async (endpoint, abort) => JSON.parse((await read(endpoint, abort)).text);
   const apiOffer = (target, verify) =>
     store.adapter === 'woo-product'

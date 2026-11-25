@@ -115,15 +115,17 @@ export function outcomeFromStatus(status) {
 }
 
 function pointKey(point) {
-  return [
+  const key = [
     point.metric,
     point.surface || '',
     point.store || '',
     point.outcome || '',
-    point.bucket || '',
-    point.page || '',
-    point.http_status ?? ''
-  ].join('\0');
+    point.bucket || ''
+  ];
+  if (point.page || point.http_status != null) {
+    key.push(point.page || '', point.http_status ?? '');
+  }
+  return key.join('\0');
 }
 
 function noPriceFields(point) {

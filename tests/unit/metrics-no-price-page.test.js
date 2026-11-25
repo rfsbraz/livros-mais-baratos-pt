@@ -17,12 +17,24 @@ const SEARCH_URL = almedina.search(SEARCH_ISBN);
 const productFixture = readFileSync('tests/fixtures/almedina-no-price-product.html', 'utf8');
 const searchFixture = readFileSync('tests/fixtures/almedina-no-price-search.html', 'utf8');
 
-function stubDoc({ url, status }) {
+function stubDoc({ url, status, hrefs = [] }) {
   return {
     shopUrl: url,
     httpStatus: status,
     title: '',
-    querySelectorAll: () => [],
+    querySelectorAll: selector => {
+      if (
+        !hrefs.length ||
+        selector === 'script[type="application/ld+json"]' ||
+        !(String(selector).includes('product-item-link') || selector === 'a[href]')
+      ) {
+        return [];
+      }
+      return hrefs.map(href => ({
+        getAttribute: name => (name === 'href' ? href : null),
+        textContent: ''
+      }));
+    },
     querySelector: () => null
   };
 }
@@ -233,4 +245,70 @@ test('Analytics Engine writes page and status after the existing columns', () =>
     '2000'
   ]);
   assertNoIdentifiers(noPricePoint);
+});
+
+test('pending keys stay stable when optional no_price fields are absent', () => {
+  const legacy = {
+    metric: 'store_latency',
+    surface: 'popup',
+    store: 'almedina',
+    outcome: 'no_price',
+    bucket: '2000',
+    count: 1
+  };
+  const legacyKey = ['store_latency', 'popup', 'almedina', 'no_price', '2000'].join('\0');
+  const pending = mergePoint({ points: { [legacyKey]: legacy } }, legacy);
+  assert.equal(Object.keys(pending.points).length, 1);
+  assert.equal(pending.points[legacyKey].count, 2);
+  const withFields = { ...legacy, page: 'search', http_status: 200 };
+  const next = mergePoint(pending, withFields);
+  assert.equal(Object.keys(next.points).length, 2);
+  assert.equal(next.points[legacyKey].count, 2);
+});
+
+test('no_price omits page for API or unknown URLs', async () => {
+  const unknown = 'https://www.almedina.net/customer/account/';
+  const api = 'https://www.almedina.net/wp-json/wc/store/v1/products?sku=0000000000000';
+  const result = await compareStore(almedina, SEARCH_ISBN, AbortSignal.timeout(5000), async () =>
+    stubDoc({ url: unknown, status: 200 })
+  );
+  assert.equal(result.status, 'unverified');
+  assert.equal(Object.hasOwn(result, 'page'), false);
+  assert.equal(result.http_status, 200);
+  const apiResult = await compareStore(almedina, SEARCH_ISBN, AbortSignal.timeout(5000), async () =>
+    stubDoc({ url: api, status: 200 })
+  );
+  assert.equal(apiResult.status, 'unverified');
+  assert.equal(Object.hasOwn(apiResult, 'page'), false);
+  assert.equal(apiResult.http_status, 200);
+  const point = storeResultPoint('popup', 'almedina', apiResult.status, 800, {
+    page: apiResult.page,
+    http_status: apiResult.http_status
+  });
+  assert.equal(Object.hasOwn(point, 'page'), false);
+  assert.equal(point.http_status, 200);
+  assertNoIdentifiers(point, [PRODUCT_URL, SEARCH_URL, unknown, api]);
+});
+
+test('no_price uses the last failed product response, not the search page', async () => {
+  const loader = async url => {
+    if (String(url).includes('/catalogsearch/')) {
+      return stubDoc({ url: SEARCH_URL, status: 200, hrefs: [PRODUCT_URL] });
+    }
+    const error = new Error('HTTP 404');
+    error.status = 404;
+    error.url = PRODUCT_URL;
+    throw error;
+  };
+  const result = await compareStore(almedina, SEARCH_ISBN, AbortSignal.timeout(5000), loader);
+  assert.equal(result.status, 'unverified');
+  assert.equal(result.page, 'product');
+  assert.equal(result.http_status, 404);
+  const point = storeResultPoint('popup', 'almedina', result.status, 1800, {
+    page: result.page,
+    http_status: result.http_status
+  });
+  assert.equal(point.page, 'product');
+  assert.equal(point.http_status, 404);
+  assertNoIdentifiers(point);
 });
