@@ -14,18 +14,24 @@ export const tooManyPoints = (batch, schema) =>
 function dataPoint(batch, point) {
   const bucket = point.bucket ?? '';
   const bucketMs = bucket === '' ? 0 : bucket === 'inf' ? OPEN_BUCKET_MS : Number(bucket);
+  const blobs = [
+    point.metric,
+    batch.browser,
+    batch.version,
+    point.surface ?? '',
+    point.store ?? '',
+    point.outcome ?? '',
+    bucket
+  ];
+  const doubles = [point.count, batch.sample_rate, bucketMs];
+  if (point.page != null || point.http_status != null) {
+    blobs.push(point.page ?? '');
+    doubles.push(point.http_status ?? 0);
+  }
   return {
     indexes: [point.metric],
-    blobs: [
-      point.metric,
-      batch.browser,
-      batch.version,
-      point.surface ?? '',
-      point.store ?? '',
-      point.outcome ?? '',
-      bucket
-    ],
-    doubles: [point.count, batch.sample_rate, bucketMs]
+    blobs,
+    doubles
   };
 }
 

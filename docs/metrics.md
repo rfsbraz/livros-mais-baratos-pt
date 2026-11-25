@@ -17,7 +17,7 @@ O Analytics Engine aceita 250 escritas por pedido, e o Worker usa uma delas para
 
 ## Lote
 
-O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. A extensão usa a cópia `metrics-schema.js`, porque o service worker do Chrome não volta a arrancar depois de parar quando importa JSON como módulo; um teste unitário garante que as duas cópias são iguais. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado.
+O esquema está em `metrics-schema.json` e é o mesmo para a extensão e para o Worker. A extensão usa a cópia `metrics-schema.js`, porque o service worker do Chrome não volta a arrancar depois de parar quando importa JSON como módulo; um teste unitário garante que as duas cópias são iguais. Cada valor vem de uma lista fechada ou de um formato estrito, por isso um ISBN, um URL ou um campo desconhecido fazem o lote inteiro ser rejeitado. Nos pontos `store_latency` com resultado `no_price` podem aparecer dois campos opcionais: `page` (`search` ou `product`), com o tipo do documento já depois de redirecionamentos, e `http_status`, um código HTTP entre 100 e 599. Os pontos antigos, sem estes campos, continuam válidos. Os outros resultados não os enviam.
 
 ```json
 {
@@ -43,19 +43,21 @@ O campo `day` é validado e não é guardado. O dia das consultas é o da escrit
 
 ## Dados guardados
 
-| Coluna    | Conteúdo                                                                |
-| --------- | ----------------------------------------------------------------------- |
-| `index1`  | `metric`                                                                |
-| `blob1`   | `metric`                                                                |
-| `blob2`   | `browser`                                                               |
-| `blob3`   | `version`                                                               |
-| `blob4`   | `surface`                                                               |
-| `blob5`   | `store`                                                                 |
-| `blob6`   | `outcome`                                                               |
-| `blob7`   | `bucket`                                                                |
-| `double1` | `count`                                                                 |
-| `double2` | `sample_rate`                                                           |
-| `double3` | Limite do balde em ms, para os percentis. O balde `inf` fica com 60000. |
+| Coluna    | Conteúdo                                                                                                                            |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `index1`  | `metric`                                                                                                                            |
+| `blob1`   | `metric`                                                                                                                            |
+| `blob2`   | `browser`                                                                                                                           |
+| `blob3`   | `version`                                                                                                                           |
+| `blob4`   | `surface`                                                                                                                           |
+| `blob5`   | `store`                                                                                                                             |
+| `blob6`   | `outcome`                                                                                                                           |
+| `blob7`   | `bucket`                                                                                                                            |
+| `blob8`   | `page`, só em `store_latency` com resultado `no_price`: `search` ou `product`. Vazio nas restantes linhas, incluindo lotes antigos. |
+| `double1` | `count`                                                                                                                             |
+| `double2` | `sample_rate`                                                                                                                       |
+| `double3` | Limite do balde em ms, para os percentis. O balde `inf` fica com 60000.                                                             |
+| `double4` | `http_status`, só em `store_latency` com resultado `no_price`. Ausente ou 0 nas restantes linhas.                                   |
 
 Nunca são guardados o IP, o User-Agent, o país (`request.cf` não é lido) nem a hora do cliente. O IP só serve de chave ao limite de pedidos, que usa contadores em memória. O Worker não escreve registos, e o `wrangler.toml` desliga o Logpush e a observabilidade. Os dados ficam no Analytics Engine durante três meses.
 

@@ -120,8 +120,24 @@ function pointKey(point) {
     point.surface || '',
     point.store || '',
     point.outcome || '',
-    point.bucket || ''
+    point.bucket || '',
+    point.page || '',
+    point.http_status ?? ''
   ].join('\0');
+}
+
+function noPriceFields(point) {
+  const fields = {};
+  if (point.metric !== 'store_latency' || point.outcome !== 'no_price') {
+    return fields;
+  }
+  if (point.page === 'search' || point.page === 'product') {
+    fields.page = point.page;
+  }
+  if (Number.isInteger(point.http_status) && point.http_status >= 100 && point.http_status <= 599) {
+    fields.http_status = point.http_status;
+  }
+  return fields;
 }
 
 function emptyPending() {
@@ -153,6 +169,7 @@ export function mergePoint(pending, point, count = point?.count ?? 1) {
   if (normalized.store && !STORE_IDS.has(normalized.store)) {
     return next;
   }
+  Object.assign(normalized, noPriceFields(point));
   const key = pointKey(normalized);
   const prev = next.points[key];
   const total = (prev?.count || 0) + Math.max(1, Math.floor(count));
@@ -381,7 +398,7 @@ export function configSnapshotPoints({
   return points;
 }
 
-export function storeResultPoint(surface, storeId, status, elapsedMs) {
+export function storeResultPoint(surface, storeId, status, elapsedMs, details) {
   const outcome = outcomeFromStatus(status);
   if (outcome === 'disabled' || outcome === 'cached') {
     return {
@@ -398,7 +415,13 @@ export function storeResultPoint(surface, storeId, status, elapsedMs) {
     store: storeId,
     outcome,
     bucket: latencyBucket(elapsedMs),
-    count: 1
+    count: 1,
+    ...noPriceFields({
+      metric: 'store_latency',
+      outcome,
+      page: details?.page,
+      http_status: details?.http_status
+    })
   };
 }
 

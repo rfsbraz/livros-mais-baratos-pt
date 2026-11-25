@@ -53,7 +53,10 @@ async function compare(message) {
                 undefined,
                 String(book.title || '').slice(0, 150)
               );
-              measurement.rendered(store.id, offer.status);
+              measurement.rendered(store.id, offer.status, {
+                page: offer.page,
+                http_status: offer.http_status
+              });
               return offer;
             })
         );
@@ -142,7 +145,10 @@ async function watchBook(message) {
           undefined,
           message.book.title || ''
         );
-        measurement.rendered(store.id, offer.status);
+        measurement.rendered(store.id, offer.status, {
+          page: offer.page,
+          http_status: offer.http_status
+        });
         return Object.fromEntries(
           [
             'id',
