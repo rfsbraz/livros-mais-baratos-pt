@@ -27,6 +27,19 @@
 - Tratar campos ISBN de editoras, hífenes Unicode, preços de venda apresentados e pesquisa Mundo Fantasma.
 - Documentar testes reais, falhas de acesso e limitações por loja, com amostras reconstruídas e testes de regressão no navegador.
 
+## [0.1.11](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.10...v0.1.11) (2026-11-26)
+
+
+### Funcionalidades
+
+* **metrics:** record page type and HTTP status on no_price ([#104](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/104)) ([a2184ee](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/a2184eea99bc1a0d6d6fbe7695189d753e4635e2))
+
+
+### Correções
+
+* **prices:** arredondar preços com mais casas decimais ([#105](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/105)) ([ef03457](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/ef03457dc79d563cfca7f09e24578aa32683519d))
+* **stores:** map HTTP 405 in compareStore to blocked ([#101](https://github.com/rfsbraz/livros-mais-baratos-pt/issues/101)) ([8678b5f](https://github.com/rfsbraz/livros-mais-baratos-pt/commit/8678b5f233ca780f87ed4f99287467f9bd95dd62))
+
 ## [0.1.10](https://github.com/rfsbraz/livros-mais-baratos-pt/compare/v0.1.9...v0.1.10) (2026-11-14)
 
 
