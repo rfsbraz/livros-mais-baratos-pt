@@ -107,7 +107,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
           try {
             links = shopifyProductLinks(await json(shopifySearchUrl(store, search), signal), store);
           } catch (error) {
-            if (signal.aborted || /HTTP (401|403|429)\b/.test(error.message)) {
+            if (signal.aborted || /HTTP (401|403|405|429)\b/.test(error.message)) {
               throw error;
             }
           }
@@ -142,7 +142,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
             };
             offer = (await apiOffer(link, verify)) || (await verify(link));
           } catch (error) {
-            if (signal.aborted || /HTTP (401|403|429)\b/.test(error.message)) {
+            if (signal.aborted || /HTTP (401|403|405|429)\b/.test(error.message)) {
               throw error;
             }
             /* Try the next exact-edition candidate. */
@@ -172,7 +172,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
     if (error?.name === 'TimeoutError' || /timed?\s*out/i.test(message)) {
       return { ...store, status: 'timeout', url };
     }
-    if (/HTTP (401|403|429)\b/.test(message)) {
+    if (/HTTP (401|403|405|429)\b/.test(message)) {
       return { ...store, status: 'blocked', url };
     }
     return { ...store, status: 'error', url };

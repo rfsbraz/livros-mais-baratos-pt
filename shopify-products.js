@@ -96,7 +96,7 @@ export function createShopifyLookup(now = Date.now) {
           variant.available === true ? 'InStock' : variant.available === false ? 'OutOfStock' : ''
       };
     } catch (error) {
-      if (signal.aborted || /HTTP (401|403|429)\b/.test(error.message)) {
+      if (signal.aborted || /HTTP (401|403|405|429)\b/.test(error.message)) {
         throw error;
       }
       return null;

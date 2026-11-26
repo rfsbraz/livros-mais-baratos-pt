@@ -446,3 +446,24 @@ test('Worten search errors stay classified and marketplace offers cannot win the
     null
   );
 });
+
+test('Almedina search HTTP 405 is classified as blocked, not error', async () => {
+  const almedina = STORES.find(s => s.id === 'almedina');
+  assert.equal(almedina?.adapter, 'html');
+  const originalFetch = globalThis.fetch;
+  const statuses = [];
+  globalThis.fetch = async () => {
+    const status = statuses.length ? statuses.shift() : 405;
+    throw new Error(`HTTP ${status}`);
+  };
+  try {
+    const blocked = await compareStore(almedina, '9789895701124', AbortSignal.timeout(5000));
+    assert.equal(blocked.status, 'blocked');
+    assert.equal(blocked.id, 'almedina');
+    statuses.push(500);
+    const failed = await compareStore(almedina, '9789895701124', AbortSignal.timeout(5000));
+    assert.equal(failed.status, 'error');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
