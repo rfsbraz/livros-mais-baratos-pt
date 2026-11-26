@@ -68,7 +68,11 @@ test('parses EUR into integer cents without silently interpreting ranges or disc
   assert.equal(euros('19,90'), 1990);
   assert.equal(euros('19.90'), 1990);
   assert.equal(euros(19.9), 1990);
-  for (const value of ['', null, '-5', '20% desconto', '10-20', '12.999', 0, Infinity]) {
+  assert.equal(euros('15.560801'), 1556);
+  assert.equal(euros('12.508001'), 1251);
+  assert.equal(euros('12.999'), 1300);
+  assert.equal(euros('15,560801 EUR'), 1556);
+  for (const value of ['', null, '-5', '20% desconto', '10-20', '12.99.9', 0, Infinity]) {
     assert.equal(euros(value), null);
   }
 });
@@ -441,4 +445,25 @@ test('Worten search errors stay classified and marketplace offers cannot win the
     ),
     null
   );
+});
+
+test('Almedina search HTTP 405 is classified as blocked, not error', async () => {
+  const almedina = STORES.find(s => s.id === 'almedina');
+  assert.equal(almedina?.adapter, 'html');
+  const originalFetch = globalThis.fetch;
+  const statuses = [];
+  globalThis.fetch = async () => {
+    const status = statuses.length ? statuses.shift() : 405;
+    throw new Error(`HTTP ${status}`);
+  };
+  try {
+    const blocked = await compareStore(almedina, '9789895701124', AbortSignal.timeout(5000));
+    assert.equal(blocked.status, 'blocked');
+    assert.equal(blocked.id, 'almedina');
+    statuses.push(500);
+    const failed = await compareStore(almedina, '9789895701124', AbortSignal.timeout(5000));
+    assert.equal(failed.status, 'error');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

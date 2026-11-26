@@ -28,7 +28,7 @@ export function euros(value) {
   if (s.includes(',')) {
     s = s.replace(/\./g, '').replace(',', '.');
   }
-  if (!/^\d+(\.\d{1,2})?$/.test(s)) {
+  if (!/^\d+(\.\d+)?$/.test(s)) {
     return null;
   }
   return euros(Number(s));
