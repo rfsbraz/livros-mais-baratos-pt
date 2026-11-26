@@ -33,12 +33,15 @@ export function comparisonMetrics({
         starts.set(id, now());
       }
     },
-    rendered(id, status) {
+    rendered(id, status, details) {
       if (closed || !stores.includes(id)) {
         return;
       }
       const at = now();
-      results.set(id, storeResultPoint(surface, id, status, at - (starts.get(id) ?? start)));
+      results.set(
+        id,
+        storeResultPoint(surface, id, status, at - (starts.get(id) ?? start), details)
+      );
       lastStore = id;
       if (status === 'ok' && firstPrice === undefined) {
         firstPrice = at;

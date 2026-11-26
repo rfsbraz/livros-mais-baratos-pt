@@ -13,7 +13,12 @@ async function loadText(url, signal) {
     signal: AbortSignal.any([signal, AbortSignal.timeout(12000)])
   });
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+    const error = new Error(`HTTP ${response.status}`);
+    error.status = response.status;
+    if (safeUrl(response.url, url)) {
+      error.url = response.url;
+    }
+    throw error;
   }
   if (!safeUrl(response.url, url)) {
     throw new Error('Destino fora da loja');
@@ -25,19 +30,104 @@ async function loadText(url, signal) {
   if (html.length > 4_000_000) {
     throw new Error('Resposta demasiado grande');
   }
-  return { text: html, url: response.url };
+  return { text: html, url: response.url, status: response.status };
 }
 
 export async function loadPage(url, signal) {
   const resource = await loadText(url, signal);
   const doc = new DOMParser().parseFromString(resource.text, 'text/html');
   Object.defineProperty(doc, 'shopUrl', { value: resource.url });
+  Object.defineProperty(doc, 'httpStatus', { value: resource.status });
   return doc;
+}
+
+function searchTemplate(store, template, url) {
+  if (!template) {
+    return false;
+  }
+  const resolved = new URL(url);
+  const sample = new URL(template.replace('{q}', 'QUERY'), store.origin);
+  if (resolved.origin !== sample.origin) {
+    return false;
+  }
+  const normalize = path => path.replace(/QUERY|[0-9]{10,13}/g, '{q}');
+  if (normalize(resolved.pathname) !== normalize(sample.pathname)) {
+    return false;
+  }
+  const keys = [...sample.searchParams.keys()];
+  if (keys.length && !keys.every(key => resolved.searchParams.has(key))) {
+    return false;
+  }
+  return sample.pathname !== '/' || keys.length > 0;
+}
+
+function resolvedPage(store, url) {
+  try {
+    const path = new URL(url).pathname;
+    if (store.product.test(path)) {
+      return 'product';
+    }
+    if ([store.query, store.titleQuery].some(template => searchTemplate(store, template, url))) {
+      return 'search';
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
+function httpStatusCode(value) {
+  return Number.isInteger(value) && value >= 100 && value <= 599 ? value : undefined;
+}
+
+function withNoPriceContext(result, store, resolvedUrl, status) {
+  if (result.status !== 'unverified' && result.status !== 'unavailable') {
+    return result;
+  }
+  const page = resolvedPage(store, resolvedUrl);
+  const httpStatus = httpStatusCode(status);
+  return {
+    ...result,
+    ...(page ? { page } : {}),
+    ...(httpStatus ? { http_status: httpStatus } : {})
+  };
 }
 
 export async function compareStore(store, isbn, signal, loader = loadPage, title = '') {
   const url = store.search(isbn);
-  const json = async (endpoint, abort) => JSON.parse((await loadText(endpoint, abort)).text);
+  let lastUrl = url;
+  let lastStatus;
+  const observe = resource => {
+    if (resource?.url) {
+      lastUrl = resource.url;
+    }
+    const status = httpStatusCode(resource?.status);
+    if (status) {
+      lastStatus = status;
+    }
+    return resource;
+  };
+  const recall = error => {
+    observe({ url: error.url, status: error.status });
+    throw error;
+  };
+  const load = async (target, abort) => {
+    try {
+      const doc = await loader(target, abort);
+      observe({ url: doc.shopUrl || target, status: doc.httpStatus });
+      return doc;
+    } catch (error) {
+      return recall(error);
+    }
+  };
+  const read = async (target, abort) => {
+    try {
+      return observe(await loadText(target, abort));
+    } catch (error) {
+      return recall(error);
+    }
+  };
+  const json = async (endpoint, abort) => JSON.parse((await read(endpoint, abort)).text);
   const apiOffer = (target, verify) =>
     store.adapter === 'woo-product'
       ? lookupWooProduct(store, isbn, target, signal, json, verify)
@@ -49,14 +139,14 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
       throw new Error('Cancelado');
     }
     if (store.adapter === 'woo-sku') {
-      const resource = await loadText(
+      const resource = await read(
         `${store.origin}/wp-json/wc/store/v1/products?sku=${isbn}`,
         signal
       );
       const offer = wooOffer(JSON.parse(resource.text), isbn, store.origin);
       return offer
         ? { ...store, ...offer, status: 'ok', checkedAt: Date.now() }
-        : { ...store, status: 'unverified', url };
+        : withNoPriceContext({ ...store, status: 'unverified', url }, store, lastUrl, lastStatus);
     }
     const searches = [url];
     if (title.trim()) {
@@ -91,6 +181,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
         if (!safeUrl(response.url, store.origin)) {
           throw new Error('Destino fora da loja');
         }
+        observe({ url: response.url, status: response.status });
         const text = await response.text();
         if (text.length > 4_000_000) {
           throw new Error('Resposta demasiado grande');
@@ -100,7 +191,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
         const endpoint = new URL(search);
         endpoint.pathname = '/search/__data.json';
         endpoint.searchParams.set('x-sveltekit-invalidated', '001');
-        const resource = await loadText(endpoint.href, signal);
+        const resource = await read(endpoint.href, signal);
         links = svelteProductLinks(JSON.parse(resource.text), store.origin);
       } else {
         if (store.adapter === 'shopify-search') {
@@ -113,7 +204,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
           }
         }
         if (!links?.length) {
-          const doc = await loader(search, signal);
+          const doc = await load(search, signal);
           const resolvedUrl = doc.shopUrl || search;
           offer = parseOffer(doc, isbn, resolvedUrl);
           if (offer) {
@@ -135,7 +226,7 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
             let pageOffer;
             const verify = async target => {
               if (pageOffer === undefined) {
-                const product = await loader(target, signal);
+                const product = await load(target, signal);
                 pageOffer = parseOffer(product, isbn, product.shopUrl || target);
               }
               return pageOffer;
@@ -157,7 +248,12 @@ export async function compareStore(store, isbn, signal, loader = loadPage, title
       }
     }
     if (!offer || !safeUrl(offer.url, store.origin)) {
-      return { ...store, status: 'unverified', url };
+      return withNoPriceContext(
+        { ...store, status: 'unverified', url },
+        store,
+        lastUrl,
+        lastStatus
+      );
     }
     offer = await enrichPromotion(offer, loader, signal);
     return { ...store, ...offer, status: 'ok', checkedAt: Date.now() };

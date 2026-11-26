@@ -150,6 +150,7 @@ export default {
       '59',
       '60'
     ],
+    pages: ['search', 'product'],
     surfaces: ['popup', 'auto', 'scheduled'],
     affiliateSurfaces: ['popup_offer', 'promotion_more', 'banner'],
     triggers: ['page', 'isbn_typed', 'cache_shown'],

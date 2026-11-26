@@ -1,5 +1,6 @@
 const BATCH_FIELDS = ['schema', 'browser', 'version', 'day', 'sample_rate', 'points'];
 const DIMENSIONS = ['surface', 'store', 'outcome', 'bucket'];
+const OPTIONAL = ['page', 'http_status'];
 const VERSION = /^\d{1,4}\.\d{1,4}\.\d{1,4}(\.\d{1,6})?$/;
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const isPlainObject = value => typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -12,17 +13,39 @@ export function validPoint(point, schema) {
   const dimensions = Object.hasOwn(schema.metrics, point.metric)
     ? schema.metrics[point.metric]
     : null;
-  if (!dimensions || !onlyHas(point, ['metric', 'count', ...DIMENSIONS])) {
+  if (!dimensions || !onlyHas(point, ['metric', 'count', ...DIMENSIONS, ...OPTIONAL])) {
     return false;
   }
   if (!Number.isInteger(point.count) || point.count < 1 || point.count > schema.limits.maxCount) {
     return false;
   }
-  return DIMENSIONS.every(name =>
-    dimensions[name]
-      ? schema.sets[dimensions[name]].includes(point[name])
-      : !Object.hasOwn(point, name)
-  );
+  if (
+    !DIMENSIONS.every(name =>
+      dimensions[name]
+        ? schema.sets[dimensions[name]].includes(point[name])
+        : !Object.hasOwn(point, name)
+    )
+  ) {
+    return false;
+  }
+  const hasPage = Object.hasOwn(point, 'page');
+  const hasStatus = Object.hasOwn(point, 'http_status');
+  if (!hasPage && !hasStatus) {
+    return true;
+  }
+  if (point.metric !== 'store_latency' || point.outcome !== 'no_price') {
+    return false;
+  }
+  if (hasPage && !schema.sets.pages.includes(point.page)) {
+    return false;
+  }
+  if (
+    hasStatus &&
+    (!Number.isInteger(point.http_status) || point.http_status < 100 || point.http_status > 599)
+  ) {
+    return false;
+  }
+  return true;
 }
 
 /** Whether a batch is exactly what the schema allows: every value is from a closed list or a strict format. */

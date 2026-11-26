@@ -448,7 +448,10 @@ async function start(book) {
         }
         renderOffers(offers);
         status(`${complete} de ${stores.length} lojas consultadas.`);
-        measurement.rendered(store.id, offers[index].status);
+        measurement.rendered(store.id, offers[index].status, {
+          page: offers[index].page,
+          http_status: offers[index].http_status
+        });
       }
     });
     if (token !== run) {
