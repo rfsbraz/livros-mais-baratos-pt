@@ -50,7 +50,8 @@ try {
   await page.addInitScript(
     ({ html, kind }) => {
       const timeout = AbortSignal.timeout.bind(AbortSignal);
-      AbortSignal.timeout = ms => timeout(ms === 35000 || ms === 12000 ? 150 : ms);
+      // Give routed responses time to settle on CI while retaining a timeout case.
+      AbortSignal.timeout = ms => timeout(ms === 35000 || ms === 12000 ? 2000 : ms);
       // Firefox opt-in: hold the book tab until consent is granted, then reload so
       // detection auto-starts with metrics able to record compare_run (trigger page).
       const fxReady = kind !== 'firefox' || sessionStorage.getItem('fxMetricsReady') === '1';
@@ -121,7 +122,7 @@ try {
   );
   await page.route('https://bookcover.pt/**', route => route.abort('failed'));
   await page.route('https://www.continente.pt/**', async route => {
-    await new Promise(resolve => setTimeout(resolve, 350));
+    await new Promise(resolve => setTimeout(resolve, 4000));
     await route.fulfill({ contentType: 'text/html', body: product('17.00') }).catch(() => {});
   });
   await page.route('https://metrics-livros.steamhardwarestock.com/**', async route => {

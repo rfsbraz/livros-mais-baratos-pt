@@ -68,7 +68,11 @@ test('parses EUR into integer cents without silently interpreting ranges or disc
   assert.equal(euros('19,90'), 1990);
   assert.equal(euros('19.90'), 1990);
   assert.equal(euros(19.9), 1990);
-  for (const value of ['', null, '-5', '20% desconto', '10-20', '12.999', 0, Infinity]) {
+  assert.equal(euros('15.560801'), 1556);
+  assert.equal(euros('12.508001'), 1251);
+  assert.equal(euros('12.999'), 1300);
+  assert.equal(euros('15,560801 EUR'), 1556);
+  for (const value of ['', null, '-5', '20% desconto', '10-20', '12.99.9', 0, Infinity]) {
     assert.equal(euros(value), null);
   }
 });
